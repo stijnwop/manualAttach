@@ -1000,12 +1000,14 @@ function ManualAttaching:detachPowerTakeOff(vehicle, object, noEventSend)
             end
 
             local overwriteType = overwriteOutput ~= '' and overwriteOutput or type
-            local isActive = true
+            local isActive = false
 
             if jointDesc[('%sActive'):format(type)] then
                 local input = object[('%sInput'):format(type)]
                 local outputJointDesc = overwriteOutput ~= '' and jointDesc[('%sOutput'):format(overwriteOutput)] or jointDesc[('%sOutput'):format(type)]
                 local outputObject = overwriteOutput ~= '' and object[('%sOutput'):format(overwriteOutput)] or object[('%sOutput'):format(type)]
+
+                isActive = true
 
                 if input ~= nil and input.rootNode ~= nil then
                     if input.isNonScalable ~= nil and input.isNonScalable then
