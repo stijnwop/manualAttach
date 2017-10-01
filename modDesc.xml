@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="34">
+    <author>Wopster and fruktor</author>
+    <version>1.2.1</version>
+    
+	<title>
+        <en>Manual Attaching</en>
+        <de>Manuelles Ankuppeln</de>
+		<nl>Handmatig aankoppelen</nl>
+    </title>
+    
+	<description>
+        <en><![CDATA[This mod enforces you to attach/detach tools and trailers manually
+We hope you enjoy this Mod!]]></en>
+        <de><![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
+Wir hoffen, dass du viel Spaß mit diesem Mod hast!]]></de>
+    </description>
+    
+	<iconFilename>icon.png</iconFilename>
+    <multiplayer supported="true"/>	
+	
+    <extraSourceFiles>
+        <sourceFile filename="scripts/ManualAttaching.lua"/>
+		<sourceFile filename="scripts/ManualAttachingExtensionRegister.lua"/>
+		<sourceFile filename="scripts/ManualAttachingExtension.lua"/>
+    </extraSourceFiles>
+		
+    <l10n>
+		<text name="MANUAL_ATTACHING_ATTACH">
+            <en>Attach %s</en>
+            <de>%s ankuppeln</de>
+			<nl>%s aankoppelen</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_DETACH">
+            <en>Detach %s</en>
+            <de>%s abkuppeln</de>
+			<nl>%s afkoppelen</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_ATTACHPTO">
+            <en>Attach PTO of %s</en>
+            <de>Zapfwelle von %s ankuppeln</de>
+			<nl>PTO van %s aankoppelen</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_DETACHPTO">
+            <en>Detach PTO of %s</en>
+            <de>Zapfwelle von %s abkuppeln</de>
+			<nl>PTO van %s afkoppelen</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES">
+            <en>Hold to attach hoses of %s</en>
+            <de>Schläuche von %s ankuppeln</de>
+			<nl>Houd ingedrukt om de slangen van %s aan te koppelen</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES">
+            <en>Hold to detach hoses of %s</en>
+            <de>Schläuche von %s abkuppeln</de>
+			<nl>Houd ingedrukt om de slangen van %s af te koppelen</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_LOWER_WARNING">
+            <en>Lower %s first</en>
+            <de>%s zuerst herunterlassen</de>
+			<nl>Laat %s eerst zakken</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_DETACHPTO_WARNING">
+            <en>Detach PTO of %s first</en>
+            <de>Zapfwelle von %s zuerst abbauen</de>
+			<nl>Koppel eerst de PTO van %s af</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_ATTACHPTO_WARNING">
+            <en>Attach PTO of %s first</en>
+            <de>Zapfwelle von %s anbauen</de>
+			<nl>Koppel eerst de PTO van %s aan</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING">
+            <en>Detach hoses of %s first</en>
+            <de>Schläuche von %s zuerst abbauen</de>
+			<nl>Koppel eerst de slangen van %s af</nl>
+        </text>		
+		<text name="MANUAL_ATTACHING_TURNOFF_WARNING">
+            <en>Turn %s off first</en>
+            <de>%s zuerst ausschalten</de>
+			<nl>Zet %s eerst uit</nl>
+        </text>
+		<text name="MANUAL_ATTACHING_CUT_WARNING">
+            <en>Position %s above the trailer correctly</en>
+            <de>Positioniere %s korrekt über dem Anhänger</de>
+			<nl>Positioneer %s correct boven de trailer</nl>
+        </text>
+    </l10n>
+</modDesc>
