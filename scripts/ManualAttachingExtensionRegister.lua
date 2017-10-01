@@ -8,52 +8,68 @@
 --
 
 ManualAttachingExtensionRegister = {
-	isLoaded = false
+    isLoaded = false
 }
 
 if SpecializationUtil.specializations['ManualAttachingExtension'] == nil then
-	SpecializationUtil.registerSpecialization('ManualAttachingExtension', 'ManualAttachingExtension', g_currentModDirectory .. 'scripts/ManualAttachingExtension.lua')
-	ManualAttachingExtensionRegister.isLoaded = false
+    SpecializationUtil.registerSpecialization('ManualAttachingExtension', 'ManualAttachingExtension', g_currentModDirectory .. 'scripts/ManualAttachingExtension.lua')
+    ManualAttachingExtensionRegister.isLoaded = false
 end
 
+---
+-- @param name
+--
 function ManualAttachingExtensionRegister:loadMap(name)
-	if not g_currentMission.manualAttachingExtensionLoaded then
-		if not ManualAttachingExtensionRegister.isLoaded then
-			self:register()
-		end
-		
-		g_currentMission.manualAttachingExtensionLoaded = true
-	else
-		print("ManualAttaching - error: The ManualAttachingExtension have been loaded already! Remove one of the copy's!")
-	end
+    if not g_currentMission.manualAttachingExtensionLoaded then
+        if not ManualAttachingExtensionRegister.isLoaded then
+            self:register()
+        end
+
+        g_currentMission.manualAttachingExtensionLoaded = true
+    else
+        print("ManualAttaching - error: The ManualAttachingExtension have been loaded already! Remove one of the copy's!")
+    end
 end
 
+---
+--
 function ManualAttachingExtensionRegister:deleteMap()
-	g_currentMission.manualAttachingExtensionLoaded = nil
+    g_currentMission.manualAttachingExtensionLoaded = nil
 end
 
-function ManualAttachingExtensionRegister:keyEvent(unicode, sym, modifier, isDown)
+---
+-- @param ...
+--
+function ManualAttachingExtensionRegister:keyEvent(...)
 end
 
-function ManualAttachingExtensionRegister:mouseEvent(posX, posY, isDown, isUp, button)
+---
+-- @param ...
+--
+function ManualAttachingExtensionRegister:mouseEvent(...)
 end
 
+---
+-- @param dt
+--
 function ManualAttachingExtensionRegister:update(dt)
 end
 
+---
+--
 function ManualAttachingExtensionRegister:draw()
 end
 
 ---
 --
 function ManualAttachingExtensionRegister:register()
-	for k, vehicle in pairs(VehicleTypeUtil.vehicleTypes) do
-		if vehicle ~= nil then				
-			table.insert(vehicle.specializations, SpecializationUtil.getSpecialization('ManualAttachingExtension'))		
-		end	
-	end
-	
-	ManualAttachingExtensionRegister.isLoaded = true
+    for _, vehicle in pairs(VehicleTypeUtil.vehicleTypes) do
+        if vehicle ~= nil then
+            table.insert(vehicle.specializations, SpecializationUtil.getSpecialization('ManualAttachingExtension'))
+        end
+    end
+
+    ManualAttachingExtensionRegister.isLoaded = true
 end
 
 addModEventListener(ManualAttachingExtensionRegister)
