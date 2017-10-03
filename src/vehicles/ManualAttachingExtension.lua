@@ -1,11 +1,10 @@
 --
---	Manual Attaching: Extension
+-- ManualAttachingExtension
 --
---	@author: 	 Wopster & fruktor
---	@descripion: Extension on AttacherJointGraphics and for custom Manual Attaching settings
---	@history:	 v1.0 - 2015-4-11 - Initial implementation
---				 v1.1 - 2016-4-29 - Update see changes in changelog
+-- Authors: Wopster & fruktor
+-- Description: Vehicle extension needed for Manual Attaching
 --
+-- Copyright (c) Wopster, 2015 - 2017
 
 ManualAttachingExtension = {}
 

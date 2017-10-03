@@ -1,30 +1,10 @@
 --
---	Manual Attaching
+-- ManualAttaching
 --
---	@author: 	 Wopster
---	@descripion: This script enforces you to attach/detach tools and trailers manually.
---	@history:	 v1.0 - 2015-4-11 - Initial implementation
---				 v1.1 - 2016-5-21 - Update see changes in changelog
---				 v1.2 - 2016-12-09 - Optimization and ported for FS17
+-- Authors: Wopster
+-- Description: The main specilization for Manual Attaching
 --
-
--- XML options
--- Values: boolean only
---
---[[
-
-	x = actual index (0> 0>1|1 etc)
-	boolean = true or false
-
-	<inputAttacherJoints>
-		<inputAttacherJoint index="x" isManual="boolean" />
-	</inputAttacherJoints>
-
-	<attacherJoints>
-		<attacherJoint index="x" dynamicHosesIsManual="boolean" ptoIsManual="boolean" />
-	</attacherJoints>
-
-]]
+-- Copyright (c) Wopster, 2015 - 2017
 
 ManualAttaching = {
     debug = false,

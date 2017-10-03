@@ -1,11 +1,10 @@
 --
---	ManualAttachingRegistrationHelper
+-- ManualAttachingRegistrationHelper
 --
---	@author: 	 Wopster
---	@descripion: Register for the ManualAttachingExtension
---	@history:	 v1.0 - 2015-4-11 - Initial implementation
---				 v1.1 - 2016-4-29 - Update see changes in changelog
+-- Authors: Wopster
+-- Description: The register class to load the specialization
 --
+-- Copyright (c) Wopster, 2015 - 2017
 
 ManualAttachingRegistrationHelper = {
     baseDirectory = g_currentModDirectory
