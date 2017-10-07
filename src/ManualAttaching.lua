@@ -48,6 +48,7 @@ source(ManualAttaching.baseDirectory .. 'src/events/ManualAttachingDynamicHosesE
 --
 function ManualAttaching:loadMap(filename)
     self.inRangeManual = {
+        attachedVehicle = nil,
         vehicle = nil,
         attachedImplement = nil,
         attachedImplementIndex = nil,
@@ -71,8 +72,12 @@ function ManualAttaching:loadMap(filename)
 
     self.currentSoundPlayer = nil
     self.playerDistance = math.huge
+    self.attachedPlayerDistance = math.huge
     self.attachAllowed = false
     self.detachAllowed = false
+
+    self.resetInRangeManualTable = true
+    self.resetInRangeAttachedManualTable = true
 
     g_currentMission.dynamicHoseIsManual = true
     g_currentMission.callbackManualAttaching = self
@@ -100,13 +105,29 @@ end
 -- @param dt
 --
 function ManualAttaching:update(dt)
-    self:resetManualTable()
+    if not g_currentMission:getIsClient() then
+        return
+    end
+
+    if self.resetInRangeManualTable then
+        self:resetManualAttachableTable()
+    end
+
+    if self.resetInRangeAttachedManualTable then
+        self:resetManualAttachedTable()
+    end
+
+    --    self:resetManualTable()
     self:resetNonManualTable()
 
     if self:isPlayer() then
+        self.resetInRangeManualTable = true
+        self.resetInRangeAttachedManualTable = true
+
         for _, vehicle in pairs(g_currentMission.vehicles) do
             if vehicle.isa ~= nil and vehicle:isa(Vehicle) and vehicle.stationCraneDirtyFlag == nil then -- dismiss trains and the station crane
-                self:setInRangeManual(vehicle)
+                --                self:setInRangeManual(vehicle)
+                self:getIsManualAttachableInRange(vehicle)
             end
         end
 
@@ -117,17 +138,19 @@ function ManualAttaching:update(dt)
             player.manualAttachingTimer = { time = 0, longEnough = false }
         end
 
-        if ir.vehicle ~= nil then
+        if ir.vehicle ~= nil or ir.attachedVehicle ~= nil then
             -- Handle attach / detach
             if InputBinding.hasEvent(InputBinding.ATTACH) then
                 self:handleAttachDetach()
             end
+        end
 
+        if ir.attachedVehicle ~= nil then
             if ir.attachedImplement ~= nil then
-                local implement = ir.vehicle:getImplementByObject(ir.attachedImplement)
+                local implement = ir.attachedVehicle:getImplementByObject(ir.attachedImplement)
 
                 if implement ~= nil then
-                    local jointDesc = ir.vehicle.attacherJoints[implement.jointDescIndex]
+                    local jointDesc = ir.attachedVehicle.attacherJoints[implement.jointDescIndex]
 
                     ir.attachedImplement.dynamicHoseIsManual = self:isDynamicHosesManual(jointDesc)
 
@@ -198,20 +221,59 @@ end
 
 ---
 --
-function ManualAttaching:resetManualTable()
+function ManualAttaching:resetManualAttachableTable()
     local ir = self.inRangeManual
 
-    ir.vehicle = nil
-    ir.attachedImplement = nil
-    ir.attachedImplementIndex = nil
-    ir.attachedImplementInputJoint = nil
-    ir.attachableInMountRange = nil
-    ir.attachableInMountRangeInputJointIndex = nil
-    ir.attachableInMountRangeJointIndex = nil
-    ir.attachableInMountRangeInputJoint = nil
-    ir.attachableInMountRangeJoint = nil
+    if ir.vehicle ~= nil then
+        ir.vehicle = nil
+    end
+
+    if ir.attachableInMountRange ~= nil then
+        ir.attachableInMountRange = nil
+    end
+
+    if ir.attachableInMountRangeInputJointIndex ~= nil then
+        ir.attachableInMountRangeInputJointIndex = nil
+    end
+
+    if ir.attachableInMountRangeJointIndex ~= nil then
+        ir.attachableInMountRangeJointIndex = nil
+    end
+
+    if ir.attachableInMountRangeInputJoint ~= nil then
+        ir.attachableInMountRangeInputJoint = nil
+    end
+
+
+    if ir.attachableInMountRangeJoint ~= nil then
+        ir.attachableInMountRangeJoint = nil
+    end
 
     self.playerDistance = math.huge
+end
+
+---
+--
+function ManualAttaching:resetManualAttachedTable()
+    local ir = self.inRangeManual
+
+    if ir.attachedVehicle ~= nil then
+        ir.attachedVehicle = nil
+    end
+
+    if ir.attachedImplement ~= nil then
+        ir.attachedImplement = nil
+    end
+
+    if ir.attachedImplementIndex ~= nil then
+        ir.attachedImplementIndex = nil
+    end
+
+    if ir.attachedImplementInputJoint ~= nil then
+        ir.attachedImplementInputJoint = nil
+    end
+
+    self.attachedPlayerDistance = math.huge
 end
 
 ---
@@ -229,9 +291,52 @@ function ManualAttaching:resetNonManualTable()
 end
 
 ---
--- @param vehicle
+-- @param attacherJoint
+-- @param jointTrans
+-- @param distanceSequence
 --
-function ManualAttaching:setInRangeManual(vehicle)
+function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence)
+    if #g_currentMission.attachables <= 0 or attacherJoint == nil or jointTrans == nil then
+        return
+    end
+
+    if distanceSequence == nil then
+        distanceSequence = ManualAttaching.JOINT_SEQUENCE
+    end
+
+    for _, attachable in pairs(g_currentMission.attachables) do
+        if attachable.attacherVehicle == nil then
+            for i, inputAttacherJoint in pairs(attachable.inputAttacherJoints) do
+                if attachable:getIsInputAttacherActive(inputAttacherJoint) and inputAttacherJoint.jointType == attacherJoint.jointType then
+                    local inputJointTrans = { getWorldTranslation(inputAttacherJoint.node) }
+                    local distanceJoints = Utils.vector2LengthSq(inputJointTrans[1] - jointTrans[1], inputJointTrans[3] - jointTrans[3])
+
+                    if distanceJoints < distanceSequence then
+                        if (math.abs(inputJointTrans[2] - jointTrans[2])) < ManualAttaching.JOINT_DISTANCE then
+                            local cosAngle = ManualAttaching:calculateCosAngle(inputAttacherJoint.node, attacherJoint.jointTransform)
+
+                            if cosAngle > ManualAttaching.COSANGLE_THRESHOLD or ManualAttaching:getDoesNotNeedCosAngleValidation(attacherJoint) then
+                                return attachable, inputAttacherJoint, i
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return nil, nil, nil
+end
+
+---
+-- @param vehicle
+-- @param sq
+--
+function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
+    if vehicle == nil then
+        return
+    end
+
     local playerTrans = { getWorldTranslation(g_currentMission.player.rootNode) }
     local ir = self.inRangeManual
 
@@ -240,12 +345,15 @@ function ManualAttaching:setInRangeManual(vehicle)
             local jointTrans = { getWorldTranslation(vehicle.attacherJoints[implement.jointDescIndex].jointTransform) }
             local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
 
-            if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.playerDistance then
-                ir.vehicle = vehicle
-                ir.attachedImplement = implement.object
-                ir.attachedImplementIndex = i
-                ir.attachedImplementInputJoint = implement.object.inputAttacherJoints[implement.object.inputAttacherJointDescIndex]
-                self.playerDistance = distance
+            if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.attachedPlayerDistance then
+                if ir.attachedImplement ~= implement.object then
+                    ir.attachedVehicle = vehicle
+                    ir.attachedImplement = implement.object
+                    ir.attachedImplementIndex = i
+                    ir.attachedImplementInputJoint = implement.object.inputAttacherJoints[implement.object.inputAttacherJointDescIndex]
+                    self.attachedPlayerDistance = distance
+                    self.resetInRangeAttachedManualTable = false
+                end
             end
         end
     end
@@ -257,36 +365,23 @@ function ManualAttaching:setInRangeManual(vehicle)
                 local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
 
                 if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.playerDistance then
-                    local nearestDisSequence = ManualAttaching.JOINT_SEQUENCE
+                    local attachable, inputAttacherJoint, inputAttacherJointIndex = self:getAttachableInJointRange(attacherJoint, jointTrans)
 
-                    for _, attachable in pairs(g_currentMission.attachables) do
-                        if attachable.attacherVehicle == nil then
-                            for i, inputAttacherJoint in pairs(attachable.inputAttacherJoints) do
-                                if attachable:getIsInputAttacherActive(inputAttacherJoint) and inputAttacherJoint.jointType == attacherJoint.jointType then
-                                    local inputJointTrans = { getWorldTranslation(inputAttacherJoint.node) }
-                                    local distanceJoints = Utils.vector2LengthSq(inputJointTrans[1] - jointTrans[1], inputJointTrans[3] - jointTrans[3])
+                    if attachable ~= nil and attachable ~= ir.attachableInMountRange or
+                            inputAttacherJoint ~= nil and inputAttacherJoint ~= ir.attachableInMountRangeInputJoint or
+                            inputAttacherJointIndex ~= nil and inputAttacherJointIndex ~= ir.attachableInMountRangeInputJointIndex then
+                        ir.vehicle = vehicle
+                        -- ir.attachedImplement = nil
+                        ir.attachableInMountRange = attachable
+                        ir.attachableInMountRangeInputJoint = inputAttacherJoint
+                        ir.attachableInMountRangeInputJointIndex = inputAttacherJointIndex
+                        ir.attachableInMountRangeJoint = attacherJoint
+                        ir.attachableInMountRangeJointIndex = j
 
-                                    if distanceJoints < nearestDisSequence then
-                                        if (math.abs(inputJointTrans[2] - jointTrans[2])) < ManualAttaching.JOINT_DISTANCE then
-                                            local cosAngle = ManualAttaching:calculateCosAngle(inputAttacherJoint.node, attacherJoint.jointTransform)
+                        self.playerDistance = distance
 
-                                            if cosAngle > ManualAttaching.COSANGLE_THRESHOLD or ManualAttaching:getDoesNotNeedCosAngleValidation(attacherJoint) then
-                                                ir.vehicle = vehicle
-                                                -- ir.attachedImplement = nil
-                                                ir.attachableInMountRange = attachable
-                                                ir.attachableInMountRangeInputJoint = inputAttacherJoint
-                                                ir.attachableInMountRangeInputJointIndex = i
-                                                ir.attachableInMountRangeJoint = attacherJoint
-                                                ir.attachableInMountRangeJointIndex = j
-
-                                                self.playerDistance = distance
-                                                nearestDisSequence = distanceJoints
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
+                        -- disable reset since we should have set this vehicle already
+                        self.resetInRangeManualTable = false
                     end
                 end
             end
@@ -643,7 +738,7 @@ function ManualAttaching:handleAttachDetach()
     if ir.attachableInMountRange ~= nil then
         self:attachImplement(ir.vehicle, ir.attachableInMountRange, ir.attachableInMountRangeJointIndex, ir.attachableInMountRangeInputJointIndex)
     elseif ir.attachedImplement ~= nil then
-        self:detachImplement(ir.vehicle, ir.attachedImplement, ir.attachedImplementIndex)
+        self:detachImplement(ir.attachedVehicle, ir.attachedImplement, ir.attachedImplementIndex)
     end
 end
 
@@ -779,19 +874,21 @@ end
 function ManualAttaching:handleDynamicHoses(jointDesc)
     local ir = self.inRangeManual
 
+    local vehicle = ir.attachedVehicle
+
     self:setSoundPlayer(g_currentMission.player)
 
     if not g_currentMission.player.manualAttachingTimer.longEnough and g_currentMission.dynamicHoseIsManual then
-        local implement = ir.vehicle:getImplementByObject(ir.attachedImplement)
+        local implement = vehicle:getImplementByObject(ir.attachedImplement)
         local implementJoint = ir.attachedImplement.attacherJoint
 
         if implement ~= nil then
             if jointDesc.dynamicHoseIndice ~= nil and implementJoint.dynamicHoseIndice ~= nil then
                 if implementJoint.dynamicHoseIsAttached then
                     if ir.attachedImplement.dynamicHoseIsManual then
-                        if not ((ir.attachedImplement.getIsTurnedOn ~= nil and ir.attachedImplement:getIsTurnedOn()) or (ir.vehicle.getIsTurnedOn ~= nil and ir.vehicle:getIsTurnedOn())) then
-                            self:detachDynamicHoses(ir.attachedImplement, ir.vehicle, implement.jointDescIndex)
-                            self:playSound(ir.vehicle, implementJoint, self.currentSoundPlayer)
+                        if not ((ir.attachedImplement.getIsTurnedOn ~= nil and ir.attachedImplement:getIsTurnedOn()) or (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn())) then
+                            self:detachDynamicHoses(ir.attachedImplement, vehicle, implement.jointDescIndex)
+                            self:playSound(vehicle, implementJoint, self.currentSoundPlayer)
                         else
                             self:showWarning(ManualAttaching.message.turnOffWarning, ir.attachedImplement)
                             g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
@@ -799,8 +896,8 @@ function ManualAttaching:handleDynamicHoses(jointDesc)
                     end
                 else
                     if ir.attachedImplement.dynamicHoseIsManual then
-                        self:attachDynamicHoses(ir.attachedImplement, ir.vehicle, implement.jointDescIndex)
-                        self:playSound(ir.vehicle, implementJoint, self.currentSoundPlayer)
+                        self:attachDynamicHoses(ir.attachedImplement, vehicle, implement.jointDescIndex)
+                        self:playSound(vehicle, implementJoint, self.currentSoundPlayer)
                     end
                 end
             end
@@ -848,24 +945,26 @@ end
 function ManualAttaching:handlePowerTakeOff(jointDesc)
     local ir = self.inRangeManual
 
+    local vehicle = ir.attachedVehicle
+
     self:setSoundPlayer(g_currentMission.player)
 
     if g_currentMission.player.manualAttachingTimer.time > 0 then
         if g_currentMission.player.manualAttachingTimer.time < ManualAttaching.TIMER_THRESHOLD then
-            if ir.vehicle ~= nil and ir.attachedImplement ~= nil then
+            if vehicle ~= nil and ir.attachedImplement ~= nil then
                 if ManualAttaching:hasPowerTakeOff(ir.attachedImplement) then
                     if self:isPtoManual(jointDesc) then
                         if ManualAttaching:getCanDetachPowerTakeOff(jointDesc, 'pto') or ManualAttaching:getCanDetachPowerTakeOff(jointDesc, 'pto2') or ManualAttaching:getCanDetachPowerTakeOff(jointDesc, 'movingPto') then
-                            if not ((ir.attachedImplement.getIsTurnedOn ~= nil and ir.attachedImplement:getIsTurnedOn()) or (ir.vehicle.getIsTurnedOn ~= nil and ir.vehicle:getIsTurnedOn())) then
-                                self:detachPowerTakeOff(ir.vehicle, ir.attachedImplement)
-                                self:playSound(ir.vehicle, jointDesc, self.currentSoundPlayer)
+                            if not ((ir.attachedImplement.getIsTurnedOn ~= nil and ir.attachedImplement:getIsTurnedOn()) or (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn())) then
+                                self:detachPowerTakeOff(vehicle, ir.attachedImplement)
+                                self:playSound(vehicle, jointDesc, self.currentSoundPlayer)
                             else
                                 ManualAttaching:showWarning(ManualAttaching.message.turnOffWarning, ir.attachedImplement)
                                 g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
                             end
                         else
-                            self:attachPowerTakeOff(ir.vehicle, ir.attachedImplement)
-                            self:playSound(ir.vehicle, jointDesc, self.currentSoundPlayer)
+                            self:attachPowerTakeOff(vehicle, ir.attachedImplement)
+                            self:playSound(vehicle, jointDesc, self.currentSoundPlayer)
                         end
                     end
                 end
