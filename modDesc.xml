@@ -7,6 +7,7 @@
         <en>Manual Attaching</en>
         <de>Manuelles Ankuppeln</de>
 		<nl>Handmatig aankoppelen</nl>
+		<pl>Ręczne zaczepianie</pl>
     </title>
     
 	<description>
@@ -14,6 +15,8 @@
 We hope you enjoy this Mod!]]></en>
         <de><![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
 Wir hoffen, dass du viel Spaß mit diesem Mod hast!]]></de>
+		<pl><![CDATA[Ten mod wymusza na tobie ręczne zaczepianie/oczekiwanie przyczep, maszyn i narzędzi.
+Mamy nadzieję że będziesz się dobrze bawił z tym modem!]]></pl>
     </description>
     
 	<iconFilename>icon.png</iconFilename>
@@ -28,61 +31,73 @@ Wir hoffen, dass du viel Spaß mit diesem Mod hast!]]></de>
             <en>Attach %s</en>
             <de>%s ankuppeln</de>
 			<nl>%s aankoppelen</nl>
+			<pl>Zaczep %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_DETACH">
             <en>Detach %s</en>
             <de>%s abkuppeln</de>
 			<nl>%s afkoppelen</nl>
+			<pl>Odczep %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_ATTACHPTO">
             <en>Attach PTO of %s</en>
             <de>Zapfwelle von %s ankuppeln</de>
 			<nl>PTO van %s aankoppelen</nl>
+			<pl>Podłącz WOM od %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_DETACHPTO">
             <en>Detach PTO of %s</en>
             <de>Zapfwelle von %s abkuppeln</de>
 			<nl>PTO van %s afkoppelen</nl>
+			<pl>Odłącz WOM od %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES">
             <en>Hold to attach hoses of %s</en>
             <de>Schläuche von %s ankuppeln</de>
 			<nl>Houd ingedrukt om de slangen van %s aan te koppelen</nl>
+			<pl>Przytrzymaj, aby podłączyć węże od %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES">
             <en>Hold to detach hoses of %s</en>
             <de>Schläuche von %s abkuppeln</de>
 			<nl>Houd ingedrukt om de slangen van %s af te koppelen</nl>
+			<pl>Przytrzymaj, aby odłączyć węże od %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_LOWER_WARNING">
             <en>Lower %s first</en>
             <de>%s zuerst herunterlassen</de>
 			<nl>Laat %s eerst zakken</nl>
+			<pl>Najpierw opuść %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_DETACHPTO_WARNING">
             <en>Detach PTO of %s first</en>
             <de>Zapfwelle von %s zuerst abbauen</de>
 			<nl>Koppel eerst de PTO van %s af</nl>
+			<pl>Najpierw odłącz WOM od %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_ATTACHPTO_WARNING">
             <en>Attach PTO of %s first</en>
             <de>Zapfwelle von %s anbauen</de>
 			<nl>Koppel eerst de PTO van %s aan</nl>
+			<pl>Najpierw podłącz WOM od %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING">
             <en>Detach hoses of %s first</en>
             <de>Schläuche von %s zuerst abbauen</de>
 			<nl>Koppel eerst de slangen van %s af</nl>
+			<pl>Najpierw odłącz węże od %s</pl>
         </text>		
 		<text name="MANUAL_ATTACHING_TURNOFF_WARNING">
             <en>Turn %s off first</en>
             <de>%s zuerst ausschalten</de>
 			<nl>Zet %s eerst uit</nl>
+			<pl>Najpierw wyłącz %s</pl>
         </text>
 		<text name="MANUAL_ATTACHING_CUT_WARNING">
             <en>Position %s above the trailer correctly</en>
             <de>Positioniere %s korrekt über dem Anhänger</de>
 			<nl>Positioneer %s correct boven de trailer</nl>
+			<pl>Umieść %s poprawnie nad przyczepę</pl>
         </text>
     </l10n>
 </modDesc>
