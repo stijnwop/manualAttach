@@ -32,6 +32,7 @@ ManualAttaching = {
 
 ManualAttaching.COSANGLE_THRESHOLD = math.cos(math.rad(70))
 ManualAttaching.PLAYER_MIN_DISTANCE = 9
+ManualAttaching.PLAYER_DISTANCE = math.huge
 ManualAttaching.TIMER_THRESHOLD = 200 -- ms
 ManualAttaching.DETACHING_NOT_ALLOWED_TIME = 50 -- ms
 ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED = 6
@@ -91,8 +92,8 @@ function ManualAttaching:loadMap(filename)
     }
 
     self.currentSoundPlayer = nil
-    self.playerDistance = math.huge
-    self.attachedPlayerDistance = math.huge
+    self.playerDistance = ManualAttaching.PLAYER_DISTANCE
+    self.attachedPlayerDistance = ManualAttaching.PLAYER_DISTANCE
     self.attachAllowed = false
     self.detachAllowed = false
 
@@ -275,7 +276,7 @@ function ManualAttaching:resetManualAttachableTable()
         ir.attachableInMountRangeJoint = nil
     end
 
-    self.playerDistance = math.huge
+    self.playerDistance = ManualAttaching.PLAYER_DISTANCE
 end
 
 ---
@@ -299,7 +300,7 @@ function ManualAttaching:resetManualAttachedTable()
         ir.attachedImplementInputJoint = nil
     end
 
-    self.attachedPlayerDistance = math.huge
+    self.attachedPlayerDistance = ManualAttaching.PLAYER_DISTANCE
 end
 
 ---
