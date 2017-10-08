@@ -40,6 +40,26 @@ ManualAttaching.JOINT_DISTANCE = 1.3
 ManualAttaching.JOINT_SEQUENCE = 0.6 * 0.6
 ManualAttaching.FORCED_ACTIVE_TIME_INCREASMENT = 600 -- ms
 
+local function jointTypeNameToInt(typeName)
+    local jointType = AttacherJoints.jointTypeNameToInt[typeName]
+
+    -- Custom joints needs a check if it exists in the game
+    return jointType ~= nil and jointType or -1
+end
+
+ManualAttaching.MANUAL_JOINTYPES = {
+    [jointTypeNameToInt('skidSteer')] = true,
+    [jointTypeNameToInt('cutter')] = true,
+    [jointTypeNameToInt('cutterHarvester')] = true,
+    [jointTypeNameToInt('wheelLoader')] = true,
+    [jointTypeNameToInt('frontloader')] = true,
+    [jointTypeNameToInt('telehandler')] = true,
+    [jointTypeNameToInt('hookLift')] = true,
+    [jointTypeNameToInt('semitrailer')] = true,
+    [jointTypeNameToInt('semitrailerHook')] = true,
+    [jointTypeNameToInt('fastCoupler')] = true
+}
+
 source(ManualAttaching.baseDirectory .. 'src/events/ManualAttachingPTOEvent.lua')
 source(ManualAttaching.baseDirectory .. 'src/events/ManualAttachingDynamicHosesEvent.lua')
 
@@ -1168,16 +1188,7 @@ end
 -- @param type
 --
 function ManualAttaching:isManual(vehicle, jointDesc, type)
-    if not (jointDesc.jointType == AttacherJoints.jointTypeNameToInt['skidSteer'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['cutter'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['cutterHarvester'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['wheelLoader'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['frontloader'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['telehandler'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['hookLift'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['semitrailer'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['semitrailerHook'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['fastCoupler']) then
+    if not ManualAttaching.MANUAL_JOINTYPES[jointDesc.jointType] then
         if jointDesc.isManual ~= nil then
             if not jointDesc.isManual then
                 return false
