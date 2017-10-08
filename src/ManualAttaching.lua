@@ -120,13 +120,12 @@ function ManualAttaching:update(dt)
     --    self:resetManualTable()
     self:resetNonManualTable()
 
-    if self:isPlayer() then
+    if ManualAttaching:getIsValidPlayer() then
         self.resetInRangeManualTable = true
         self.resetInRangeAttachedManualTable = true
 
         for _, vehicle in pairs(g_currentMission.vehicles) do
-            if vehicle.isa ~= nil and vehicle:isa(Vehicle) and vehicle.stationCraneDirtyFlag == nil then -- dismiss trains and the station crane
-                --                self:setInRangeManual(vehicle)
+            if ManualAttaching:getIsValidVehicle(vehicle) then
                 self:getIsManualAttachableInRange(vehicle)
             end
         end
@@ -220,6 +219,13 @@ function ManualAttaching:draw()
 end
 
 ---
+-- @param vehicle
+--
+function ManualAttaching:getIsValidVehicle(vehicle)
+    return vehicle.isa ~= nil and vehicle:isa(Vehicle) and vehicle.stationCraneDirtyFlag == nil -- dismiss trains and the station crane
+end
+
+---
 --
 function ManualAttaching:resetManualAttachableTable()
     local ir = self.inRangeManual
@@ -297,7 +303,7 @@ end
 --
 function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence)
     if #g_currentMission.attachables <= 0 or attacherJoint == nil or jointTrans == nil then
-        return
+        return nil, nil, nil
     end
 
     if distanceSequence == nil then
@@ -758,7 +764,7 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
             if ManualAttaching:isManual(object, inputJointDesc) or force then
                 vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
 
-                if ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc) then
+                if ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc, false) then
                     vehicle:setJointMoveDown(jointDescIndex, true)
 
                     if vehicle.attacherJoint ~= nil then
@@ -809,7 +815,7 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
         if ManualAttaching:isManual(vehicle, jointDesc) or force then
             if jointDesc.allowsLowering then
                 if not jointDesc.moveDown and not (jointDesc.jointType == AttacherJoints.jointTypeNameToInt['attachableFrontloader']) then
-                    if not ManualAttaching:getDoesNotNeedJointMovedown(jointDesc) then
+                    if (not ManualAttaching:getDoesNotNeedJointMovedown(jointDesc)) and (ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, false)) then
                         ManualAttaching:showWarning(ManualAttaching.message.lowerWarning, object)
                         g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
 
@@ -1139,8 +1145,21 @@ end
 
 ---
 --
-function ManualAttaching:isPlayer()
-    return g_currentMission.controlPlayer and g_currentMission.player ~= nil and not g_gui:getIsGuiVisible() and not g_currentMission.isPlayerFrozen and not g_currentMission.player.hasHPWLance and g_currentMission.player.currentTool == nil
+function ManualAttaching:getIsValidPlayer()
+    local hasHoseSystem = false
+
+    if g_currentMission.player.hoseSystem ~= nil then
+        hasHoseSystem = g_currentMission.player.hoseSystem.index ~= nil
+    end
+
+    return not hasHoseSystem and
+            g_currentMission.controlPlayer and
+            g_currentMission.player ~= nil and
+            g_currentMission.player.currentTool == nil and
+            not g_currentMission.player.hasHPWLance and
+            not g_currentMission.player.isCarryingObject and
+            not g_currentMission.isPlayerFrozen and
+            not g_gui:getIsGuiVisible()
 end
 
 ---
@@ -1157,7 +1176,8 @@ function ManualAttaching:isManual(vehicle, jointDesc, type)
             jointDesc.jointType == AttacherJoints.jointTypeNameToInt['telehandler'] or
             jointDesc.jointType == AttacherJoints.jointTypeNameToInt['hookLift'] or
             jointDesc.jointType == AttacherJoints.jointTypeNameToInt['semitrailer'] or
-            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['semitrailerHook']) then
+            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['semitrailerHook'] or
+            jointDesc.jointType == AttacherJoints.jointTypeNameToInt['fastCoupler']) then
         if jointDesc.isManual ~= nil then
             if not jointDesc.isManual then
                 return false
@@ -1205,15 +1225,19 @@ end
 -- @param object
 -- @param jointDesc
 --
-function ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc)
+function ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, onAttach)
     if object ~= nil then
         if object.mountDynamic ~= nil and object.dynamicMountObject ~= nil then
             return false
         end
 
-        if object.mower ~= nil and #object.foldingParts > 1 then
+        if object.foldingParts ~= nil and #object.foldingParts > 0 then
             return false
         end
+    end
+
+    if onAttach then
+        return jointDesc.isDefaultLowered
     end
 
     return true
@@ -1277,21 +1301,19 @@ end
 -- @param noEventSend
 --
 function ManualAttaching:playSound(vehicle, jointDesc, player, noEventSend)
-    if player ~= nil then
+    if g_currentMission:getIsClient() and player ~= nil then
         -- if not noEventSend then
         -- ManualAttachingSoundEvent.sendEvent(vehicle, jointDesc, player, noEventSend)
         -- end
 
-        if g_client ~= nil then
-            if player == self.currentSoundPlayer then
-                if jointDesc ~= nil and jointDesc.sampleAttach ~= nil then
-                    SoundUtil.playSample(jointDesc.sampleAttach, 1, 0, nil)
-                else
-                    SoundUtil.playSample(vehicle.sampleAttach, 1, 0, nil)
-                end
-
-                -- self:setSoundPlayer(nil)
+        if player == self.currentSoundPlayer then
+            if jointDesc ~= nil and jointDesc.sampleAttach ~= nil then
+                SoundUtil.playSample(jointDesc.sampleAttach, 1, 0, nil)
+            else
+                SoundUtil.playSample(vehicle.sampleAttach, 1, 0, nil)
             end
+
+            -- self:setSoundPlayer(nil)
         end
     end
 end
