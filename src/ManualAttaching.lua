@@ -243,7 +243,7 @@ end
 -- @param vehicle
 --
 function ManualAttaching:getIsValidVehicle(vehicle)
-    return vehicle.isa ~= nil and vehicle:isa(Vehicle) and vehicle.stationCraneDirtyFlag == nil -- dismiss trains and the station crane
+    return vehicle.isa ~= nil and vehicle:isa(Vehicle) and not vehicle:isa(StationCrane) -- dismiss trains and the station crane
 end
 
 ---
@@ -324,7 +324,7 @@ end
 --
 function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence)
     if #g_currentMission.attachables <= 0 or attacherJoint == nil or jointTrans == nil then
-        return nil, nil, nil
+        return nil, nil, nil, distanceSequence
     end
 
     if distanceSequence == nil then
@@ -343,7 +343,7 @@ function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, di
                             local cosAngle = ManualAttaching:calculateCosAngle(inputAttacherJoint.node, attacherJoint.jointTransform)
 
                             if cosAngle > ManualAttaching.COSANGLE_THRESHOLD or ManualAttaching:getDoesNotNeedCosAngleValidation(attacherJoint) then
-                                return attachable, inputAttacherJoint, i
+                                return attachable, inputAttacherJoint, i, distanceJoints
                             end
                         end
                     end
@@ -352,7 +352,7 @@ function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, di
         end
     end
 
-    return nil, nil, nil
+    return nil, nil, nil, distanceSequence
 end
 
 ---
@@ -366,20 +366,23 @@ function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
 
     local playerTrans = { getWorldTranslation(g_currentMission.player.rootNode) }
     local ir = self.inRangeManual
+    local distanceSequence = ManualAttaching.JOINT_SEQUENCE
 
-    if vehicle.attachedImplements ~= nil then
+    if vehicle.attachedImplements ~= nil and vehicle.attacherJoints ~= nil then
         for i, implement in pairs(vehicle.attachedImplements) do
-            local jointTrans = { getWorldTranslation(vehicle.attacherJoints[implement.jointDescIndex].jointTransform) }
-            local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
+            if implement.jointDescIndex ~= nil then
+                local jointTrans = { getWorldTranslation(vehicle.attacherJoints[implement.jointDescIndex].jointTransform) }
+                local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
 
-            if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.attachedPlayerDistance then
-                if ir.attachedImplement ~= implement.object then
-                    ir.attachedVehicle = vehicle
-                    ir.attachedImplement = implement.object
-                    ir.attachedImplementIndex = i
-                    ir.attachedImplementInputJoint = implement.object.inputAttacherJoints[implement.object.inputAttacherJointDescIndex]
-                    self.attachedPlayerDistance = distance
-                    self.resetInRangeAttachedManualTable = false
+                if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.attachedPlayerDistance then
+                    if ir.attachedImplement ~= implement.object then
+                        ir.attachedVehicle = vehicle
+                        ir.attachedImplement = implement.object
+                        ir.attachedImplementIndex = i
+                        ir.attachedImplementInputJoint = implement.object.inputAttacherJoints[implement.object.inputAttacherJointDescIndex]
+                        self.attachedPlayerDistance = distance
+                        self.resetInRangeAttachedManualTable = false
+                    end
                 end
             end
         end
@@ -392,7 +395,7 @@ function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
                 local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
 
                 if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.playerDistance then
-                    local attachable, inputAttacherJoint, inputAttacherJointIndex = self:getAttachableInJointRange(attacherJoint, jointTrans)
+                    local attachable, inputAttacherJoint, inputAttacherJointIndex, distanceSq = self:getAttachableInJointRange(attacherJoint, jointTrans)
 
                     if attachable ~= nil and attachable ~= ir.attachableInMountRange or
                             inputAttacherJoint ~= nil and inputAttacherJoint ~= ir.attachableInMountRangeInputJoint or
@@ -406,7 +409,7 @@ function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
                         ir.attachableInMountRangeJointIndex = j
 
                         self.playerDistance = distance
-
+                        distanceSequence = distanceSq
                         -- disable reset since we should have set this vehicle already
                         self.resetInRangeManualTable = false
                     end
@@ -561,96 +564,90 @@ function ManualAttaching:disableDetachRecursively(vehicle)
     if numImplements > 0 then
         for i = 1, numImplements do
             local implement = vehicle.attachedImplements[i]
-            local object = implement.object
-            local jointDesc = vehicle.attacherJoints[implement.jointDescIndex]
-            local inputJointDesc = object.inputAttacherJoints ~= nil and object.inputAttacherJoints[object.inputAttacherJointDescIndex] or nil
 
-            if jointDesc ~= nil then
-                if object ~= nil then
-                    if inputJointDesc ~= nil and ManualAttaching:isManual(object, inputJointDesc) then
-                        object.allowsDetaching = false
-                        self:disableDetachRecursively(object)
-                    else
-                        -- local allows = self:scopeAllowsDetaching(implement.object, jointDesc)
-                        object.allowsDetaching = self:scopeAllowsDetaching(object, jointDesc, false)
+            if implement.object ~= nil or implement.jointDescIndex ~= nil then
+                local object = implement.object
+                local jointDesc = vehicle.attacherJoints[implement.jointDescIndex]
+                local inputJointDesc = object.inputAttacherJoints ~= nil and object.inputAttacherJoints[object.inputAttacherJointDescIndex] or nil
 
-                        if InputBinding.hasEvent(InputBinding.ATTACH) then
-                            self:scopeAllowsDetaching(object, jointDesc)
+                if jointDesc ~= nil then
+                    if object ~= nil then
+                        if inputJointDesc ~= nil and ManualAttaching:isManual(object, inputJointDesc) then
+                            object.allowsDetaching = false
+                            self:disableDetachRecursively(object)
+                        else
+                            -- local allows = self:scopeAllowsDetaching(implement.object, jointDesc)
+                            object.allowsDetaching = self:scopeAllowsDetaching(object, jointDesc, false)
+
+                            if InputBinding.hasEvent(InputBinding.ATTACH) then
+--                                self:scopeAllowsDetaching(object, jointDesc)
+                            end
+
+                            -- Debug
+                            -- if ManualAttaching.debug then
+                            -- print(self:print_r(implement.object.allowsDetaching, 'allowsDetaching'))
+                            -- print(self:print_r(scope, 'scope'))
+                            -- end
                         end
 
-                        -- Debug
-                        -- if ManualAttaching.debug then
-                        -- print(self:print_r(implement.object.allowsDetaching, 'allowsDetaching'))
-                        -- print(self:print_r(scope, 'scope'))
-                        -- end
-                    end
+                        local checkPto = function(vehicle, object, jointDesc, type, overwriteOutput)
+                            if object[('%sInput'):format(type)] ~= nil and (jointDesc[('%sOutput'):format(type)] ~= nil or jointDesc[('%sOutput'):format(overwriteOutput)] ~= nil) then
+                                if not jointDesc[('%sActive'):format(type)] then
+                                    local canTurnOnVehicle, canTipVehicle = self:scopeAllowsInputVehicle(vehicle, object)
 
-                    local checkPto = function(vehicle, object, jointDesc, type, overwriteOutput)
-                        if object[('%sInput'):format(type)] ~= nil and (jointDesc[('%sOutput'):format(type)] ~= nil or jointDesc[('%sOutput'):format(overwriteOutput)] ~= nil) then
-                            if not jointDesc[('%sActive'):format(type)] then
-                                local canTurnOnVehicle, canTipVehicle = self:scopeAllowsInputVehicle(vehicle, object)
-
-                                if canTurnOnVehicle ~= nil then
-                                    if canTurnOnVehicle:getIsTurnedOn() then
-                                        if canTurnOnVehicle.setIsTurnedOn ~= nil then
-                                            ManualAttaching:showWarning(ManualAttaching.message.attachPtoWarning, object)
-                                            canTurnOnVehicle.manualAttachingForcedActiveSound = true -- dirty i know
-                                            canTurnOnVehicle:setIsTurnedOn(false)
-                                            canTurnOnVehicle.manualAttachingForcedActiveSound = false
-                                            -- Debug
-                                            -- if ManualAttaching.debug then
-                                            -- print(self:print_r(message, 'canTurnOnVehicle:setIsTurnedOn(false, true)'))
-                                            -- end
-                                        end
-
-                                        -- Handle AI if not stopped already
-                                        if canTurnOnVehicle.isHired ~= nil then
-                                            if canTurnOnVehicle.isHired then
+                                    if canTurnOnVehicle ~= nil then
+                                        if canTurnOnVehicle:getIsTurnedOn() then
+                                            if canTurnOnVehicle.setIsTurnedOn ~= nil then
                                                 ManualAttaching:showWarning(ManualAttaching.message.attachPtoWarning, object)
-                                                canTurnOnVehicle:stopAIVehicle()
+                                                canTurnOnVehicle.manualAttachingForcedActiveSound = true -- dirty i know
+                                                canTurnOnVehicle:setIsTurnedOn(false)
+                                                canTurnOnVehicle.manualAttachingForcedActiveSound = false
+                                            end
 
-                                                -- Debug
-                                                -- if ManualAttaching.debug then
-                                                -- print(self:print_r(message, 'canTurnOnVehicle:stopAITractor()'))
-                                                -- end
+                                            -- Handle AI if not stopped already
+                                            if canTurnOnVehicle.isHired ~= nil then
+                                                if canTurnOnVehicle.isHired then
+                                                    ManualAttaching:showWarning(ManualAttaching.message.attachPtoWarning, object)
+                                                    canTurnOnVehicle:stopAIVehicle()
+                                                end
                                             end
                                         end
                                     end
-                                end
 
-                                if canTipVehicle ~= nil then
-                                    if canTipVehicle.tipState ~= nil then
-                                        if canTipVehicle.tipState == Trailer.TIPSTATE_OPEN or canTipVehicle.tipState == Trailer.TIPSTATE_OPENING then
-                                            if canTipVehicle.tiltContainerOnDischarge ~= nil then
-                                                if not canTipVehicle.tiltContainerOnDischarge then
+                                    if canTipVehicle ~= nil then
+                                        if canTipVehicle.tipState ~= nil then
+                                            if canTipVehicle.tipState == Trailer.TIPSTATE_OPEN or canTipVehicle.tipState == Trailer.TIPSTATE_OPENING then
+                                                if canTipVehicle.tiltContainerOnDischarge ~= nil then
+                                                    if not canTipVehicle.tiltContainerOnDischarge then
+                                                        ManualAttaching:showWarning(ManualAttaching.message.attachPtoWarning, object)
+                                                        canTipVehicle:onEndTip()
+                                                    end
+                                                else
                                                     ManualAttaching:showWarning(ManualAttaching.message.attachPtoWarning, object)
                                                     canTipVehicle:onEndTip()
                                                 end
-                                            else
-                                                ManualAttaching:showWarning(ManualAttaching.message.attachPtoWarning, object)
-                                                canTipVehicle:onEndTip()
                                             end
                                         end
                                     end
                                 end
                             end
                         end
-                    end
 
-                    checkPto(vehicle, object, jointDesc, 'pto')
-                    checkPto(vehicle, object, jointDesc, 'pto2')
-                    checkPto(vehicle, object, jointDesc, 'movingPto', 'pto')
+                        checkPto(vehicle, object, jointDesc, 'pto')
+                        checkPto(vehicle, object, jointDesc, 'pto2')
+                        checkPto(vehicle, object, jointDesc, 'movingPto', 'pto')
 
-                    if inputJointDesc ~= nil then
-                        if inputJointDesc.dependentAttacherJoints ~= nil then
-                            for _, dependentAttacherJointIndex in pairs(inputJointDesc.dependentAttacherJoints) do
-                                if vehicle.attacherJoints[dependentAttacherJointIndex] ~= nil then
-                                    local dependentObject = vehicle.attachedImplements[vehicle:getImplementIndexByJointDescIndex(dependentAttacherJointIndex)]
+                        if inputJointDesc ~= nil then
+                            if inputJointDesc.dependentAttacherJoints ~= nil then
+                                for _, dependentAttacherJointIndex in pairs(inputJointDesc.dependentAttacherJoints) do
+                                    if vehicle.attacherJoints[dependentAttacherJointIndex] ~= nil then
+                                        local dependentObject = vehicle.attachedImplements[vehicle:getImplementIndexByJointDescIndex(dependentAttacherJointIndex)]
 
-                                    if dependentObject ~= nil then
-                                        checkPto(vehicle, dependentObject, vehicle.attacherJoints[dependentAttacherJointIndex], 'pto')
-                                        checkPto(vehicle, dependentObject, vehicle.attacherJoints[dependentAttacherJointIndex], 'pto2')
-                                        checkPto(vehicle, dependentObject, vehicle.attacherJoints[dependentAttacherJointIndex], 'movingPto', 'pto')
+                                        if dependentObject ~= nil then
+                                            checkPto(vehicle, dependentObject, vehicle.attacherJoints[dependentAttacherJointIndex], 'pto')
+                                            checkPto(vehicle, dependentObject, vehicle.attacherJoints[dependentAttacherJointIndex], 'pto2')
+                                            checkPto(vehicle, dependentObject, vehicle.attacherJoints[dependentAttacherJointIndex], 'movingPto', 'pto')
+                                        end
                                     end
                                 end
                             end
@@ -783,9 +780,11 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
 
         if jointDesc ~= nil and inputJointDesc ~= nil then
             if ManualAttaching:isManual(object, inputJointDesc) or force then
-                vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
+                local startLowered = ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc, true)
 
-                if ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc, false) then
+                vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex, false, nil, startLowered, false)
+
+                if startLowered then
                     vehicle:setJointMoveDown(jointDescIndex, true)
 
                     if vehicle.attacherJoint ~= nil then
@@ -800,8 +799,6 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
                 if ManualAttaching:hasPowerTakeOff(object) then
                     if ManualAttaching:isPtoManual(jointDesc) then
                         self:detachPowerTakeOff(vehicle, object)
-                        -- else
-                        -- self:attachPowerTakeOff(vehicle, object)
                     end
                 end
 
