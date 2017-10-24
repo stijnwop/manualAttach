@@ -1,11 +1,12 @@
 --
 -- DynamicHose
 --
--- @author:    	Xentro (Marcus@Xentro.se)
+-- @author:    	Xentro (Marcus@Xentro.se) and Wopster
 -- @website:	www.Xentro.se
 -- @history:	v1.0 - 2017-01-08 - Initial implementation
 -- 				v1.1 - 2017-02-15 - Pickup override by Wopster
--- 
+-- 				v1.2 - 2017-10-24 - Refactor by Wopster
+--
 --[[
 <dynamicHose>
 	<set toolIndices="0">
@@ -29,6 +30,9 @@ DynamicHose.TYPES = {
     [DynamicHose.TYPE_ISOBUS] = true
 }
 
+---
+-- @param specializations
+--
 function DynamicHose.prerequisitesPresent(specializations)
     if not SpecializationUtil.hasSpecialization(Cylindered, specializations) then
         print("Warning: Specialization DynamicHose needs the specialization Cylindered.")
@@ -39,6 +43,9 @@ function DynamicHose.prerequisitesPresent(specializations)
     return true
 end
 
+---
+-- @param savegame
+--
 function DynamicHose:preLoad(savegame)
     self.attachDynamicHose = SpecializationUtil.callSpecializationsFunction("attachDynamicHose")
     self.detachDynamicHose = SpecializationUtil.callSpecializationsFunction("detachDynamicHose")
@@ -51,13 +58,13 @@ function DynamicHose:preLoad(savegame)
     self.loadInputAttacherJoint = Utils.overwrittenFunction(self.loadInputAttacherJoint, DynamicHose.loadExtraAttacherJoints)
 
     self.gameExtensionDifficultyUpdate = DynamicHose.gameExtensionDifficultyUpdate
-
     self.enableLimitationsByType = DynamicHose.enableLimitationsByType
 
     -- Use to override the attaching/detaching of hoses.
     -- g_currentMission.dynamicHoseIsManual = true
 
     self.dynamicHoseSupport = true
+
     self.hydraulicEnabled = false
     self.electricEnabled = false
     self.airBrakeEnabled = false
@@ -69,6 +76,9 @@ function DynamicHose:preLoad(savegame)
     end
 end
 
+---
+-- @param savegame
+--
 function DynamicHose:load(savegame)
     self.hoseIsAttached = {} -- Only add hoseTypes we support for this vehicle.
     self.hoseSets = {}
@@ -149,7 +159,7 @@ function DynamicHose:load(savegame)
         i = i + 1
     end
 
-    -- Make sure we don't have valid indices
+    -- Make sure we don't have invalid indices
     for i, joint in ipairs(self.inputAttacherJoints) do
         if joint.dynamicHoseIndice ~= nil then
             if self.hoseSets[joint.dynamicHoseIndice] == nil then
@@ -175,7 +185,7 @@ function DynamicHose:load(savegame)
         self.setBrakeLightsVisibility = Utils.overwrittenFunction(self.setBrakeLightsVisibility, DynamicHose.updatedSetBrakeLightsVisibility)
         self.setReverseLightsVisibility = Utils.overwrittenFunction(self.setReverseLightsVisibility, DynamicHose.updatedSetReverseLightsVisibility)
 
-        self.updateCurrentLightState = {}
+        self.updateCurrentLightStates = false
     end
 
     if self.airBrakeEnabled then
@@ -205,6 +215,9 @@ function DynamicHose:enableLimitationsByType(type)
     end
 end
 
+---
+-- @param savegame
+--
 function DynamicHose:postLoad(savegame)
     -- setup an movingPart for the IK node, should reduce the problem to find the correct indice for it...
     for key, value in ipairs(self.hoseSets) do
@@ -258,12 +271,17 @@ function DynamicHose:postLoad(savegame)
     end
 end
 
+---
+--
 function DynamicHose:delete()
     if g_currentMission.dynamicHose ~= nil then
         g_currentMission.dynamicHose:removeHoseVehicle(self)
     end
 end
 
+---
+-- @param nodeIdent
+--
 function DynamicHose:getSaveAttributesAndNodes(nodeIdent)
     local isAttached = false
 
@@ -283,6 +301,9 @@ end
 function DynamicHose:keyEvent(...)
 end
 
+---
+-- @param dt
+--
 function DynamicHose:update(dt)
     if self.isServer and self:getIsActive() then
         if self.airBrakeEnabled and self.attacherVehicle ~= nil then
@@ -296,23 +317,29 @@ function DynamicHose:update(dt)
     end
 end
 
+---
+-- @param dt
+--
 function DynamicHose:updateTick(dt)
     if self.isServer and self.electricEnabled then
         if self:getIsHoseAttached(DynamicHose.TYPE_ELECTRIC) then
-            if (self.updateCurrentLightState["LIGHTS"] ~= nil or self.updateCurrentLightState["BEACONS"] ~= nil or self.updateCurrentLightState["TURN_LIGHT"] ~= nil or self.updateCurrentLightState["REVERSE"] ~= nil) then
+            if self.updateCurrentLightStates then
                 self:updateLightStates(true)
-                self.updateCurrentLightState["LIGHTS"] = nil
-                self.updateCurrentLightState["BEACONS"] = nil
-                self.updateCurrentLightState["TURN_LIGHT"] = nil
-                self.updateCurrentLightState["REVERSE"] = nil
+                self.updateCurrentLightStates = false
             end
         end
     end
 end
 
+---
+--
 function DynamicHose:draw()
 end
 
+---
+-- @param vehicle
+-- @param jointDescIndex
+--
 function DynamicHose:onAttach(vehicle, jointDescIndex)
     if not vehicle.dynamicHoseSupport then
         for i, set in pairs(self.hoseSets) do
@@ -337,6 +364,9 @@ function DynamicHose:onAttach(vehicle, jointDescIndex)
     end
 end
 
+---
+-- @param vehicle
+--
 function DynamicHose:onDetach(vehicle)
     if not vehicle.dynamicHoseSupport then
         for i, set in pairs(self.hoseSets) do
@@ -351,6 +381,11 @@ function DynamicHose:onDetach(vehicle)
     end
 end
 
+---
+-- @param vehicle
+-- @param jointDescIndex
+-- @param noEventSend
+--
 function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
     local setId = vehicle.attacherJoints[jointDescIndex].dynamicHoseIndice
 
@@ -401,6 +436,9 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
     end
 end
 
+---
+-- @param noEventSend
+--
 function DynamicHose:detachDynamicHose(noEventSend)
     local joint = self.attacherJoint
 
@@ -424,13 +462,20 @@ function DynamicHose:detachDynamicHose(noEventSend)
     end
 end
 
+---
+-- @param types
+-- @param attachState
+-- @param detachState
+-- @param cleanUpDetach
+--
 function DynamicHose:setHoseVisible(types, attachState, detachState, cleanUpDetach)
-    for i, hoses in pairs(types) do
-        if i ~= "movingToolCouplings" then
+    for type, hoses in pairs(types) do
+        if DynamicHose.TYPES[type] then
             for k, h in pairs(hoses) do
                 if h.attachedHose ~= nil then
                     setVisibility(h.attachedHose, attachState)
                 end
+
                 if h.detachedHose ~= nil then
                     setVisibility(h.detachedHose, detachState)
                 end
@@ -444,6 +489,11 @@ function DynamicHose:setHoseVisible(types, attachState, detachState, cleanUpDeta
     end
 end
 
+---
+-- @param hoseType
+-- @param state
+-- @param realState
+--
 function DynamicHose:setHoseAttached(hoseType, state, realState)
     if self.hoseIsAttached[hoseType] ~= nil then
         self.hoseIsAttached[hoseType].state = state
@@ -451,14 +501,17 @@ function DynamicHose:setHoseAttached(hoseType, state, realState)
     end
 end
 
+---
+-- @param hoseType
+--
 function DynamicHose:getIsHoseAttached(hoseType)
     if self.attacherVehicle ~= nil then
         if not self.attacherVehicle.dynamicHoseSupport then
             return true -- Vehicle don't support hoses, make it work anyway
         else
             if g_currentMission.dynamicHose ~= nil then -- GameExtension is activated
-                if not g_currentMission.dynamicHose:getHoseSetting("alwaysFunction") then
-                    if g_currentMission.dynamicHose:getHoseSetting("missingOneHoseFunctionAnyway") then
+                if not g_currentMission.dynamicHose:getHoseSetting('alwaysFunction') then
+                    if g_currentMission.dynamicHose:getHoseSetting('missingOneHoseFunctionAnyway') then
                         return self.hoseIsAttached[hoseType].state
                     else
                         return self.hoseIsAttached[hoseType].realState -- real state
@@ -475,6 +528,9 @@ function DynamicHose:getIsHoseAttached(hoseType)
     return false
 end
 
+---
+-- @param isHardLevel
+--
 function DynamicHose:gameExtensionDifficultyUpdate(isHardLevel)
     if self.electricEnabled then
         if isHardLevel then
@@ -489,6 +545,10 @@ function DynamicHose:gameExtensionDifficultyUpdate(isHardLevel)
 end
 
 -- Hydraulics
+---
+-- @param superFunc
+-- @param onAiTurnOn
+--
 function DynamicHose:getIsFoldAllowed(superFunc, onAiTurnOn)
     if not self:getIsHoseAttached(DynamicHose.TYPE_HYDRAULIC) then
         return false
@@ -497,6 +557,12 @@ function DynamicHose:getIsFoldAllowed(superFunc, onAiTurnOn)
     return superFunc(self, onAiTurnOn)
 end
 
+---
+-- @param superFunc
+-- @param jointDescIndex
+-- @param moveDown
+-- @param noEventSend
+--
 function DynamicHose:setJointMoveDown(superFunc, jointDescIndex, moveDown, noEventSend)
     if not self:getIsHoseAttached(DynamicHose.TYPE_HYDRAULIC) then
         if g_i18n:hasText("COUPLING_ERROR") and self:getIsActiveForInput() then
@@ -509,6 +575,9 @@ function DynamicHose:setJointMoveDown(superFunc, jointDescIndex, moveDown, noEve
     return superFunc(self, jointDescIndex, moveDown, noEventSend)
 end
 
+---
+-- @param active
+--
 function DynamicHose:updateMovingToolCouplings(active)
     for key, t in ipairs(self.hoseSets) do
         for id, v in ipairs(t.movingToolCouplings) do
@@ -525,6 +594,8 @@ function DynamicHose:updateMovingToolCouplings(active)
     end
 end
 
+---
+--
 function DynamicHose:updateHydraulicInputs()
     if SpecializationUtil.hasSpecialization(Pickup, self.specializations) then
         if not self:getIsHoseAttached(DynamicHose.TYPE_HYDRAULIC) then
@@ -544,9 +615,15 @@ function DynamicHose:updateHydraulicInputs()
 end
 
 -- Electrics
+---
+-- @param superFunc
+-- @param state
+-- @param force
+-- @param noEventSend
+--
 function DynamicHose:updatedSetLightsTypesMask(superFunc, state, force, noEventSend)
     if not self:getIsHoseAttached(DynamicHose.TYPE_ELECTRIC) then
-        self.updateCurrentLightState["LIGHTS"] = state > 0
+        self.updateCurrentLightStates = state > 0
 
         return false
     end
@@ -554,19 +631,30 @@ function DynamicHose:updatedSetLightsTypesMask(superFunc, state, force, noEventS
     return superFunc(self, state, force, noEventSend)
 end
 
+---
+-- @param superFunc
+-- @param visibility
+-- @param force
+-- @param noEventSend
+--
 function DynamicHose:updatedSetBeaconLightsVisibility(superFunc, visibility, force, noEventSend)
     if not self:getIsHoseAttached(DynamicHose.TYPE_ELECTRIC) then
-        self.updateCurrentLightState["BEACONS"] = visibility
-
+        self.updateCurrentLightStates = visibility
         return false
     end
 
     return superFunc(self, visibility, force, noEventSend)
 end
 
+---
+-- @param superFunc
+-- @param visibility
+-- @param force
+-- @param noEventSend
+--
 function DynamicHose:updatedSetTurnLightState(superFunc, visibility, force, noEventSend)
     if not self:getIsHoseAttached(DynamicHose.TYPE_ELECTRIC) then
-        self.updateCurrentLightState["TURN_LIGHT"] = visibility
+        self.updateCurrentLightStates = visibility
 
         return false
     end
@@ -574,6 +662,10 @@ function DynamicHose:updatedSetTurnLightState(superFunc, visibility, force, noEv
     return superFunc(self, visibility, force, noEventSend)
 end
 
+---
+-- @param superFunc
+-- @param visibility
+--
 function DynamicHose:updatedSetBrakeLightsVisibility(superFunc, visibility)
     if not self:getIsHoseAttached(DynamicHose.TYPE_ELECTRIC) then
         return false
@@ -582,9 +674,13 @@ function DynamicHose:updatedSetBrakeLightsVisibility(superFunc, visibility)
     return superFunc(self, visibility)
 end
 
+---
+-- @param superFunc
+-- @param visibility
+--
 function DynamicHose:updatedSetReverseLightsVisibility(superFunc, visibility)
     if not self:getIsHoseAttached(DynamicHose.TYPE_ELECTRIC) then
-        self.updateCurrentLightState["REVERSE"] = visibility
+        self.updateCurrentLightStates = visibility
 
         return false
     end
@@ -592,6 +688,10 @@ function DynamicHose:updatedSetReverseLightsVisibility(superFunc, visibility)
     return superFunc(self, visibility)
 end
 
+---
+-- @param synch
+-- @param event
+--
 function DynamicHose:updateLightStates(synch, event)
     if self.electricEnabled then
         local rootAttacherVehicle = self.attacherVehicle -- self:getRootAttacherVehicle()
@@ -612,6 +712,11 @@ function DynamicHose:updateLightStates(synch, event)
 end
 
 -- Air
+---
+-- @param superFunc
+-- @param brakePedal
+-- @param force
+--
 function DynamicHose:updatedOnBrake(superFunc, brakePedal, force)
     if not self:getIsHoseAttached(DynamicHose.TYPE_AIR) then
         brakePedal = 1
@@ -619,6 +724,9 @@ function DynamicHose:updatedOnBrake(superFunc, brakePedal, force)
     end
 end
 
+---
+-- @param superFunc
+--
 function DynamicHose:updatedOnReleaseBrake(superFunc)
     if self:getIsHoseAttached(DynamicHose.TYPE_AIR) then
         self.airBrakeActive = false
@@ -626,6 +734,26 @@ function DynamicHose:updatedOnReleaseBrake(superFunc)
     end
 end
 
+-- ISO Bus
+---
+-- @param superFunc
+-- @param fillLevelInformations
+--
+function DynamicHose:getFillLevelInformation(superFunc, fillLevelInformations)
+    if not self:getIsHoseAttached(DynamicHose.TYPE_ISOBUS) then
+        return fillLevelInformations
+    end
+
+    return superFunc(self, fillLevelInformations)
+end
+
+---
+-- @param superFunc
+-- @param xmlFile
+-- @param key
+-- @param inputAttacherJoint
+-- @param index
+--
 function DynamicHose:loadExtraAttacherJoints(superFunc, xmlFile, key, inputAttacherJoint, index)
     if superFunc ~= nil then
         if not superFunc(self, xmlFile, key, inputAttacherJoint, index) then
@@ -639,15 +767,6 @@ function DynamicHose:loadExtraAttacherJoints(superFunc, xmlFile, key, inputAttac
     return true
 end
 
--- ISO Bus
-function DynamicHose:getFillLevelInformation(superFunc, fillLevelInformations)
-    if not self:getIsHoseAttached(DynamicHose.TYPE_ISOBUS) then
-        return fillLevelInformations
-    end
-
-    return superFunc(self, fillLevelInformations)
-end
-
 -- Event
 DynamicHoseEvent = {}
 
@@ -657,22 +776,22 @@ DynamicHoseEvent.NUM_BITS = 1
 
 DynamicHoseEvent_mt = Class(DynamicHoseEvent, Event)
 
-InitEventClass(DynamicHoseEvent, "DynamicHoseEvent")
+InitEventClass(DynamicHoseEvent, 'DynamicHoseEvent')
 
 function DynamicHoseEvent:emptyNew()
-    local self = Event:new(DynamicHoseEvent_mt)
-    return self
+    local event = Event:new(DynamicHoseEvent_mt)
+    return event
 end
 
 function DynamicHoseEvent:new(object, eventType, vehicle, jointDescIndex)
-    local self = DynamicHoseEvent:emptyNew()
+    local event = DynamicHoseEvent:emptyNew()
 
-    self.object = object
-    self.eventType = eventType
-    self.vehicle = vehicle
-    self.jointDescIndex = jointDescIndex
+    event.object = object
+    event.eventType = eventType
+    event.vehicle = vehicle
+    event.jointDescIndex = jointDescIndex
 
-    return self
+    return event
 end
 
 function DynamicHoseEvent:readStream(streamId, connection)
