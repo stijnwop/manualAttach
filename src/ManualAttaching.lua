@@ -580,7 +580,7 @@ function ManualAttaching:disableDetachRecursively(vehicle)
                             object.allowsDetaching = self:scopeAllowsDetaching(object, jointDesc, false)
 
                             if InputBinding.hasEvent(InputBinding.ATTACH) then
---                                self:scopeAllowsDetaching(object, jointDesc)
+                                --                                self:scopeAllowsDetaching(object, jointDesc)
                             end
 
                             -- Debug
