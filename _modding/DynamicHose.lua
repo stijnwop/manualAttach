@@ -639,6 +639,15 @@ function DynamicHose:loadExtraAttacherJoints(superFunc, xmlFile, key, inputAttac
     return true
 end
 
+-- ISO Bus
+function DynamicHose:getFillLevelInformation(superFunc, fillLevelInformations)
+    if not self:getIsHoseAttached(DynamicHose.TYPE_ISOBUS) then
+        return fillLevelInformations
+    end
+
+    return superFunc(self, fillLevelInformations)
+end
+
 -- Event
 DynamicHoseEvent = {}
 
