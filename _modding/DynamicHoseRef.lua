@@ -18,20 +18,29 @@
 ]] --
 
 DynamicHoseRef = {}
+DynamicHoseRef.TYPE_HYDRAULIC = 'hydraulic'
+DynamicHoseRef.TYPE_ELECTRIC = 'electric'
+DynamicHoseRef.TYPE_AIR = 'air'
+DynamicHoseRef.TYPE_ISOBUS = 'isobus'
 
+DynamicHoseRef.TYPES = {
+    [DynamicHoseRef.TYPE_HYDRAULIC] = true,
+    [DynamicHoseRef.TYPE_ELECTRIC] = true,
+    [DynamicHoseRef.TYPE_AIR] = true,
+    [DynamicHoseRef.TYPE_ISOBUS] = true
+}
+
+---
+-- @param specializations
+--
 function DynamicHoseRef.prerequisitesPresent(specializations)
     return true
 end
 
+---
+-- @param saveGame
+--
 function DynamicHoseRef:preLoad(saveGame)
-    if g_currentMission.dynamicHoseTypes == nil then
-        g_currentMission.dynamicHoseTypes = {}
-
-        g_currentMission.dynamicHoseTypes["hydraulic"] = true
-        g_currentMission.dynamicHoseTypes["electric"] = true
-        g_currentMission.dynamicHoseTypes["air"] = true
-    end
-
     self.getDynamicRefSet = DynamicHoseRef.getDynamicRefSet
     self.canWeAttachHose = DynamicHoseRef.canWeAttachHose
     self.loadAttacherJointFromXML = Utils.overwrittenFunction(self.loadAttacherJointFromXML, DynamicHoseRef.loadExtraAttacherJoints)
@@ -40,24 +49,33 @@ function DynamicHoseRef:preLoad(saveGame)
 
     -- For the future..
     if g_currentMission.dynamicHose ~= nil then
-        g_currentMission.dynamicHose:addRefVehicle(self, 1.0)
+        g_currentMission.dynamicHose:addRefVehicle(self)
     end
 end
 
+---
+-- @param saveGame
+--
 function DynamicHoseRef:load(saveGame)
     self.activeHoseTypes = {}
     self.hoseRefSets = {}
 
     local i = 0
     while true do
-        local key = string.format("vehicle.dynamicHose.set(%d)", i)
-        if not hasXMLProperty(self.xmlFile, key) then break end
+        local key = ('vehicle.dynamicHose.set(%d)'):format(i)
 
-        local set
+        if not hasXMLProperty(self.xmlFile, key) then
+            break
+        end
+
+        local set = {}
         local r = 0
         while true do
-            local refKey = string.format(key .. ".ref(%d)", r)
-            if not hasXMLProperty(self.xmlFile, refKey) then break end
+            local refKey = ('%s.ref(%d)'):format(key, r)
+
+            if not hasXMLProperty(self.xmlFile, refKey) then
+                break
+            end
 
             local node = Utils.indexToObject(self.components, getXMLString(self.xmlFile, refKey .. "#index"))
             local create = Utils.getNoNil(getXMLBool(self.xmlFile, refKey .. "#create"), false)
@@ -65,7 +83,7 @@ function DynamicHoseRef:load(saveGame)
             if (node ~= nil or create) then
                 local hoseType = string.lower(Utils.getNoNil(getXMLString(self.xmlFile, refKey .. "#type"), "hydraulic"))
 
-                if g_currentMission.dynamicHoseTypes[hoseType] then
+                if DynamicHoseRef.TYPES[hoseType] then
                     if create then
                         local linkNode = Utils.indexToObject(self.components, Utils.getNoNil(getXMLString(self.xmlFile, refKey .. "#linkNode"), "0>"))
                         node = createTransformGroup("DynamicHose_Set_" .. i .. "_Ref_" .. r)
@@ -83,8 +101,9 @@ function DynamicHoseRef:load(saveGame)
                         link(linkNode, node)
                     end
 
-                    if set == nil then set = {} end
-                    if set[hoseType] == nil then set[hoseType] = {} end
+                    if set[hoseType] == nil then
+                        set[hoseType] = {}
+                    end
 
                     self.activeHoseTypes[hoseType] = true
                     table.insert(set[hoseType], node)
@@ -117,45 +136,62 @@ function DynamicHoseRef:load(saveGame)
     end
 end
 
+---
+--
 function DynamicHoseRef:delete()
     if g_currentMission.dynamicHose ~= nil then
         g_currentMission.dynamicHose:removeRefVehicle(self)
     end
 end
 
-function DynamicHoseRef:readStream(streamId, connection)
+---
+-- @param ...
+--
+function DynamicHoseRef:mouseEvent(...)
 end
 
-function DynamicHoseRef:writeStream(streamId, connection)
+---
+-- @param ...
+--
+function DynamicHoseRef:keyEvent(...)
 end
 
-function DynamicHoseRef:mouseEvent(posX, posY, isDown, isUp, button)
-end
-
-function DynamicHoseRef:keyEvent(unicode, sym, modifier, isDown)
-end
-
+---
+-- @param dt
+--
 function DynamicHoseRef:update(dt)
 end
 
-function DynamicHoseRef:updateTick(dt)
-end
-
+---
+--
 function DynamicHoseRef:draw()
 end
 
+---
+-- @param id
+--
 function DynamicHoseRef:getDynamicRefSet(id)
     return self.hoseRefSets[id]
 end
 
+---
+-- @param name
+--
 function DynamicHoseRef:canWeAttachHose(name)
     if not self.activeHoseTypes[name] then
         return false
-    else
-        return true
     end
+
+    return true
 end
 
+---
+-- @param oldFunc
+-- @param attacherJoint
+-- @param xmlFile
+-- @param key
+-- @param index
+--
 function DynamicHoseRef:loadExtraAttacherJoints(oldFunc, attacherJoint, xmlFile, key, index)
     if oldFunc ~= nil then
         if not oldFunc(self, attacherJoint, xmlFile, key, index) then
