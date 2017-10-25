@@ -445,7 +445,7 @@ end
 ---
 -- @param noEventSend
 --
-function DynamicHose:detachDynamicHose(noEventSend, vehicle)
+function DynamicHose:detachDynamicHose(noEventSend)
     local joint = self.attacherJoint
 
     if joint ~= nil then
