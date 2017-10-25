@@ -141,10 +141,10 @@ function ManualAttaching:update(dt)
     --    self:resetManualTable()
     self:resetNonManualTable()
 
-    if ManualAttaching:getIsValidPlayer() then
-        self.resetInRangeManualTable = true
-        self.resetInRangeAttachedManualTable = true
+    self.resetInRangeManualTable = true
+    self.resetInRangeAttachedManualTable = true
 
+    if ManualAttaching:getIsValidPlayer() then
         for _, vehicle in pairs(g_currentMission.vehicles) do
             if ManualAttaching:getIsValidVehicle(vehicle) then
                 self:getIsManualAttachableInRange(vehicle)
