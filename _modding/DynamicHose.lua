@@ -1,11 +1,12 @@
 --
 -- DynamicHose
 --
--- @author:    	Xentro (Marcus@Xentro.se) and Wopster
--- @website:	www.Xentro.se
--- @history:	v1.0 - 2017-01-08 - Initial implementation
--- 				v1.1 - 2017-02-15 - Pickup override by Wopster
--- 				v1.2 - 2017-10-24 - Refactor by Wopster
+-- Authors: Xentro (Marcus@Xentro.se) and Wopster
+-- Description: The hose specialization for the DynamicHoses
+-- History:
+--      - v1.0 - 2017-01-08 - Initial implementation
+--      - v1.1 - 2017-02-15 - Pickup override by Wopster
+--      - v1.2 - 2017-10-25 - Refactor by Wopster
 --
 --[[
 <dynamicHose>

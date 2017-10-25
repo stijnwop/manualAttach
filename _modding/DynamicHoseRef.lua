@@ -1,16 +1,23 @@
 --
 -- DynamicHoseRef
 --
--- @author:    	Xentro (Marcus@Xentro.se)
--- @website:	www.Xentro.se
--- @history:	v1.0 - 2017-01-08 - Initial implementation
--- 
+-- Authors: Xentro (Marcus@Xentro.se) and Wopster
+-- Description: The reference specialization for the DynamicHoses
+-- History:
+--      - v1.0 - 2017-01-08 - Initial implementation
+--      - v1.1 - 2017-10-25 - Refactor by Wopster
+--
 --[[
 <dynamicHose>
 	<set>
 		<!-- if you have an node in the I3D -->
 		<ref type="hydraulic" index="0>0" />
-		
+
+		<!-- if you want to use object change -->
+		<ref type="hydraulic" index="0>0">
+		    <objectChange ... />
+		</ref>
+
 		<!-- If you don't have the above then the below will create them for you. -->
 		<ref type="hydraulic" create="true" linkNode="0>" position="0.139 1.463 -2.114" rotation="0 0 0" />
 	</set>
