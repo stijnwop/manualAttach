@@ -366,8 +366,9 @@ end
 
 ---
 -- @param vehicle
+-- @param jointDescIndex
 --
-function DynamicHose:onDetach(vehicle)
+function DynamicHose:onDetach(vehicle, jointDescIndex)
     if not vehicle.dynamicHoseSupport then
         for i, set in pairs(self.hoseSets) do
             self:setHoseVisible(set, false, true)
@@ -397,7 +398,7 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
         joint.dynamicHoseIsAttached = true
 
         for hoseType, allowed in pairs(DynamicHose.TYPES) do
-            if allowed and vehicle:canWeAttachHose(hoseType) then
+            if allowed and vehicle:getCanAttachHose(hoseType) then
                 local selectedRefs = refs[hoseType]
                 local selectedHoses = hoses[hoseType]
 
@@ -408,10 +409,14 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
 
                         if attachHose then
                             self:setHoseAttached(hoseType, true, true)
-                            part.referenceFrame = selectedRefs[i]
+                            part.referenceFrame = selectedRefs[i].node
 
                             if g_currentMission.dynamicHoseIsManual ~= nil and g_currentMission.dynamicHoseIsManual then
                                 Cylindered.setDirty(self, part)
+                            end
+
+                            if vehicle.setDynamicRefSetObjectChanges ~= nil then
+                                vehicle:setDynamicRefSetObjectChanges(true, setId, hoseType, i)
                             end
                         else
                             self:setHoseAttached(hoseType, true, false) -- not all hoses are attached, keep it functioning. Make it an toggleable setting.
@@ -420,6 +425,7 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
                         if v.attachedHose ~= nil then
                             setVisibility(v.attachedHose, attachHose)
                         end
+
                         if v.detachedHose ~= nil then
                             setVisibility(v.detachedHose, not attachHose)
                         end
@@ -439,7 +445,7 @@ end
 ---
 -- @param noEventSend
 --
-function DynamicHose:detachDynamicHose(noEventSend)
+function DynamicHose:detachDynamicHose(noEventSend, vehicle)
     local joint = self.attacherJoint
 
     if joint ~= nil then
@@ -456,6 +462,14 @@ function DynamicHose:detachDynamicHose(noEventSend)
             self:setHoseVisible(hoses, false, true, true)
             self:updateMovingToolCouplings(true)
             self:updateHydraulicInputs()
+
+            if self.attacherVehicle ~= nil then
+                local implement = self.attacherVehicle:getImplementByObject(self)
+
+                if self.attacherVehicle.resetDynamicRefSetObjectChanges ~= nil then
+                    self.attacherVehicle:resetDynamicRefSetObjectChanges(self.attacherVehicle.attacherJoints[implement.jointDescIndex].dynamicHoseIndice)
+                end
+            end
 
             DynamicHoseEvent.sendEvent(self, DynamicHoseEvent.DETACH_HOSE, nil, nil, noEventSend)
         end

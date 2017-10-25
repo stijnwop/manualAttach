@@ -42,7 +42,9 @@ end
 --
 function DynamicHoseRef:preLoad(saveGame)
     self.getDynamicRefSet = DynamicHoseRef.getDynamicRefSet
-    self.canWeAttachHose = DynamicHoseRef.canWeAttachHose
+    self.getCanAttachHose = DynamicHoseRef.getCanAttachHose
+    self.setDynamicRefSetObjectChanges = DynamicHoseRef.setDynamicRefSetObjectChanges
+    self.resetDynamicRefSetObjectChanges = DynamicHoseRef.resetDynamicRefSetObjectChanges
     self.loadAttacherJointFromXML = Utils.overwrittenFunction(self.loadAttacherJointFromXML, DynamicHoseRef.loadExtraAttacherJoints)
 
     self.dynamicHoseSupport = true
@@ -81,7 +83,7 @@ function DynamicHoseRef:load(saveGame)
             local create = Utils.getNoNil(getXMLBool(self.xmlFile, refKey .. "#create"), false)
 
             if (node ~= nil or create) then
-                local hoseType = string.lower(Utils.getNoNil(getXMLString(self.xmlFile, refKey .. "#type"), "hydraulic"))
+                local hoseType = Utils.getNoNil(getXMLString(self.xmlFile, refKey .. "#type"), "hydraulic"):lower()
 
                 if DynamicHoseRef.TYPES[hoseType] then
                     if create then
@@ -106,7 +108,16 @@ function DynamicHoseRef:load(saveGame)
                     end
 
                     self.activeHoseTypes[hoseType] = true
-                    table.insert(set[hoseType], node)
+
+                    local entry = {
+                        node = node,
+                        changeObjects = {}
+                    }
+
+                    ObjectChangeUtil.loadObjectChangeFromXML(self.xmlFile, refKey, entry.changeObjects, self.components, self)
+
+                    table.insert(set[hoseType], entry)
+
                     r = r + 1
                 else
                     print("DynamicHose - Error: " .. hoseType .. " is not an valid type. " .. self.configFileName)
@@ -126,7 +137,7 @@ function DynamicHoseRef:load(saveGame)
     end
 
     -- Make sure we have valid indices
-    for i, joint in ipairs(self.attacherJoints) do
+    for _, joint in ipairs(self.attacherJoints) do
         if joint.dynamicHoseIndice ~= nil then
             if self.hoseRefSets[joint.dynamicHoseIndice] == nil then
                 print("DynamicHose - Error: Invalid dynamicHoseIndice (" .. (joint.dynamicHoseIndice - 1) .. ") in " .. self.configFileName)
@@ -168,16 +179,49 @@ function DynamicHoseRef:draw()
 end
 
 ---
+-- @param setId
+--
+function DynamicHoseRef:getDynamicRefSet(setId)
+    return self.hoseRefSets[setId]
+end
+
+---
+-- @param visibility
+-- @param setId
+-- @param hoseType
 -- @param id
 --
-function DynamicHoseRef:getDynamicRefSet(id)
-    return self.hoseRefSets[id]
+function DynamicHoseRef:setDynamicRefSetObjectChanges(visibility, setId, hoseType, id)
+    local set = self.hoseRefSets[setId]
+
+    if set ~= nil and set[hoseType] ~= nil and set[hoseType][id] ~= nil then
+        ObjectChangeUtil.setObjectChanges(set[hoseType][id].changeObjects, visibility, self, self.setMovingToolDirty)
+    end
+end
+
+---
+-- @param setId
+--
+function DynamicHoseRef:resetDynamicRefSetObjectChanges(setId)
+    local set = self.hoseRefSets[setId]
+
+    for hoseType, allowed in pairs(DynamicHoseRef.TYPES) do
+        if allowed then
+            local typeSetRefs = set[hoseType]
+
+            if typeSetRefs ~= nil then
+                for _, s in pairs(typeSetRefs) do
+                    ObjectChangeUtil.setObjectChanges(s.changeObjects, false, self, self.setMovingToolDirty)
+                end
+            end
+        end
+    end
 end
 
 ---
 -- @param name
 --
-function DynamicHoseRef:canWeAttachHose(name)
+function DynamicHoseRef:getCanAttachHose(name)
     if not self.activeHoseTypes[name] then
         return false
     end
