@@ -221,9 +221,7 @@ function ManualAttaching:update(dt)
             self.detachAllowed = false
         end
 
-        if not self.detachAllowed then
-            g_currentMission.attachableInMountRange = nil
-        end
+        g_currentMission.attachableInMountRange = nil
     end
 
     self:drawHud()
@@ -317,7 +315,7 @@ end
 -- @param jointTrans
 -- @param distanceSequence
 --
-function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence)
+function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence, isManualCheck)
     if #g_currentMission.attachables <= 0 or attacherJoint == nil or jointTrans == nil then
         return nil, nil, nil, distanceSequence
     end
@@ -338,7 +336,11 @@ function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, di
                             local cosAngle = ManualAttaching:calculateCosAngle(inputAttacherJoint.node, attacherJoint.jointTransform)
 
                             if cosAngle > ManualAttaching.COSANGLE_THRESHOLD or ManualAttaching:getDoesNotNeedCosAngleValidation(attacherJoint) then
-                                return attachable, inputAttacherJoint, i, distanceJoints
+                                local isManual = ManualAttaching:isManual(attachable, inputAttacherJoint)
+
+                                if (isManualCheck and isManual) or (not isManualCheck and not isManual) then
+                                    return attachable, inputAttacherJoint, i, distanceJoints
+                                end
                             end
                         end
                     end
@@ -390,7 +392,7 @@ function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
                 local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
 
                 if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < self.playerDistance then
-                    local attachable, inputAttacherJoint, inputAttacherJointIndex, distanceSq = self:getAttachableInJointRange(attacherJoint, jointTrans)
+                    local attachable, inputAttacherJoint, inputAttacherJointIndex, distanceSq = self:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence, true)
 
                     if attachable ~= nil and attachable ~= ir.attachableInMountRange or
                             inputAttacherJoint ~= nil and inputAttacherJoint ~= ir.attachableInMountRangeInputJoint or
@@ -427,7 +429,7 @@ function ManualAttaching:setInRangeNonManual(vehicle)
                     local jointTrans = { getWorldTranslation(attacherJoint.jointTransform) }
                     local distanceSequence = ManualAttaching.JOINT_SEQUENCE
 
-                    local attachable, inputAttacherJoint, inputAttacherJointIndex, distanceSq = self:getAttachableInJointRange(attacherJoint, jointTrans)
+                    local attachable, inputAttacherJoint, inputAttacherJointIndex, distanceSq = self:getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence, false)
 
                     if attachable ~= nil and attachable ~= ir.attachableInMountRange or
                             inputAttacherJoint ~= nil and inputAttacherJoint ~= ir.attachableInMountRangeInputJoint or
@@ -558,7 +560,7 @@ function ManualAttaching:disableDetachRecursively(vehicle)
                             object.allowsDetaching = self:scopeAllowsDetaching(object, jointDesc, false)
 
                             if InputBinding.hasEvent(InputBinding.ATTACH) then
-                                --                                self:scopeAllowsDetaching(object, jointDesc)
+                                self:scopeAllowsDetaching(object, jointDesc)
                             end
 
                             -- Debug
