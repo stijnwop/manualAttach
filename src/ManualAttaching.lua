@@ -677,8 +677,11 @@ function ManualAttaching:scopeAllowsDetaching(object, jointDesc, showWarning)
         end
     end
 
-    if warning ~= nil and showWarning then
-        ManualAttaching:showWarning(warning, object)
+    if warning ~= nil then
+        if showWarning then
+            ManualAttaching:showWarning(warning, object)
+        end
+
         g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
     end
 
@@ -799,6 +802,28 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
     return true
 end
 
+local function getAllowDetachFromLockNodes(object)
+    if object.detachLockNodes ~= nil then
+        for entry, data in pairs(object.detachLockNodes) do
+            local rot = { getRotation(entry.node) }
+
+            if data.detachingRotMinLimit ~= nil and rot[entry.rotationAxis] < data.detachingRotMinLimit
+                    or data.detachingRotMaxLimit ~= nil and rot[entry.rotationAxis] > data.detachingRotMaxLimit then
+                return false
+            end
+
+            local trans = { getTranslation(entry.node) }
+
+            if data.detachingTransMinLimit ~= nil and trans[entry.translationAxis] < data.detachingTransMinLimit
+                    or data.detachingTransMaxLimit ~= nil and trans[entry.translationAxis] > data.detachingTransMaxLimit then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 ---
 -- @param vehicle
 -- @param object
@@ -852,6 +877,12 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
                     -- self.ma.targetAttachable:aiTurnOff()
                     -- self.ma.targetAttachable.attacherVehicle:aiTurnOff()
                     -- end
+                end
+
+                if not getAllowDetachFromLockNodes(object) then
+                    g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
+
+                    return false
                 end
 
                 if (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn()) or (object.getIsTurnedOn ~= nil and object:getIsTurnedOn()) then
