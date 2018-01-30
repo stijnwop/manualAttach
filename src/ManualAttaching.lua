@@ -809,7 +809,7 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
                     end
                 end
 
-                if object.activateOnLowering ~= nil and object.activateOnLowering then
+                if object.activateOnLowering ~= nil and object.activateOnLowering or object.needsActivation ~= nil and object.needsActivation then
                     if object.setIsTurnedOn ~= nil then
                         object:setIsTurnedOn(false)
                     end
