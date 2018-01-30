@@ -716,7 +716,7 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
 
         if jointDesc ~= nil and inputJointDesc ~= nil then
             if ManualAttaching:isManual(object, inputJointDesc) or force then
-                local startLowered = ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc, true)
+                local startLowered = ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc)
 
                 vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex, false, nil, startLowered, false)
 
@@ -792,7 +792,7 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
         if ManualAttaching:isManual(vehicle, jointDesc) or force then
             if inputJointDesc.allowsLowering then
                 if not jointDesc.moveDown and not (inputJointDesc.jointType == AttacherJoints.jointTypeNameToInt['attachableFrontloader']) then
-                    if (not ManualAttaching:getDoesNotNeedJointMovedown(jointDesc)) and (ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, false)) then
+                    if (not ManualAttaching:getDoesNotNeedJointMovedown(jointDesc)) and (ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc)) then
                         ManualAttaching:showWarning(ManualAttaching.message.lowerWarning, object)
                         g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
 
@@ -1180,9 +1180,8 @@ end
 ---
 -- @param object
 -- @param jointDesc
--- @param onAttach
 --
-function ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, onAttach)
+function ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc)
     if object ~= nil then
         if object.mountDynamic ~= nil and object.dynamicMountObject ~= nil then
             return false
@@ -1192,10 +1191,6 @@ function ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, onAttach)
         if object.foldMiddleAnimTime ~= nil then
             return false
         end
-    end
-
-    if onAttach then
-        return jointDesc.isDefaultLowered
     end
 
     return true
