@@ -63,14 +63,14 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <de>Schläuche von %s ankuppeln</de>
             <nl>Houd ingedrukt om de slangen van %s aan te koppelen</nl>
             <pl>Przytrzymaj, aby podłączyć węże od %s</pl>
-            <ru>Нажмите и удерживайте, чтобы присоединить шланги %s</ru>
+            <ru>Удерживайте, чтобы присоединить шланги %s</ru>
         </text>
         <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES">
             <en>Hold to detach hoses of %s</en>
             <de>Schläuche von %s abkuppeln</de>
             <nl>Houd ingedrukt om de slangen van %s af te koppelen</nl>
             <pl>Przytrzymaj, aby odłączyć węże od %s</pl>
-            <ru>Нажмите и удерживайте, чтобы отсоединить шланги %s</ru>
+            <ru>Удерживайте, чтобы отсоединить шланги %s</ru>
         </text>
         <text name="MANUAL_ATTACHING_LOWER_WARNING">
             <en>Lower %s first</en>
