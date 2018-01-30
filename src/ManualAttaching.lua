@@ -131,17 +131,8 @@ function ManualAttaching:update(dt)
     end
 
     self:resetNonManualTable()
-
-    if self.resetInRangeManualTable then
-        self:resetManualAttachableTable()
-    end
-
-    if self.resetInRangeAttachedManualTable then
-        self:resetManualAttachedTable()
-    end
-
-    self.resetInRangeManualTable = true
-    self.resetInRangeAttachedManualTable = true
+    self:resetManualAttachableTable()
+    self:resetManualAttachedTable()
 
     if ManualAttaching:getIsValidPlayer() then
         for _, vehicle in pairs(g_currentMission.vehicles) do
@@ -244,30 +235,12 @@ end
 function ManualAttaching:resetManualAttachableTable()
     local ir = self.inRangeManual
 
-    if ir.vehicle ~= nil then
-        ir.vehicle = nil
-    end
-
-    if ir.attachableInMountRange ~= nil then
-        ir.attachableInMountRange = nil
-    end
-
-    if ir.attachableInMountRangeInputJointIndex ~= nil then
-        ir.attachableInMountRangeInputJointIndex = nil
-    end
-
-    if ir.attachableInMountRangeJointIndex ~= nil then
-        ir.attachableInMountRangeJointIndex = nil
-    end
-
-    if ir.attachableInMountRangeInputJoint ~= nil then
-        ir.attachableInMountRangeInputJoint = nil
-    end
-
-
-    if ir.attachableInMountRangeJoint ~= nil then
-        ir.attachableInMountRangeJoint = nil
-    end
+    ir.vehicle = nil
+    ir.attachableInMountRange = nil
+    ir.attachableInMountRangeInputJointIndex = nil
+    ir.attachableInMountRangeJointIndex = nil
+    ir.attachableInMountRangeInputJoint = nil
+    ir.attachableInMountRangeJoint = nil
 
     self.playerDistance = ManualAttaching.PLAYER_DISTANCE
 end
@@ -277,21 +250,10 @@ end
 function ManualAttaching:resetManualAttachedTable()
     local ir = self.inRangeManual
 
-    if ir.attachedVehicle ~= nil then
-        ir.attachedVehicle = nil
-    end
-
-    if ir.attachedImplement ~= nil then
-        ir.attachedImplement = nil
-    end
-
-    if ir.attachedImplementIndex ~= nil then
-        ir.attachedImplementIndex = nil
-    end
-
-    if ir.attachedImplementInputJoint ~= nil then
-        ir.attachedImplementInputJoint = nil
-    end
+    ir.attachedVehicle = nil
+    ir.attachedImplement = nil
+    ir.attachedImplementIndex = nil
+    ir.attachedImplementInputJoint = nil
 
     self.attachedPlayerDistance = ManualAttaching.PLAYER_DISTANCE
 end
@@ -378,7 +340,6 @@ function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
                         ir.attachedImplementIndex = i
                         ir.attachedImplementInputJoint = implement.object.inputAttacherJoints[implement.object.inputAttacherJointDescIndex]
                         self.attachedPlayerDistance = distance
-                        self.resetInRangeAttachedManualTable = false
                     end
                 end
             end
@@ -407,8 +368,6 @@ function ManualAttaching:getIsManualAttachableInRange(vehicle, sq)
 
                         self.playerDistance = distance
                         distanceSequence = distanceSq
-                        -- disable reset since we should have set this vehicle already
-                        self.resetInRangeManualTable = false
                     end
                 end
             end
@@ -562,12 +521,6 @@ function ManualAttaching:disableDetachRecursively(vehicle)
                             if InputBinding.hasEvent(InputBinding.ATTACH) then
                                 self:scopeAllowsDetaching(object, jointDesc)
                             end
-
-                            -- Debug
-                            -- if ManualAttaching.debug then
-                            -- print(self:print_r(implement.object.allowsDetaching, 'allowsDetaching'))
-                            -- print(self:print_r(scope, 'scope'))
-                            -- end
                         end
 
                         local checkPto = function(vehicle, object, jointDesc, type, overwriteOutput)
@@ -834,17 +787,16 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
     if vehicle ~= nil and object ~= nil then
         local implement = vehicle.attachedImplements[implementIndex]
         local jointDesc = vehicle.attacherJoints[implement.jointDescIndex]
+        local inputJointDesc = object.inputAttacherJoints[object.inputAttacherJointDescIndex]
 
         if ManualAttaching:isManual(vehicle, jointDesc) or force then
-            if jointDesc.allowsLowering then
-                if not jointDesc.moveDown and not (jointDesc.jointType == AttacherJoints.jointTypeNameToInt['attachableFrontloader']) then
+            if inputJointDesc.allowsLowering then
+                if not jointDesc.moveDown and not (inputJointDesc.jointType == AttacherJoints.jointTypeNameToInt['attachableFrontloader']) then
                     if (not ManualAttaching:getDoesNotNeedJointMovedown(jointDesc)) and (ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, false)) then
                         ManualAttaching:showWarning(ManualAttaching.message.lowerWarning, object)
                         g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
 
                         return false
-                        -- else
-                        -- handle moveDown exceptions
                     end
                 end
             end
@@ -852,31 +804,15 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
             if self:scopeAllowsDetaching(implement.object, jointDesc) then
                 -- handle TurnOnVehicle exceptions
                 if object.activateTankOnLowering ~= nil and object.activateTankOnLowering then
+                    if vehicle.setIsTurnedOn ~= nil then
+                        vehicle:setIsTurnedOn(false)
+                    end
+                end
+
+                if object.activateOnLowering ~= nil and object.activateOnLowering then
                     if object.setIsTurnedOn ~= nil then
                         object:setIsTurnedOn(false)
                     end
-
-                    -- if vehicle.turnOnDueToLoweredImplement ~= nil then
-                    -- if self.ma.targetVehicle.turnOnDueToLoweredImplement then
-                    -- self.ma.targetVehicle:setIsTurnedOn(false)
-                    -- self.ma.targetVehicle.turnOnDueToLoweredImplement = nil
-                    -- end
-                    -- if vehicle.turnOnDueToLoweredImplement.object.activateOnLowering then
-                    -- if vehicle.turnOnDueToLoweredImplement.object:getIsTurnedOn() then
-                    -- vehicle.turnOnDueToLoweredImplement.object:setIsTurnedOn(false)
-                    -- end
-                    -- end
-                    -- end
-
-                    -- todo: check this?
-                    -- if self.ma.targetAttachable.attacherVehicle.attachedTool ~= nil then
-                    -- if self.ma.targetAttachable.attacherVehicle.setIsTurnedOn ~= nil then
-                    -- self.ma.targetAttachable.attacherVehicle:setIsTurnedOn(false)
-                    -- end
-
-                    -- self.ma.targetAttachable:aiTurnOff()
-                    -- self.ma.targetAttachable.attacherVehicle:aiTurnOff()
-                    -- end
                 end
 
                 if not getAllowDetachFromLockNodes(object) then
@@ -1252,7 +1188,8 @@ function ManualAttaching:getIsJointMoveDownAllowed(object, jointDesc, onAttach)
             return false
         end
 
-        if object.foldingParts ~= nil and #object.foldingParts > 0 then
+        -- ignore vehicles which unfold at lowering state
+        if object.foldMiddleAnimTime ~= nil then
             return false
         end
     end
@@ -1333,8 +1270,6 @@ function ManualAttaching:playSound(vehicle, jointDesc, player, noEventSend)
             else
                 SoundUtil.playSample(vehicle.sampleAttach, 1, 0, nil)
             end
-
-            -- self:setSoundPlayer(nil)
         end
     end
 end
