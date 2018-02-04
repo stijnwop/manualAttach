@@ -755,6 +755,9 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
     return true
 end
 
+---
+-- @param object
+--
 local function getAllowDetachFromLockNodes(object)
     if object.detachLockNodes ~= nil then
         for entry, data in pairs(object.detachLockNodes) do
@@ -775,6 +778,24 @@ local function getAllowDetachFromLockNodes(object)
     end
 
     return true
+end
+
+---
+-- @param object
+-- @param vehicle
+--
+local function handleTurnOnExceptions(object, vehicle)
+    if object.activateTankOnLowering ~= nil and object.activateTankOnLowering then
+        if vehicle.setIsTurnedOn ~= nil then
+            vehicle:setIsTurnedOn(false)
+        end
+    end
+
+    if object.activateOnLowering ~= nil and object.activateOnLowering or object.needsActivation ~= nil and object.needsActivation then
+        if object.setIsTurnedOn ~= nil then
+            object:setIsTurnedOn(false)
+        end
+    end
 end
 
 ---
@@ -803,26 +824,16 @@ function ManualAttaching:detachImplement(vehicle, object, implementIndex, force)
 
             if self:scopeAllowsDetaching(implement.object, jointDesc) then
                 -- handle TurnOnVehicle exceptions
-                if object.activateTankOnLowering ~= nil and object.activateTankOnLowering then
-                    if vehicle.setIsTurnedOn ~= nil then
-                        vehicle:setIsTurnedOn(false)
-                    end
-                end
+                handleTurnOnExceptions(object, vehicle)
 
-                if object.activateOnLowering ~= nil and object.activateOnLowering or object.needsActivation ~= nil and object.needsActivation then
-                    if object.setIsTurnedOn ~= nil then
-                        object:setIsTurnedOn(false)
-                    end
-                end
-
-                if not getAllowDetachFromLockNodes(object) then
+                if (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn()) or (object.getIsTurnedOn ~= nil and object:getIsTurnedOn()) then
+                    ManualAttaching:showWarning(ManualAttaching.message.turnOffWarning, object)
                     g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
 
                     return false
                 end
 
-                if (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn()) or (object.getIsTurnedOn ~= nil and object:getIsTurnedOn()) then
-                    ManualAttaching:showWarning(ManualAttaching.message.turnOffWarning, object)
+                if not getAllowDetachFromLockNodes(object) then
                     g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
 
                     return false
@@ -857,6 +868,8 @@ function ManualAttaching:handleDynamicHoses(jointDesc)
             if jointDesc.dynamicHoseIndice ~= nil and implementJoint.dynamicHoseIndice ~= nil then
                 if implementJoint.dynamicHoseIsAttached then
                     if ir.attachedImplement.dynamicHoseIsManual then
+                        handleTurnOnExceptions(ir.attachedImplement, vehicle)
+
                         if not ((ir.attachedImplement.getIsTurnedOn ~= nil and ir.attachedImplement:getIsTurnedOn()) or (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn())) then
                             self:detachDynamicHoses(ir.attachedImplement, vehicle, implement.jointDescIndex)
                             self:playSound(vehicle, implementJoint, self.currentSoundPlayer)
@@ -926,6 +939,8 @@ function ManualAttaching:handlePowerTakeOff(jointDesc)
                 if ManualAttaching:getHasPowerTakeOff(ir.attachedImplement) then
                     if self:isPtoManual(jointDesc) then
                         if ManualAttaching:getCanDetachPowerTakeOff(jointDesc, 'pto') or ManualAttaching:getCanDetachPowerTakeOff(jointDesc, 'pto2') or ManualAttaching:getCanDetachPowerTakeOff(jointDesc, 'movingPto') then
+                            handleTurnOnExceptions(ir.attachedImplement, vehicle)
+
                             if not ((ir.attachedImplement.getIsTurnedOn ~= nil and ir.attachedImplement:getIsTurnedOn()) or (vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn())) then
                                 self:detachPowerTakeOff(vehicle, ir.attachedImplement)
                                 self:playSound(vehicle, jointDesc, self.currentSoundPlayer)
