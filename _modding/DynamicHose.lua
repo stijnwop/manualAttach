@@ -102,7 +102,7 @@ function DynamicHose:load(savegame)
             if not hasXMLProperty(self.xmlFile, entryKey) then
                 break
             end
-
+			
             local type = Utils.getNoNil(getXMLString(self.xmlFile, entryKey .. '#type'), DynamicHose.TYPE_HYDRAULIC):lower()
 
             if DynamicHose.TYPES[type] then
@@ -141,7 +141,7 @@ function DynamicHose:load(savegame)
             r = r + 1
         end
 
-        if set ~= nil then
+        if set ~= nil and r > 0 then
             set.movingToolCouplings = {}
 
             local toolIds = Utils.getVectorNFromString(getXMLString(self.xmlFile, key .. '#toolIndices'))
@@ -399,8 +399,8 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
         joint.dynamicHoseIsAttached = true
 
         for hoseType, allowed in pairs(DynamicHose.TYPES) do
-            if allowed and vehicle:getCanAttachHose(hoseType) then
-                local selectedRefs = refs[hoseType]
+            if allowed and (vehicle.getCanAttachHose ~= nil and vehicle:getCanAttachHose(hoseType)) or (vehicle.canWeAttachHose ~= nil and vehicle:canWeAttachHose(hoseType)) then				
+				local selectedRefs = refs[hoseType]
                 local selectedHoses = hoses[hoseType]
 
                 if selectedHoses ~= nil then
@@ -410,14 +410,16 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
 
                         if attachHose then
                             self:setHoseAttached(hoseType, true, true)
-                            part.referenceFrame = selectedRefs[i].node
+							
+							local node = selectedRefs[i]
+							if type(selectedRefs[i]) == "table" then
+								node = selectedRefs[i].node
+							end
+							
+                            part.referenceFrame = node
 
                             if g_currentMission.dynamicHoseIsManual ~= nil and g_currentMission.dynamicHoseIsManual then
                                 Cylindered.setDirty(self, part)
-                            end
-
-                            if vehicle.setDynamicRefSetObjectChanges ~= nil then
-                                vehicle:setDynamicRefSetObjectChanges(true, setId, hoseType, i)
                             end
                         else
                             self:setHoseAttached(hoseType, true, false) -- not all hoses are attached, keep it functioning. Make it an toggleable setting.
@@ -432,8 +434,12 @@ function DynamicHose:attachDynamicHose(vehicle, jointDescIndex, noEventSend)
                         end
                     end
                 end
-            end
+            end			
         end
+				
+		if vehicle.setDynamicRefSetObjectChanges ~= nil then
+			vehicle:setDynamicRefSetObjectChanges(true, setId)
+		end
 
         self:updateLightStates(true, true)
         self:updateMovingToolCouplings(true)

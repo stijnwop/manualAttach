@@ -49,6 +49,7 @@ end
 --
 function DynamicHoseRef:preLoad(saveGame)
     self.getDynamicRefSet = DynamicHoseRef.getDynamicRefSet
+    self.canWeAttachHose = DynamicHoseRef.canWeAttachHose
     self.getCanAttachHose = DynamicHoseRef.getCanAttachHose
     self.setDynamicRefSetObjectChanges = DynamicHoseRef.setDynamicRefSetObjectChanges
     self.resetDynamicRefSetObjectChanges = DynamicHoseRef.resetDynamicRefSetObjectChanges
@@ -116,14 +117,7 @@ function DynamicHoseRef:load(saveGame)
 
                     self.activeHoseTypes[hoseType] = true
 
-                    local entry = {
-                        node = node,
-                        changeObjects = {}
-                    }
-
-                    ObjectChangeUtil.loadObjectChangeFromXML(self.xmlFile, refKey, entry.changeObjects, self.components, self)
-
-                    table.insert(set[hoseType], entry)
+                    table.insert(set[hoseType], node)
 
                     r = r + 1
                 else
@@ -135,8 +129,11 @@ function DynamicHoseRef:load(saveGame)
                 break
             end
         end
-
-        if set ~= nil then
+		
+        if set ~= nil and r > 0 then
+			set.changeObjects = {}
+			ObjectChangeUtil.loadObjectChangeFromXML(self.xmlFile, key, set.changeObjects, self.components, self)
+		
             table.insert(self.hoseRefSets, set)
         end
 
@@ -195,14 +192,12 @@ end
 ---
 -- @param visibility
 -- @param setId
--- @param hoseType
--- @param id
 --
-function DynamicHoseRef:setDynamicRefSetObjectChanges(visibility, setId, hoseType, id)
+function DynamicHoseRef:setDynamicRefSetObjectChanges(visibility, setId)
     local set = self.hoseRefSets[setId]
 
-    if set ~= nil and set[hoseType] ~= nil and set[hoseType][id] ~= nil then
-        ObjectChangeUtil.setObjectChanges(set[hoseType][id].changeObjects, visibility, self, self.setMovingToolDirty)
+    if set ~= nil then
+        ObjectChangeUtil.setObjectChanges(set.changeObjects, visibility, self, self.setMovingToolDirty)
     end
 end
 
@@ -212,17 +207,16 @@ end
 function DynamicHoseRef:resetDynamicRefSetObjectChanges(setId)
     local set = self.hoseRefSets[setId]
 
-    for hoseType, allowed in pairs(DynamicHoseRef.TYPES) do
-        if allowed then
-            local typeSetRefs = set[hoseType]
-
-            if typeSetRefs ~= nil then
-                for _, s in pairs(typeSetRefs) do
-                    ObjectChangeUtil.setObjectChanges(s.changeObjects, false, self, self.setMovingToolDirty)
-                end
-            end
-        end
+	if set ~= nil then
+		ObjectChangeUtil.setObjectChanges(set.changeObjects, false, self, self.setMovingToolDirty)
     end
+end
+
+---
+-- @param name
+--
+function DynamicHoseRef:canWeAttachHose(name)
+    return self:getCanAttachHose(name)
 end
 
 ---
