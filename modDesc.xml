@@ -14,7 +14,7 @@
     <description>
         <en><![CDATA[This mod enforces you to attach/detach tools and trailers manually.
 
-<b>A manual is available <a href="https://www.dropbox.com/s/t7wm0nsqd4hb8u6/Manual%20Attaching.pdf?dl=0">here</a>.</b>
+<b>A manual is available <a href="https://github.com/stijnwop/manualAttaching/blob/master/_modding/Manual%20Attaching.pdf">here</a>.</b>
 
 Changelog v1.3:
 - Checks on input jointDesc for lowering expections
@@ -27,7 +27,7 @@ Changelog v1.3:
 <a href="https://www.dropbox.com/s/gtxidgn4iex4zc3/changelog.txt?dl=0">Changelog Manual Attaching</a></b>]]></en>
         <de><![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
 
-<b>Eine Anleitung in Englisch gibt es <a href="https://www.dropbox.com/s/t7wm0nsqd4hb8u6/Manual%20Attaching.pdf?dl=0">hier</a>.</b>
+<b>Eine Anleitung in Englisch gibt es <a href="https://github.com/stijnwop/manualAttaching/blob/master/_modding/Manual%20Attaching.pdf">hier</a>.</b>
 
 Changelog v1.3:
 - Checks on input jointDesc for lowering expections
