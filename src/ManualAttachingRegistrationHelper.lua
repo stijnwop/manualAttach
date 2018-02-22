@@ -10,6 +10,12 @@ ManualAttachingRegistrationHelper = {
     baseDirectory = g_currentModDirectory
 }
 
+local function noopFunction()
+end
+
+-- replace the base mission function with a noop.. we don't want to use unnecessary resources
+BaseMission.getAttachableInRange = Utils.overwrittenFunction(BaseMission.getAttachableInRange, noopFunction)
+
 source(ManualAttachingRegistrationHelper.baseDirectory .. 'src/ManualAttaching.lua')
 
 if SpecializationUtil.specializations['manualAttachingExtension'] == nil then
