@@ -129,11 +129,11 @@ function DynamicHoseRef:load(saveGame)
                 break
             end
         end
-		
+
         if set ~= nil and r > 0 then
-			set.changeObjects = {}
-			ObjectChangeUtil.loadObjectChangeFromXML(self.xmlFile, key, set.changeObjects, self.components, self)
-		
+            set.changeObjects = {}
+            ObjectChangeUtil.loadObjectChangeFromXML(self.xmlFile, key, set.changeObjects, self.components, self)
+
             table.insert(self.hoseRefSets, set)
         end
 
@@ -207,8 +207,8 @@ end
 function DynamicHoseRef:resetDynamicRefSetObjectChanges(setId)
     local set = self.hoseRefSets[setId]
 
-	if set ~= nil then
-		ObjectChangeUtil.setObjectChanges(set.changeObjects, false, self, self.setMovingToolDirty)
+    if set ~= nil then
+        ObjectChangeUtil.setObjectChanges(set.changeObjects, false, self, self.setMovingToolDirty)
     end
 end
 
