@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	
+	<translationContributors></translationContributors>
+	
+    <texts>
+        <text name="MANUAL_ATTACHING_ATTACH" text="Attach %s"/> 
+        <text name="MANUAL_ATTACHING_DETACH" text="Detach %s"/>
+		
+        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Attach PTO of %s"/> 
+        <text name="MANUAL_ATTACHING_DETACHPTO" text="Detach PTO of %s"/>
+		
+        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Hold to attach hoses of %s"/> 
+        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Hold to detach hoses of %s"/> 
+		
+        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Lower %s first"/> 
+        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Detach PTO of %s first"/> 
+        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Attach PTO of %s first"/> 
+        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Detach hoses of %s first"/> 
+        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Turn %s off first"/> 
+        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Position %s above the trailer correctly"/>        
+    </texts>
+</l10n>

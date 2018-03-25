@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	
+	<translationContributors></translationContributors>
+	
+    <texts>
+        <text name="MANUAL_ATTACHING_ATTACH" text="%s ankuppeln"/> 
+        <text name="MANUAL_ATTACHING_DETACH" text="%s abkuppeln"/> 
+		
+        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Zapfwelle von %s ankuppeln"/> 
+        <text name="MANUAL_ATTACHING_DETACHPTO" text="Zapfwelle von %s abkuppeln"/>
+		
+        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Schläuche von %s ankuppeln"/> 
+        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Schläuche von %s abkuppeln"/>
+		
+        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="%s zuerst herunterlassen"/> 
+        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Zapfwelle von %s zuerst abbauen"/> 
+        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Zapfwelle von %s anbauen"/> 
+        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Schläuche von %s zuerst abbauen"/> 
+        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="%s zuerst ausschalten"/> 
+        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Positioniere %s korrekt über dem Anhänger"/>        
+    </texts>
+</l10n>
