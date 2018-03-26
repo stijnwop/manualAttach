@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	
+	<translationContributors>kiki</translationContributors>
+	
+    <texts>
+        <text name="MANUAL_ATTACHING_ATTACH" text="Připojit %s"/> 
+        <text name="MANUAL_ATTACHING_DETACH" text="Odpojit %s"/>
+		
+        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Připojit náhon"/> 
+        <text name="MANUAL_ATTACHING_DETACHPTO" text="Odpojit náhon"/>
+		
+        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Držet pro připojení hadic"/> 
+        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Držet pro odpojení hadic"/>
+		
+        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Nejdříve snižte %s"/> 
+        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Nejdříve odpojte náhon"/> 
+        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Nejdříve připojte náhon"/> 
+        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Nejdříve odpojte hadice"/> 
+        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Nejdříve vypněte %s"/> 
+        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Umístěte %s na správnou pozici nad vlečkou"/>        
+    </texts>
+</l10n>
