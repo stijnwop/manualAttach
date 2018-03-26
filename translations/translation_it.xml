@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
-	
-	<translationContributors>zed636</translationContributors>
-	
+    <translationContributors>zed636</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="Collega %s"/> 
+        <text name="MANUAL_ATTACHING_ATTACH" text="Collega %s"/>
         <text name="MANUAL_ATTACHING_DETACH" text="Scollega %s"/>
-		
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Collega PTO di %s"/> 
+
+        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Collega PTO di %s"/>
         <text name="MANUAL_ATTACHING_DETACHPTO" text="Scollega PTO di %s"/>
-		
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Tenere per collegare i tubi di %s"/> 
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Tenere per scollegare i tubi di %s"/> 
-		
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Abbassa prima %s"/> 
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Scollega prima la PTO di %s"/> 
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Collega prima la PTO di %"/> 
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Scollega prima i tubi di %s"/> 
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Spegni prima %s"/> 
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Posiziona %s sopra il rimorchio correttamente"/>        
+
+        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Tenere per collegare i tubi di %s"/>
+        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Tenere per scollegare i tubi di %s"/>
+
+        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Abbassa prima %s"/>
+        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Scollega prima la PTO di %s"/>
+        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Collega prima la PTO di %"/>
+        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Scollega prima i tubi di %s"/>
+        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Spegni prima %s"/>
+        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Posiziona %s sopra il rimorchio correttamente"/>
     </texts>
 </l10n>

@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
-	
-	<translationContributors>KITT3000, Dzi4d3k</translationContributors>
-	
+    <translationContributors>KITT3000, Dzi4d3k</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="Zaczep %s"/> 
-        <text name="MANUAL_ATTACHING_DETACH" text="Odczep %s"/> 
-		
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Podłącz WOM od %s"/> 
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="Odłącz WOM od %s"/> 
-		
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Przytrzymaj, aby podłączyć węże od %s"/> 
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Przytrzymaj, aby odłączyć węże od %s"/> 
-		
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Najpierw opuść %s"/> 
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Najpierw odłącz WOM od %s"/> 
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Najpierw podłącz WOM od %s"/> 
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Najpierw odłącz węże od %s"/> 
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Najpierw wyłącz %s"/> 
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Umieść %s poprawnie nad przyczepą"/>        
+        <text name="MANUAL_ATTACHING_ATTACH" text="Zaczep %s"/>
+        <text name="MANUAL_ATTACHING_DETACH" text="Odczep %s"/>
+
+        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Podłącz WOM od %s"/>
+        <text name="MANUAL_ATTACHING_DETACHPTO" text="Odłącz WOM od %s"/>
+
+        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Przytrzymaj, aby podłączyć węże od %s"/>
+        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Przytrzymaj, aby odłączyć węże od %s"/>
+
+        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Najpierw opuść %s"/>
+        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Najpierw odłącz WOM od %s"/>
+        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Najpierw podłącz WOM od %s"/>
+        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Najpierw odłącz węże od %s"/>
+        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Najpierw wyłącz %s"/>
+        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Umieść %s poprawnie nad przyczepą"/>
     </texts>
 </l10n>
