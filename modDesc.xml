@@ -10,6 +10,8 @@
         <pl>Ręczne zaczepianie</pl>
         <ru>Ручная сцепка</ru>
 		<cz>Manuální připojování</cz>
+        <hu>Kézi Csatlakozás</hu>
+        <it>Attracco manuale</it> 
     </title>
 
     <description>
@@ -19,7 +21,9 @@
 Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
         <ru><![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную.
 Мы надеемся вам понравится этот мод.]]></ru>
-	<cz><![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.]]></cz>
+		<cz><![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.]]></cz>
+		<hu><![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]></hu>
+		<it><![CDATA[Questa mod ti impone di attaccare / staccare manualmente strumenti e rimorchi.]]></it>
     </description>
 
     <iconFilename>icon.png</iconFilename>
