@@ -11,7 +11,6 @@
         <ru>Ручная сцепка</ru>
         <cz>Manuální připojování</cz>
         <hu>Kézi Csatlakozás</hu>
-        <it>Attracco manuale</it>
     </title>
 
     <description>
@@ -34,7 +33,7 @@
             <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]>
         </hu>
         <it>
-            <![CDATA[Questa mod ti impone di attaccare / staccare manualmente strumenti e rimorchi.]]>
+            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.]]>
         </it>
     </description>
 
