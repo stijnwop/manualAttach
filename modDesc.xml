@@ -9,6 +9,7 @@
         <nl>Handmatig aankoppelen</nl>
         <pl>Ręczne zaczepianie</pl>
         <ru>Ручная сцепка</ru>
+        <hu>Kézi Csatlakozás</hu>        
     </title>
 
     <description>
@@ -41,6 +42,20 @@ Changelog v1.3:
 Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
         <ru><![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную.
 Мы надеемся вам понравится этот мод.]]></ru>
+        
+<hu><![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.
+
+<b>A kézikönyv elérhető <a href="https://github.com/stijnwop/manualAttaching/blob/master/_modding/Manual%20Attaching.pdf">itt</a>.</b>
+
+Changelog v1.3:
+- Checks on input jointDesc for lowering expections
+- Script optimizations
+- Handle turned on exceptions
+- Take detachLockNodes into account for detaching
+- Refactored dynamic hoses (allows objectChange)
+
+<b>Részletes changelog:
+<a href="https://www.dropbox.com/s/gtxidgn4iex4zc3/changelog.txt?dl=0">Changelog Manual Attaching</a></b>]]></hu>        
     </description>
 
     <iconFilename>icon.png</iconFilename>
@@ -57,6 +72,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>%s aankoppelen</nl>
             <pl>Zaczep %s</pl>
             <ru>Присоединить %s</ru>
+            <hu>Felcsatolás %s</hu>            
         </text>
         <text name="MANUAL_ATTACHING_DETACH">
             <en>Detach %s</en>
@@ -64,6 +80,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>%s afkoppelen</nl>
             <pl>Odczep %s</pl>
             <ru>Отсоединить %s</ru>
+            <hu>Lecsatolás %s</hu>            
         </text>
         <text name="MANUAL_ATTACHING_ATTACHPTO">
             <en>Attach PTO of %s</en>
@@ -71,6 +88,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>PTO van %s aankoppelen</nl>
             <pl>Podłącz WOM od %s</pl>
             <ru>Присоединить вал %s</ru>
+            <hu>PTO csatolása a %s -hoz</hu>            
         </text>
         <text name="MANUAL_ATTACHING_DETACHPTO">
             <en>Detach PTO of %s</en>
@@ -78,6 +96,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>PTO van %s afkoppelen</nl>
             <pl>Odłącz WOM od %s</pl>
             <ru>Отсоединить вал %s</ru>
+            <hu>PTO lecsatolása a %s -ról</hu>            
         </text>
         <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES">
             <en>Hold to attach hoses of %s</en>
@@ -85,6 +104,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Houd ingedrukt om de slangen van %s aan te koppelen</nl>
             <pl>Przytrzymaj, aby podłączyć węże od %s</pl>
             <ru>Удерживайте, чтобы присоединить шланги %s</ru>
+            <hu>Tartsd nyomva a csövek %s -hoz csatolásához</hu>            
         </text>
         <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES">
             <en>Hold to detach hoses of %s</en>
@@ -92,6 +112,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Houd ingedrukt om de slangen van %s af te koppelen</nl>
             <pl>Przytrzymaj, aby odłączyć węże od %s</pl>
             <ru>Удерживайте, чтобы отсоединить шланги %s</ru>
+            <hu>Tartsd nyomva a csövek %s -hoz lecsatolásához</hu>             
         </text>
         <text name="MANUAL_ATTACHING_LOWER_WARNING">
             <en>Lower %s first</en>
@@ -99,6 +120,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Laat %s eerst zakken</nl>
             <pl>Najpierw opuść %s</pl>
             <ru>Сначала опустите %s</ru>
+            <hu>Előbb engedd le a  %s -t</hu>            
         </text>
         <text name="MANUAL_ATTACHING_DETACHPTO_WARNING">
             <en>Detach PTO of %s first</en>
@@ -106,6 +128,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Koppel eerst de PTO van %s af</nl>
             <pl>Najpierw odłącz WOM od %s</pl>
             <ru>Сначала отсоедините вал %s</ru>
+            <hu>Előbb csatold le a PTO-t a %s -ról</hu>            
         </text>
         <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING">
             <en>Attach PTO of %s first</en>
@@ -113,6 +136,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Koppel eerst de PTO van %s aan</nl>
             <pl>Najpierw podłącz WOM od %s</pl>
             <ru>Сначала присоединить вал %s</ru>
+            <hu>Előbb csatlakoztasd a PTO-t a %s -hoz</hu>            
         </text>
         <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING">
             <en>Detach hoses of %s first</en>
@@ -120,6 +144,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Koppel eerst de slangen van %s af</nl>
             <pl>Najpierw odłącz węże od %s</pl>
             <ru>Сначала отсоедините шланги %s</ru>
+            <en>Előbb csatold le a csöveket a %s -ról</en>            
         </text>
         <text name="MANUAL_ATTACHING_TURNOFF_WARNING">
             <en>Turn %s off first</en>
@@ -127,6 +152,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Zet %s eerst uit</nl>
             <pl>Najpierw wyłącz %s</pl>
             <ru>Сначала выключите %s</ru>
+            <hu>Előbb kapcsold ki a %s -t</hu>            
         </text>
         <text name="MANUAL_ATTACHING_CUT_WARNING">
             <en>Position %s above the trailer correctly</en>
@@ -134,6 +160,7 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
             <nl>Positioneer %s correct boven de trailer</nl>
             <pl>Umieść %s poprawnie nad przyczepą</pl>
             <ru>Правильное положение %s выше прицепа</ru>
+            <hu>Pozicionáld a %s -t a trailer fölé helyesen</hu>            
         </text>
     </l10n>
 </modDesc>
