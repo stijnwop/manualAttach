@@ -717,7 +717,7 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
             if ManualAttaching:isManual(object, inputJointDesc) or force then
                 local startLowered = ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc)
 
-                vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex, false, nil, startLowered, false)
+                vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
 
                 if startLowered then
                     vehicle:setJointMoveDown(jointDescIndex, true)
