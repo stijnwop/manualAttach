@@ -633,9 +633,8 @@ function ManualAttaching:scopeAllowsDetaching(object, jointDesc, showWarning)
     if warning ~= nil then
         if showWarning then
             ManualAttaching:showWarning(warning, object)
+            g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
         end
-
-        g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
     end
 
     -- When nothing blocks the flow return true (implement allows detaching)
