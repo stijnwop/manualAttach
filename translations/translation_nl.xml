@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <translationContributors>Wopster</translationContributors>
+    <texts>
+        <text name="MANUAL_ATTACHING_ATTACH" text="%s aankoppelen"/>
+        <text name="MANUAL_ATTACHING_DETACH" text="%s afkoppelen"/>
+
+        <text name="MANUAL_ATTACHING_ATTACHPTO" text="PTO van %s aankoppelen"/>
+        <text name="MANUAL_ATTACHING_DETACHPTO" text="PTO van %s afkoppelen"/>
+
+        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Houd ingedrukt om de slangen van %s aan te koppelen"/>
+        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Houd ingedrukt om de slangen van %s af te koppelen"/>
+
+        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Laat %s eerst zakken"/>
+        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Koppel eerst de PTO van %s af"/>
+        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Koppel eerst de PTO van %s aan"/>
+        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Koppel eerst de slangen van %s af"/>
+        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Zet %s eerst uit"/>
+        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Positioneer %s correct boven de trailer"/>
+    </texts>
+</l10n>

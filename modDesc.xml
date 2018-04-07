@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="39">
     <author>Wopster</author>
-    <version>1.3.0.0</version>
+    <version>1.3.0.1</version>
 
     <title>
         <en>Manual Attaching</en>
@@ -9,38 +9,32 @@
         <nl>Handmatig aankoppelen</nl>
         <pl>Ręczne zaczepianie</pl>
         <ru>Ручная сцепка</ru>
+        <cz>Manuální připojování</cz>
+        <hu>Kézi Csatlakozás</hu>
     </title>
 
     <description>
-        <en><![CDATA[This mod enforces you to attach/detach tools and trailers manually.
-
-<b>A manual is available <a href="https://github.com/stijnwop/manualAttaching/blob/master/_modding/Manual%20Attaching.pdf">here</a>.</b>
-
-Changelog v1.3:
-- Checks on input jointDesc for lowering expections
-- Script optimizations
-- Handle turned on exceptions
-- Take detachLockNodes into account for detaching
-- Refactored dynamic hoses (allows objectChange)
-
-<b>Full detailed changelog:
-<a href="https://www.dropbox.com/s/gtxidgn4iex4zc3/changelog.txt?dl=0">Changelog Manual Attaching</a></b>]]></en>
-        <de><![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
-
-<b>Eine Anleitung in Englisch gibt es <a href="https://github.com/stijnwop/manualAttaching/blob/master/_modding/Manual%20Attaching.pdf">hier</a>.</b>
-
-Changelog v1.3:
-- Checks on input jointDesc for lowering expections
-- Script optimizations
-- Handle turned on exceptions
-- Take detachLockNodes into account for detaching
-- Refactored dynamic hoses (allows objectChange)
-
-<b>Full detailed changelog: <a href="https://www.dropbox.com/s/gtxidgn4iex4zc3/changelog.txt?dl=0">Changelog Manuelles Ankuppeln.</a></b>]]></de>
-        <pl><![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi.
-Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
-        <ru><![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную.
-Мы надеемся вам понравится этот мод.]]></ru>
+        <en>
+            <![CDATA[This mod enforces you to attach/detach tools and trailers manually.]]>
+        </en>
+        <de>
+            <![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.]]>
+        </de>
+        <pl>
+            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!]]>
+        </pl>
+        <ru>
+            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.]]>
+        </ru>
+        <cz>
+            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.]]>
+        </cz>
+        <hu>
+            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]>
+        </hu>
+        <it>
+            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.]]>
+        </it>
     </description>
 
     <iconFilename>icon.png</iconFilename>
@@ -50,90 +44,5 @@ Mamy nadzieję, że będziesz się dobrze z nim bawił!]]></pl>
         <sourceFile filename="src/ManualAttachingRegistrationHelper.lua"/>
     </extraSourceFiles>
 
-    <l10n>
-        <text name="MANUAL_ATTACHING_ATTACH">
-            <en>Attach %s</en>
-            <de>%s ankuppeln</de>
-            <nl>%s aankoppelen</nl>
-            <pl>Zaczep %s</pl>
-            <ru>Присоединить %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_DETACH">
-            <en>Detach %s</en>
-            <de>%s abkuppeln</de>
-            <nl>%s afkoppelen</nl>
-            <pl>Odczep %s</pl>
-            <ru>Отсоединить %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_ATTACHPTO">
-            <en>Attach PTO of %s</en>
-            <de>Zapfwelle von %s ankuppeln</de>
-            <nl>PTO van %s aankoppelen</nl>
-            <pl>Podłącz WOM od %s</pl>
-            <ru>Присоединить вал %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_DETACHPTO">
-            <en>Detach PTO of %s</en>
-            <de>Zapfwelle von %s abkuppeln</de>
-            <nl>PTO van %s afkoppelen</nl>
-            <pl>Odłącz WOM od %s</pl>
-            <ru>Отсоединить вал %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES">
-            <en>Hold to attach hoses of %s</en>
-            <de>Schläuche von %s ankuppeln</de>
-            <nl>Houd ingedrukt om de slangen van %s aan te koppelen</nl>
-            <pl>Przytrzymaj, aby podłączyć węże od %s</pl>
-            <ru>Удерживайте, чтобы присоединить шланги %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES">
-            <en>Hold to detach hoses of %s</en>
-            <de>Schläuche von %s abkuppeln</de>
-            <nl>Houd ingedrukt om de slangen van %s af te koppelen</nl>
-            <pl>Przytrzymaj, aby odłączyć węże od %s</pl>
-            <ru>Удерживайте, чтобы отсоединить шланги %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_LOWER_WARNING">
-            <en>Lower %s first</en>
-            <de>%s zuerst herunterlassen</de>
-            <nl>Laat %s eerst zakken</nl>
-            <pl>Najpierw opuść %s</pl>
-            <ru>Сначала опустите %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING">
-            <en>Detach PTO of %s first</en>
-            <de>Zapfwelle von %s zuerst abbauen</de>
-            <nl>Koppel eerst de PTO van %s af</nl>
-            <pl>Najpierw odłącz WOM od %s</pl>
-            <ru>Сначала отсоедините вал %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING">
-            <en>Attach PTO of %s first</en>
-            <de>Zapfwelle von %s anbauen</de>
-            <nl>Koppel eerst de PTO van %s aan</nl>
-            <pl>Najpierw podłącz WOM od %s</pl>
-            <ru>Сначала присоединить вал %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING">
-            <en>Detach hoses of %s first</en>
-            <de>Schläuche von %s zuerst abbauen</de>
-            <nl>Koppel eerst de slangen van %s af</nl>
-            <pl>Najpierw odłącz węże od %s</pl>
-            <ru>Сначала отсоедините шланги %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING">
-            <en>Turn %s off first</en>
-            <de>%s zuerst ausschalten</de>
-            <nl>Zet %s eerst uit</nl>
-            <pl>Najpierw wyłącz %s</pl>
-            <ru>Сначала выключите %s</ru>
-        </text>
-        <text name="MANUAL_ATTACHING_CUT_WARNING">
-            <en>Position %s above the trailer correctly</en>
-            <de>Positioniere %s korrekt über dem Anhänger</de>
-            <nl>Positioneer %s correct boven de trailer</nl>
-            <pl>Umieść %s poprawnie nad przyczepą</pl>
-            <ru>Правильное положение %s выше прицепа</ru>
-        </text>
-    </l10n>
+    <l10n filenamePrefix="translations/translation"/>
 </modDesc>
