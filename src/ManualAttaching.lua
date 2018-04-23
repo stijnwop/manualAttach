@@ -635,9 +635,8 @@ function ManualAttaching:scopeAllowsDetaching(object, jointDesc, showWarning)
     if warning ~= nil then
         if showWarning then
             ManualAttaching:showWarning(warning, object)
+            g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
         end
-
-        g_currentMission:enableHudIcon('detachingNotAllowed', ManualAttaching.DETACHING_PRIORITY_NOT_ALLOWED, ManualAttaching.DETACHING_NOT_ALLOWED_TIME)
     end
 
     -- When nothing blocks the flow return true (implement allows detaching)
@@ -720,7 +719,7 @@ function ManualAttaching:attachImplement(vehicle, object, jointDescIndex, inputJ
             if ManualAttaching:isManual(object, inputJointDesc) or force then
                 local startLowered = ManualAttaching:getIsJointMoveDownAllowed(object, inputJointDesc)
 
-                vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex, false, nil, startLowered, false)
+                vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
 
                 if startLowered then
                     vehicle:setJointMoveDown(jointDescIndex, true)
