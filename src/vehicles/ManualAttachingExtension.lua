@@ -50,6 +50,7 @@ function ManualAttachingExtension:loadInputAttacherJoint(super, xmlFile, key, in
     end
 
     inputAttacherJoint.isManual = Utils.getNoNil(getXMLBool(xmlFile, key .. '#isManual'), true)
+    inputAttacherJoint.inRangeDistance = Utils.getNoNil(getXMLFloat(xmlFile, key .. '#inRangeDistance'), 1.3)
 
     return true
 end

@@ -294,7 +294,9 @@ function ManualAttaching:getAttachableInJointRange(attacherJoint, jointTrans, di
                     local distanceJoints = Utils.vector2LengthSq(inputJointTrans[1] - jointTrans[1], inputJointTrans[3] - jointTrans[3])
 
                     if distanceJoints < distanceSequence then
-                        if (math.abs(inputJointTrans[2] - jointTrans[2])) < ManualAttaching.JOINT_DISTANCE then
+                        local jointDistance = Utils.getNoNil(inputAttacherJoint.inRangeDistance, ManualAttaching.JOINT_DISTANCE)
+
+                        if (math.abs(inputJointTrans[2] - jointTrans[2])) < jointDistance then
                             local cosAngle = ManualAttaching:calculateCosAngle(inputAttacherJoint.node, attacherJoint.jointTransform)
 
                             if cosAngle > ManualAttaching.COSANGLE_THRESHOLD or ManualAttaching:getDoesNotNeedCosAngleValidation(attacherJoint) then
