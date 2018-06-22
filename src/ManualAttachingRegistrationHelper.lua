@@ -28,7 +28,6 @@ end
 function ManualAttachingRegistrationHelper:loadMap(name)
     if not g_currentMission.manualAttachingRegistrationHelperIsLoaded then
         self:register()
-
         g_currentMission.manualAttachingRegistrationHelperIsLoaded = true
     else
         print("ManualAttaching - error: The ManualAttachingRegistrationHelper have been loaded already! Remove one of the copy's!")
@@ -38,7 +37,10 @@ end
 ---
 --
 function ManualAttachingRegistrationHelper:deleteMap()
-    g_currentMission.manualAttachingRegistrationHelperIsLoaded = nil
+    if g_currentMission.manualAttachingRegistrationHelperIsLoaded then
+        self:unregister()
+        g_currentMission.manualAttachingRegistrationHelperIsLoaded = false
+    end
 end
 
 ---
@@ -67,9 +69,30 @@ end
 ---
 --
 function ManualAttachingRegistrationHelper:register()
+    local extensionSpec = SpecializationUtil.getSpecialization('manualAttachingExtension')
+
     for _, vehicleType in pairs(VehicleTypeUtil.vehicleTypes) do
-        if vehicleType ~= nil and SpecializationUtil.hasSpecialization(Attachable, vehicleType.specializations) or SpecializationUtil.hasSpecialization(AttacherJoints, vehicleType.specializations) then
-            table.insert(vehicleType.specializations, SpecializationUtil.getSpecialization('manualAttachingExtension'))
+        if vehicleType ~= nil
+                and SpecializationUtil.hasSpecialization(Attachable, vehicleType.specializations)
+                or SpecializationUtil.hasSpecialization(AttacherJoints, vehicleType.specializations) then
+            table.insert(vehicleType.specializations, extensionSpec)
+        end
+    end
+end
+
+---
+--
+function ManualAttachingRegistrationHelper:unregister()
+    local extensionSpec = SpecializationUtil.getSpecialization('manualAttachingExtension')
+
+    for _, vehicleType in pairs(VehicleTypeUtil.vehicleTypes) do
+        if vehicleType ~= nil then
+            for i, spec in ipairs(vehicleType.specializations) do
+                if spec == extensionSpec then
+                    table.remove(vehicleType.specializations, i)
+                    break
+                end
+            end
         end
     end
 end

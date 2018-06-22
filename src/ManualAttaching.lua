@@ -107,6 +107,7 @@ end
 ---
 --
 function ManualAttaching:deleteMap()
+    g_currentMission.dynamicHoseIsManual = false
     g_currentMission.callbackManualAttaching = nil
 end
 
