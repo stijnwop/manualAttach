@@ -41,7 +41,7 @@
     <multiplayer supported="true"/>
 
     <extraSourceFiles>
-        <sourceFile filename="src/ManualAttachingRegistrationHelper.lua"/>
+        <sourceFile filename="src/loader.lua"/>
     </extraSourceFiles>
 
     <l10n filenamePrefix="translations/translation"/>
