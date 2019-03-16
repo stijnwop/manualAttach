@@ -4,7 +4,14 @@
     <texts>
 
         <text name="input_MA_ATTACH_VEHICLE" text="Attach/Detach" />
-        <text name="input_MA_ATTACH_EXTRA" text="Attach/Detach" />
+        <text name="input_MA_ATTACH_HOSE" text="Attach/Detach" />
+        <text name="input_MA_ATTACH_PTO" text="Attach/Detach" />
+
+        <text name="action_attach_pto" text="Attach power take off" />
+        <text name="action_detach_pto" text="Detach power take off" />
+
+        <text name="info_attach_hose" text="Hold to attach hoses" />
+        <text name="info_detach_hose" text="Hold to detach hoses" />
 
         <text name="MANUAL_ATTACHING_ATTACH" text="Attach %s"/>
         <text name="MANUAL_ATTACHING_DETACH" text="Detach %s"/>

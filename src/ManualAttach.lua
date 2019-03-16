@@ -93,16 +93,8 @@ function ManualAttach:update(dt)
     end
 
     if self:hasVehicles() then
-        local attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement = ManualAttachUtil.findVehicleInAttachRange(self.vehicles, AttacherJoints.MAX_ATTACH_DISTANCE_SQ, AttacherJoints.MAX_ATTACH_ANGLE)
-
-        self.attacherVehicle = attacherVehicle
-        self.attacherVehicleJointDescIndex = attacherVehicleJointDescIndex
-        self.attachable = attachable
-        self.attachableJointDescIndex = attachableJointDescIndex
-        self.attachedImplement = attachedImplement
+        self.attacherVehicle, self.attacherVehicleJointDescIndex, self.attachable, self.attachableJointDescIndex, self.attachedImplement = ManualAttachUtil.findVehicleInAttachRange(self.vehicles, AttacherJoints.MAX_ATTACH_DISTANCE_SQ, AttacherJoints.MAX_ATTACH_ANGLE)
     end
-
-    self.hasHoseEventInput = 0
 end
 
 local function setActionEventText(id, text, priority, visibility)
@@ -123,25 +115,41 @@ function ManualAttach:draw(dt)
 
         local ptoEventVisibility = false
         local ptoEventText = ""
+        local hoseEventVisibility = false
+        local hoseEventText = ""
 
-        local implement = self.attachedImplement
+        local object = self.attachedImplement
 
-        if implement ~= nil and not implement.isDeleted then
-            local attacherVehicle = implement:getAttacherVehicle()
+        if object ~= nil and not object.isDeleted then
+            local attacherVehicle = object:getAttacherVehicle()
+
             if attacherVehicle ~= nil then
-                if implement.isDetachAllowed ~= nil and implement:isDetachAllowed() then
+                if object.isDetachAllowed ~= nil and object:isDetachAllowed() then
                     attachEventVisibility = true
                     attachEventText = g_i18n:getText("action_detach")
                 end
 
-                if implement.getInputPowerTakeOffs ~= nil then
-                    if ManualAttachUtil.hasAttachedPowerTakeOffs(implement, attacherVehicle) then
-                        ptoEventText = "Detach Pto"
+                if object.getInputPowerTakeOffs ~= nil then
+                    if ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle) then
+                        ptoEventText = g_i18n:getText("action_detach_pto")
                     else
-                        ptoEventText = "Attach Pto"
+                        ptoEventText = g_i18n:getText("action_attach_pto")
                     end
 
                     ptoEventVisibility = true
+                end
+
+                if object.getIsConnectionHoseUsed ~= nil then
+                    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
+                    if ManualAttachUtil.hasAttachedConnectionHoses(object, inputJointDescIndex) then
+                        hoseEventText = g_i18n:getText("info_detach_hose")
+                    else
+                        hoseEventText = g_i18n:getText("info_attach_hose")
+                    end
+
+                    g_currentMission:addExtraPrintText(hoseEventText)
+
+                    hoseEventVisibility = true
                 end
             end
         end
@@ -156,8 +164,7 @@ function ManualAttach:draw(dt)
         end
 
         setActionEventText(self.attachEvent, attachEventText, attachEventPrio, attachEventVisibility)
-        setActionEventText(self.ptoEvent, ptoEventText, GS_PRIO_VERY_LOW, ptoEventVisibility)
-        setActionEventText(self.hoseEvent, "hose", GS_PRIO_VERY_LOW, ptoEventVisibility)
+        setActionEventText(self.handleEventId, ptoEventText, GS_PRIO_VERY_LOW, ptoEventVisibility)
     end
 end
 
@@ -174,6 +181,7 @@ function ManualAttach:resetAttachValues()
     self.attachedImplement = nil
 
     g_inputBinding:setActionEventTextVisibility(self.attachEvent, false)
+    g_inputBinding:setActionEventTextVisibility(self.handleEventId, false)
 end
 
 function ManualAttach:onVehicleListChanged(vehicles)
@@ -252,6 +260,7 @@ function ManualAttach:onConnectionHoseEvent()
             object:disconnectHoses(attacherVehicle)
         else
             object:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
+            object:updateAttachedConnectionHoses(attacherVehicle) -- update once
         end
     end
 end
@@ -264,16 +273,11 @@ function ManualAttach:registerActionEvents()
     local _, attachEventId = g_inputBinding:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
     g_inputBinding:setActionEventTextVisibility(attachEventId, false)
 
-    local _, ptoEventId = g_inputBinding:registerActionEvent(InputAction.MA_ATTACH_EXTRA, self, function()
-    end, false, false, false, true)
-    g_inputBinding:setActionEventTextVisibility(ptoEventId, false)
-
-    local _, hoseEventId = g_inputBinding:registerActionEvent(InputAction.MA_ATTACH_EXTRA, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
+    local _, handleEventId = g_inputBinding:registerActionEvent(InputAction.MA_ATTACH_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
     g_inputBinding:setActionEventTextVisibility(hoseEventId, false)
 
     self.attachEvent = attachEventId
-    self.ptoEvent = ptoEventId
-    self.hoseEvent = hoseEventId
+    self.handleEventId = handleEventId
 end
 
 function ManualAttach:unregisterActionEvents()
