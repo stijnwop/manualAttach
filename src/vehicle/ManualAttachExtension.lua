@@ -14,6 +14,7 @@ function ManualAttachExtension.registerFunctions(vehicleType)
 end
 
 function ManualAttachExtension.registerOverwrittenFunctions(vehicleType)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachExtension.inj_getCanToggleAttach)
 end
 
 function ManualAttachExtension.registerEventListeners(vehicleType)
@@ -28,6 +29,14 @@ function ManualAttachExtension:onLoad(savegame)
 end
 
 function ManualAttachExtension:onLoadFinished(savegame)
+end
+
+function ManualAttachExtension.inj_getCanToggleAttach(superFunc, vehicle)
+    if g_manualAttach ~= nil then
+        return false
+    end
+
+    return superFunc(vehicle)
 end
 
 function ManualAttachExtension:disconnectHoses(attacherVehicle)
