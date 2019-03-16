@@ -49,11 +49,16 @@
 
     <actions>
         <action name="MA_ATTACH_VEHICLE" axisType="HALF" />
+        <action name="MA_ATTACH_EXTRA" axisType="HALF" />
     </actions>
 
     <inputBinding>
         <actionBinding action="MA_ATTACH_VEHICLE">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_q" />
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10" />
+        </actionBinding>
+        <actionBinding action="MA_ATTACH_EXTRA">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
             <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10" />
         </actionBinding>
     </inputBinding>

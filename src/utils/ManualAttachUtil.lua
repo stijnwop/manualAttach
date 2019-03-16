@@ -23,6 +23,31 @@ function ManualAttachUtil:getCosAngle(p1, p2)
     return x1 * x2 + y1 * y2 + z1 * z2
 end
 
+function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
+    local spec = object.spec_powerTakeOffs
+
+    for _, input in pairs(spec.inputPowerTakeOffs) do
+        if input.connectedVehicle ~= nil then
+            if input.connectedVehicle == attacherVehicle then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+function ManualAttachUtil.hasAttachedConnectionHoses(object, inputJointDescIndex)
+    local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
+    for _, hose in ipairs(hoses) do
+        if object:getIsConnectionHoseUsed(hose) then
+            return true
+        end
+    end
+
+    return false
+end
+
 function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxDistanceSq, maxAngle, minDist, minDistY)
     local attachableInRange
     local attachableJointDescIndex
@@ -91,7 +116,7 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
 
                         attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex = ManualAttachUtil.findVehicleInAttachRange({ object }, maxDistanceSq, maxAngle)
                         if attacherVehicle ~= nil then
-                            return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex
+                            return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement
                         end
                     end
                 end
