@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="39">
+<modDesc descVersion="40">
     <author>Wopster</author>
-    <version>1.4.0.0</version>
+    <version>1.0.0.0</version>
 
     <title>
         <en>Manual Attaching</en>
@@ -38,11 +38,23 @@
     </description>
 
     <iconFilename>icon.png</iconFilename>
+
     <multiplayer supported="true"/>
+
+    <l10n filenamePrefix="translations/translation"/>
 
     <extraSourceFiles>
         <sourceFile filename="src/loader.lua"/>
     </extraSourceFiles>
 
-    <l10n filenamePrefix="translations/translation"/>
+    <actions>
+        <action name="MA_ATTACH_VEHICLE" axisType="HALF" />
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="MA_ATTACH_VEHICLE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_q" />
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10" />
+        </actionBinding>
+    </inputBinding>
 </modDesc>

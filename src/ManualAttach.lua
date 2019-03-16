@@ -1,11 +1,3 @@
---
--- ManualAttach
---
--- Authors: Wopster
--- Description: The main specilization for Manual Attach
---
--- Copyright (c) Wopster, 2015 - 2018
-
 ManualAttach = {}
 
 ManualAttach.COSANGLE_THRESHOLD = math.cos(math.rad(70))
@@ -15,23 +7,11 @@ ManualAttach.TIMER_THRESHOLD = 200 -- ms
 ManualAttach.DETACHING_NOT_ALLOWED_TIME = 50 -- ms
 ManualAttach.DETACHING_PRIORITY_NOT_ALLOWED = 6
 ManualAttach.ATTACHING_PRIORITY_ALLOWED = 1
-ManualAttach.JOINT_DISTANCE = 1.3
-ManualAttach.JOINT_SEQUENCE = 0.6 * 0.6
+ManualAttach.DEFAULT_JOINT_DISTANCE = 1.3
+ManualAttach.JOINT_DISTANCE = ManualAttach.DEFAULT_JOINT_DISTANCE
+ManualAttach.JOINT_SEQUENCE = 0.5 * 0.5
 ManualAttach.FORCED_ACTIVE_TIME_INCREASMENT = 600 -- ms
 
----
---
-function ManualAttach:preLoadManualAttach()
-    getfenv(0)["g_manualAttach"] = self
-
-    self.debug = true --<%=debug %>
-
-    -- handle vehicle insert
-end
-
----
--- @param typeName
---
 local function mapJointTypeNameToInt(typeName)
     local jointType = AttacherJoints.jointTypeNameToInt[typeName]
     -- Custom joints need a check if it exists in the game
@@ -51,264 +31,166 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
     [mapJointTypeNameToInt("fastCoupler")] = true
 }
 
----
--- @param ...
---
-local function initInRangeTable(...)
-    local t = {}
-    local f = {}
+local ManualAttach_mt = Class(ManualAttach)
 
-    for _, v in pairs({ ... }) do
-        for _, field in pairs(v) do
-            table.insert(f, field)
-        end
+function ManualAttach:new(mission, modDirectory)
+    local self = setmetatable({}, ManualAttach_mt)
+
+    self.isServer = mission:getIsServer()
+    self.isClient = mission:getIsClient()
+    self.mission = mission
+    self.modDirectory = modDirectory
+    self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, modDirectory)
+
+    if self.isClient then
+        self.detectionHandler:addDetectionListener(self)
     end
 
-    for _, field in pairs(f) do
-        t[field] = nil
-    end
+    FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, ManualAttach.inj_registerActionEvents)
+    BaseMission.registerActionEvents = Utils.appendedFunction(BaseMission.unregisterActionEvents, ManualAttach.inj_unregisterActionEvents)
 
-    return f
+    --    self.vehicleHandler = ManualAttachVehicleHandler:new(self.isServer, self.detectionHandler)
+    -- self.playerHandler = ManualAttachPlayerHandler:new(self.isServer, self.isClient, self.detectionHandler)
+
+    return self
 end
 
----
---
-function ManualAttach:loadMap()
-    local _genericFields = {
-        "vehicle",
-        "attachableInMountRange",
-        "attachableInMountRangeInputJointIndex",
-        "attachableInMountRangeJointIndex",
-        "attachableInMountRangeInputJoint",
-        "attachableInMountRangeJoint",
-        "attachedImplement",
-    }
+function ManualAttach:onMissionStart(mission)
+    self.detectionHandler:load()
 
-    local _playerSpecificFields = {
-        "attachedVehicle",
-        "attachedImplementIndex",
-        "attachedImplementInputJoint",
-    }
-
-    self.playerControlledInRange = initInRangeTable(_genericFields, _playerSpecificFields)
-    self.vehicleControlledInRange = initInRangeTable(_genericFields)
-
-    g_currentMission.dynamicHoseIsManual = true -- Todo: remove in future and use own global
+    self.vehicles = {}
+    self:reset()
 end
 
----
---
-function ManualAttach:deleteMap()
-    getfenv(0)["g_manualAttach"] = nil
-    g_currentMission.dynamicHoseIsManual = false
+function ManualAttach:delete()
+    self.detectionHandler:delete()
 end
 
----
--- @param t
---
-local function resetInRangeTable(t)
-    for i = #t, 1, -1 do
-        t[i] = nil
-    end
-end
-
----
--- @param dt
---
 function ManualAttach:update(dt)
-    if not g_currentMission:getIsClient() then
-        return
-    end
+    self.attacherVehicle = nil
 
-    resetInRangeTable(self.playerControlledInRange)
-    resetInRangeTable(self.vehicleControlledInRange)
+    if self.isClient and #self.vehicles ~= 0 then
+        local visible = false
 
-    local isPlayerControlled = ManualAttachUtil:getIsValidPlayer()
+        local attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement = ManualAttachUtil.findVehicleInAttachRange(self.vehicles, AttacherJoints.MAX_ATTACH_DISTANCE_SQ, AttacherJoints.MAX_ATTACH_ANGLE)
 
-    if isPlayerControlled then
-        self:handlePlayerControlled(dt)
-    else
-        self:handleVehicleControlled(dt)
-    end
+        self.attacherVehicle = attacherVehicle
+        self.attacherVehicleJointDescIndex = attacherVehicleJointDescIndex
+        self.attachable = attachable
+        self.attachableJointDescIndex = attachableJointDescIndex
+        self.attachedImplement = attachedImplement
 
-    -- Todo: draw
-end
+        local text = ""
+        local prio = GS_PRIO_VERY_LOW
 
----
--- @param vehicle
---
-local function getIsValidVehicle(vehicle)
-    return vehicle ~= nil and vehicle.isa ~= nil and vehicle:isa(Vehicle) and not vehicle:isa(StationCrane) -- Dismiss trains and the station cranes
-end
-
----
--- @param dt
---
-function ManualAttach:handlePlayerControlled(dt)
-    for _, vehicle in pairs(g_currentMission.vehicles) do
-        if getIsValidVehicle(vehicle) then
-            self:getIsManualAttachableInRange(vehicle)
+        if attachedImplement ~= nil and not attachedImplement.isDeleted and attachedImplement.isDetachAllowed ~= nil and attachedImplement:isDetachAllowed() then
+            if attachedImplement:getAttacherVehicle() ~= nil then
+                visible = true
+                text = g_i18n:getText("action_detach")
+            end
         end
-    end
 
-    local player = g_currentMission.player
-    if player.manualAttachTimer == nil then
-        player.manualAttachTimer = { time = 0, longEnough = false }
-    end
+        if self.attacherVehicle ~= nil then
+            if g_currentMission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
+                visible = true
+                text = g_i18n:getText("action_attach")
+                g_currentMission:showAttachContext(self.attachable)
+                prio = GS_PRIO_VERY_HIGH
+            end
+        end
 
-    local inRange = self.playerControlledInRange
+        g_inputBinding:setActionEventText(self.attachEvent, text)
+        g_inputBinding:setActionEventTextPriority(self.attachEvent, prio)
+        g_inputBinding:setActionEventTextVisibility(self.attachEvent, visible)
+    end
 end
 
----
--- @param dt
---
-function ManualAttach:handleVehicleControlled(dt)
+function ManualAttach:draw(dt)
 end
 
----
--- @param attacherJoint
--- @param jointTrans
--- @param distanceSequence
--- @param isManualCheck
---
-local function getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence, isManualCheck)
-    if distanceSequence == nil then
-        distanceSequence = ManualAttach.JOINT_SEQUENCE
+function ManualAttach:reset()
+    -- Inrange values
+    self.attacherVehicle = nil
+    self.attacherVehicleJointDescIndex = nil
+    self.attachable = nil
+    self.attachableJointDescIndex = nil
+    self.attachedImplement = nil
+
+    g_inputBinding:setActionEventTextVisibility(self.attachEvent, false)
+end
+
+function ManualAttach:onVehicleListChanged(vehicles)
+    if #vehicles == 0 then
+        self:reset()
     end
 
-    for _, attachable in pairs(g_currentMission.attachables) do
-        if attachable.attacherVehicle == nil then
-            for i, inputAttacherJoint in pairs(attachable.inputAttacherJoints) do
-                if attachable:getIsInputAttacherActive(inputAttacherJoint) and inputAttacherJoint.jointType == attacherJoint.jointType then
-                    local inputJointTrans = { getWorldTranslation(inputAttacherJoint.node) }
-                    local distanceJoints = Utils.vector2LengthSq(inputJointTrans[1] - jointTrans[1], inputJointTrans[3] - jointTrans[3])
+    self.vehicles = vehicles
+end
 
-                    if distanceJoints < distanceSequence then
-                        local jointDistance = Utils.getNoNil(inputAttacherJoint.inRangeDistance, ManualAttach.JOINT_DISTANCE)
-                        local jointDistanceY = math.abs(inputJointTrans[2] - jointTrans[2])
+function ManualAttach:getIsValidPlayer()
+    return g_currentMission.controlPlayer
+    --    self.mission.controlPlayer and
+    --            self.mission.player ~= nil and
+    --            self.mission.player.currentTool == nil and
+    --            not self.mission.player.isCarryingObject and
+    --            not self.mission.isPlayerFrozen
+end
 
-                        if jointDistanceY < jointDistance then
-                            local cosAngle = ManualAttachUtil:getCosAngle(inputAttacherJoint.node, attacherJoint.jointTransform)
-
-                            if cosAngle > ManualAttach.COSANGLE_THRESHOLD or ManualAttach:getIsCosAngleValidationException(attacherJoint) then
-                                local isManual = ManualAttach:getIsManualControlled(attachable, inputAttacherJoint)
-
-                                if (isManualCheck and isManual) or (not isManualCheck and not isManual) then
-                                    return attachable, inputAttacherJoint, i, distanceJoints
-                                end
-                            end
-                        end
-                    end
-                end
+function ManualAttach:onAttachEvent()
+    if self.attacherVehicle ~= nil then
+        if self.attachable ~= nil and g_currentMission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
+            -- attach
+            print("OKe we should attach?")
+            if self.attacherVehicle.spec_attacherJoints.attacherJoints[self.attacherVehicleJointDescIndex].jointIndex == 0 then
+                self.attacherVehicle:attachImplement(self.attachable, self.attachableJointDescIndex, self.attacherVehicleJointDescIndex)
             end
         end
     end
 
-    return nil, nil, nil, distanceSequence
-end
-
----
--- @param vehicle
---
-function ManualAttach:getIsManualAttachableInRange(vehicle)
-    if vehicle.attacherJoints == nil then
-        return
-    end
-
-    local inRange = self.playerControlledInRange
-    local playerTrans = { getWorldTranslation(g_currentMission.player.rootNode) }
-    local distanceSequence = ManualAttach.JOINT_SEQUENCE
-    local playerDistanceAttached = ManualAttach.PLAYER_DISTANCE
-    local playerDistance = ManualAttach.PLAYER_DISTANCE
-
-    if vehicle.attachedImplements ~= nil then
-        for i, implement in pairs(vehicle.attachedImplements) do
-            if implement.jointDescIndex ~= nil then
-                local jointTrans = { getWorldTranslation(vehicle.attacherJoints[implement.jointDescIndex].jointTransform) }
-                local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
-                local object = implement.object
-
-                if distance < ManualAttach.PLAYER_MIN_DISTANCE
-                        and distance < playerDistanceAttached
-                        and inRange.attachedImplement ~= object then
-                    inRange.attachedVehicle = vehicle
-                    inRange.attachedImplement = object
-                    inRange.attachedImplementIndex = i
-                    inRange.attachedImplementInputJoint = object.inputAttacherJoints[object.inputAttacherJointDescIndex]
-
-                    playerDistanceAttached = distance
+    -- detach
+    local object = self.attachedImplement
+    if object ~= nil and object ~= self.attacherVehicle and object.isDetachAllowed ~= nil then
+        local detachAllowed, warning, showWarning = object:isDetachAllowed()
+        if detachAllowed then
+            if object.getAttacherVehicle ~= nil then
+                local attacherVehicle = object:getAttacherVehicle()
+                if attacherVehicle ~= nil then
+                    attacherVehicle:detachImplementByObject(object)
                 end
             end
-        end
-    end
-
-    for j, attacherJoint in pairs(vehicle.attacherJoints) do
-        if not attacherJoint.jointIndex ~= 0 then -- prevent double
-            local jointTrans = { getWorldTranslation(attacherJoint.jointTransform) }
-            local distance = Utils.vector3LengthSq(jointTrans[1] - playerTrans[1], jointTrans[2] - playerTrans[2], jointTrans[3] - playerTrans[3])
-
-            if distance < ManualAttaching.PLAYER_MIN_DISTANCE and distance < playerDistance then
-                local attachable, inputAttacherJoint, inputAttacherJointIndex, distanceSq = getAttachableInJointRange(attacherJoint, jointTrans, distanceSequence, true)
-
-                if attachable ~= nil and attachable ~= inRange.attachableInMountRange
-                        or inputAttacherJoint ~= nil and inputAttacherJoint ~= inRange.attachableInMountRangeInputJoint
-                        or inputAttacherJointIndex ~= nil and inputAttacherJointIndex ~= inRange.attachableInMountRangeInputJointIndex then
-                    inRange.vehicle = vehicle
-                    inRange.attachableInMountRange = attachable
-                    inRange.attachableInMountRangeInputJoint = inputAttacherJoint
-                    inRange.attachableInMountRangeInputJointIndex = inputAttacherJointIndex
-                    inRange.attachableInMountRangeJoint = attacherJoint
-                    inRange.attachableInMountRangeJointIndex = j
-
-                    playerDistance = distance
-                    distanceSequence = distanceSq
-                end
-            end
+        elseif showWarning == nil or showWarning then
+            g_currentMission:showBlinkingWarning(warning or g_i18n:getText("warning_detachNotAllowed"), 2000)
         end
     end
 end
 
----
--- @param jointDesc
---
-function ManualAttach:getIsCosAngleValidationException(jointDesc)
-    return jointDesc.jointType == AttacherJoints.jointTypeNameToInt['conveyor']
+function ManualAttach:registerActionEvents()
+    local _, eventId = g_inputBinding:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
+    g_inputBinding:setActionEventTextVisibility(eventId, false)
+
+    self.attachEvent = eventId
 end
 
----
--- @param vehicle
--- @param jointDesc
---
-function ManualAttach:getIsManualControlled(vehicle, jointDesc)
-    if not ManualAttach.AUTO_ATTACH_JOINTYPES[jointDesc.jointType] then
-        if jointDesc.isManual ~= nil and not jointDesc.isManual then
-            return false
+function ManualAttach:unregisterActionEvents()
+    g_inputBinding:removeActionEventsByTarget(self)
+end
+
+function ManualAttach.inj_registerActionEvents(mission)
+    g_manualAttach:registerActionEvents()
+end
+
+function ManualAttach.inj_unregisterActionEvents(mission)
+    g_manualAttach:unregisterActionEvents()
+end
+
+function ManualAttach.installSpecializations(vehicleTypeManager, specializationManager, modDirectory, modName)
+    specializationManager:addSpecialization("manualAttachExtension", "ManualAttachExtension", Utils.getFilename("src/vehicle/ManualAttachExtension.lua", modDirectory), nil)
+
+    for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
+        if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
+                or SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
+            -- Make sure to namespace the spec again
+            --            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachExtension")
         end
-
-        return true
     end
-
-    return false
-end
-
----
--- @param jointDesc
---
-function ManualAttach:getIsDynamicHoseManualControlled(jointDesc)
-    if jointDesc.dynamicHosesIsManual ~= nil and not jointDesc.dynamicHosesIsManual then
-        return false
-    end
-
-    return true
-end
-
----
--- @param jointDesc
---
-function ManualAttach:getIsPtoManualControlled(jointDesc)
-    if jointDesc.ptoIsManual ~= nil and not jointDesc.ptoIsManual then
-        return false
-    end
-
-    return true
 end

@@ -19,7 +19,7 @@ BaseMission.getAttachableInRange = Utils.overwrittenFunction(BaseMission.getAtta
 source(ManualAttachingRegistrationHelper.baseDirectory .. 'src/ManualAttaching.lua')
 
 if SpecializationUtil.specializations['manualAttachingExtension'] == nil then
-    SpecializationUtil.registerSpecialization('manualAttachingExtension', 'ManualAttachingExtension', ManualAttachingRegistrationHelper.baseDirectory .. 'src/vehicles/ManualAttachingExtension.lua')
+    SpecializationUtil.registerSpecialization('manualAttachingExtension', 'ManualAttachingExtension', ManualAttachingRegistrationHelper.baseDirectory .. 'src/vehicles/ManualAttachExtension.lua')
 end
 
 ---
