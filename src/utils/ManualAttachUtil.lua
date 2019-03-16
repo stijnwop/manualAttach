@@ -113,11 +113,6 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
                             minPlayerAttachedImplDist = distSq
                             attachedImplement = object
                         end
-
-                        attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex = ManualAttachUtil.findVehicleInAttachRange({ object }, maxDistanceSq, maxAngle)
-                        if attacherVehicle ~= nil then
-                            return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement
-                        end
                     end
                 end
             end
