@@ -46,12 +46,6 @@ function ManualAttach:new(mission, modDirectory)
         self.detectionHandler:addDetectionListener(self)
     end
 
-    FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, ManualAttach.inj_registerActionEvents)
-    BaseMission.registerActionEvents = Utils.appendedFunction(BaseMission.unregisterActionEvents, ManualAttach.inj_unregisterActionEvents)
-
-    --    self.vehicleHandler = ManualAttachVehicleHandler:new(self.isServer, self.detectionHandler)
-    -- self.playerHandler = ManualAttachPlayerHandler:new(self.isServer, self.isClient, self.detectionHandler)
-
     return self
 end
 
@@ -59,7 +53,7 @@ function ManualAttach:onMissionStart(mission)
     self.detectionHandler:load()
 
     self.vehicles = {}
-    self:reset()
+    self:resetAttachValues()
 end
 
 function ManualAttach:delete()
@@ -67,11 +61,11 @@ function ManualAttach:delete()
 end
 
 function ManualAttach:update(dt)
-    self.attacherVehicle = nil
+    if not self.isClient then
+        return
+    end
 
-    if self.isClient and #self.vehicles ~= 0 then
-        local visible = false
-
+    if self:hasVehicles() then
         local attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement = ManualAttachUtil.findVehicleInAttachRange(self.vehicles, AttacherJoints.MAX_ATTACH_DISTANCE_SQ, AttacherJoints.MAX_ATTACH_ANGLE)
 
         self.attacherVehicle = attacherVehicle
@@ -79,18 +73,27 @@ function ManualAttach:update(dt)
         self.attachable = attachable
         self.attachableJointDescIndex = attachableJointDescIndex
         self.attachedImplement = attachedImplement
+    end
+end
 
+function ManualAttach:draw(dt)
+    if not self.isClient then
+        return
+    end
+
+    if self:hasVehicles() then
+        local visible = false
         local text = ""
         local prio = GS_PRIO_VERY_LOW
 
-        if attachedImplement ~= nil and not attachedImplement.isDeleted and attachedImplement.isDetachAllowed ~= nil and attachedImplement:isDetachAllowed() then
-            if attachedImplement:getAttacherVehicle() ~= nil then
+        if self.attachedImplement ~= nil and not self.attachedImplement.isDeleted and self.attachedImplement.isDetachAllowed ~= nil and self.attachedImplement:isDetachAllowed() then
+            if self.attachedImplement:getAttacherVehicle() ~= nil then
                 visible = true
                 text = g_i18n:getText("action_detach")
             end
         end
 
-        if self.attacherVehicle ~= nil then
+        if self.attachable ~= nil then
             if g_currentMission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
                 visible = true
                 text = g_i18n:getText("action_attach")
@@ -105,10 +108,11 @@ function ManualAttach:update(dt)
     end
 end
 
-function ManualAttach:draw(dt)
+function ManualAttach:hasVehicles()
+    return #self.vehicles ~= 0
 end
 
-function ManualAttach:reset()
+function ManualAttach:resetAttachValues()
     -- Inrange values
     self.attacherVehicle = nil
     self.attacherVehicleJointDescIndex = nil
@@ -120,46 +124,44 @@ function ManualAttach:reset()
 end
 
 function ManualAttach:onVehicleListChanged(vehicles)
-    if #vehicles == 0 then
-        self:reset()
-    end
-
     self.vehicles = vehicles
+
+    if not self:hasVehicles() then
+        self:resetAttachValues()
+    end
 end
 
 function ManualAttach:getIsValidPlayer()
-    return g_currentMission.controlPlayer
-    --    self.mission.controlPlayer and
-    --            self.mission.player ~= nil and
-    --            self.mission.player.currentTool == nil and
-    --            not self.mission.player.isCarryingObject and
-    --            not self.mission.isPlayerFrozen
+    local player = g_currentMission.controlPlayer
+    return player
+            and not player.isCarryingObject
+            and not player:hasHandtoolEquipped()
 end
 
 function ManualAttach:onAttachEvent()
-    if self.attacherVehicle ~= nil then
+    if self.attachable ~= nil then
+        -- attach
         if self.attachable ~= nil and g_currentMission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
-            -- attach
-            print("OKe we should attach?")
             if self.attacherVehicle.spec_attacherJoints.attacherJoints[self.attacherVehicleJointDescIndex].jointIndex == 0 then
                 self.attacherVehicle:attachImplement(self.attachable, self.attachableJointDescIndex, self.attacherVehicleJointDescIndex)
+                self.attacherVehicle:handleLowerImplementByAttacherJointIndex(self.attacherVehicleJointDescIndex)
             end
         end
-    end
-
-    -- detach
-    local object = self.attachedImplement
-    if object ~= nil and object ~= self.attacherVehicle and object.isDetachAllowed ~= nil then
-        local detachAllowed, warning, showWarning = object:isDetachAllowed()
-        if detachAllowed then
-            if object.getAttacherVehicle ~= nil then
-                local attacherVehicle = object:getAttacherVehicle()
-                if attacherVehicle ~= nil then
-                    attacherVehicle:detachImplementByObject(object)
+    else
+        -- detach
+        local object = self.attachedImplement
+        if object ~= nil and object ~= self.attacherVehicle and object.isDetachAllowed ~= nil then
+            local detachAllowed, warning, showWarning = object:isDetachAllowed()
+            if detachAllowed then
+                if object.getAttacherVehicle ~= nil then
+                    local attacherVehicle = object:getAttacherVehicle()
+                    if attacherVehicle ~= nil then
+                        attacherVehicle:detachImplementByObject(object)
+                    end
                 end
+            elseif showWarning == nil or showWarning then
+                g_currentMission:showBlinkingWarning(warning or g_i18n:getText("warning_detachNotAllowed"), 2000)
             end
-        elseif showWarning == nil or showWarning then
-            g_currentMission:showBlinkingWarning(warning or g_i18n:getText("warning_detachNotAllowed"), 2000)
         end
     end
 end
@@ -190,7 +192,7 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
         if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
                 or SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
             -- Make sure to namespace the spec again
-            --            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachExtension")
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachExtension")
         end
     end
 end
