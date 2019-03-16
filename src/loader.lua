@@ -16,6 +16,14 @@ function _init()
     Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, _startMission)
 
     VehicleTypeManager.validateVehicleTypes = Utils.prependedFunction(VehicleTypeManager.validateVehicleTypes, _validateVehicleTypes)
+
+    FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, ManualAttach.inj_registerActionEvents)
+    BaseMission.unregisterActionEvents = Utils.appendedFunction(BaseMission.unregisterActionEvents, ManualAttach.inj_unregisterActionEvents)
+
+    -- Noop AttacherJoints function
+    AttacherJoints.findVehicleInAttachRange = function()
+        return nil, nil, nil, nil
+    end
 end
 
 function _load(mission)
@@ -23,8 +31,7 @@ function _load(mission)
 
     manualAttach = ManualAttach:new(mission, directory)
 
-    g_manualAttach = manualAttach
-    _G["g_manualAttach"] = manualAttach
+    getfenv(0)["g_manualAttach"] = manualAttach
 
     addModEventListener(manualAttach)
 
@@ -43,7 +50,7 @@ function _unload()
 
     manualAttach:delete()
     manualAttach = nil -- Allows garbage collecting
-    _G["g_manualAttach"] = nil
+    getfenv(0)["g_manualAttach"] = nil
 end
 
 function _validateVehicleTypes(vehicleTypeManager)
