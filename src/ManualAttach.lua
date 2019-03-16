@@ -203,9 +203,15 @@ function ManualAttach:onAttachEvent()
     if self.attachable ~= nil then
         -- attach
         if self.attachable ~= nil and g_currentMission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
-            if self.attacherVehicle.spec_attacherJoints.attacherJoints[self.attacherVehicleJointDescIndex].jointIndex == 0 then
+            local jointDesc = self.attacherVehicle.spec_attacherJoints.attacherJoints[self.attacherVehicleJointDescIndex]
+
+            if jointDesc.jointIndex == 0 then
                 self.attacherVehicle:attachImplement(self.attachable, self.attachableJointDescIndex, self.attacherVehicleJointDescIndex)
-                self.attacherVehicle:handleLowerImplementByAttacherJointIndex(self.attacherVehicleJointDescIndex)
+
+                local allowsLowering = self.attachable:getAllowsLowering()
+                if allowsLowering and jointDesc.allowsLowering then
+                    self.attacherVehicle:handleLowerImplementByAttacherJointIndex(self.attacherVehicleJointDescIndex)
+                end
             end
         end
     else
@@ -213,12 +219,23 @@ function ManualAttach:onAttachEvent()
         local object = self.attachedImplement
         if object ~= nil and object ~= self.attacherVehicle and object.isDetachAllowed ~= nil then
             local detachAllowed, warning, showWarning = object:isDetachAllowed()
-            if detachAllowed then
-                if object.getAttacherVehicle ~= nil then
-                    local attacherVehicle = object:getAttacherVehicle()
-                    if attacherVehicle ~= nil then
-                        attacherVehicle:detachImplementByObject(object)
+            local attacherVehicle = object:getAttacherVehicle()
+            local jointDesc = attacherVehicle:getAttacherJointDescFromObject(object)
+
+            if ManualAttachUtil.isManualJointType(jointDesc) then
+                local allowsLowering = object:getAllowsLowering()
+
+                if allowsLowering and jointDesc.allowsLowering then
+                    if not jointDesc.moveDown then
+                        detachAllowed = false
+                        warning = g_i18n:getText("info_lower_warning"):format(object:getName())
                     end
+                end
+            end
+
+            if detachAllowed then
+                if attacherVehicle ~= nil then
+                    attacherVehicle:detachImplementByObject(object)
                 end
             elseif showWarning == nil or showWarning then
                 g_currentMission:showBlinkingWarning(warning or g_i18n:getText("warning_detachNotAllowed"), 2000)

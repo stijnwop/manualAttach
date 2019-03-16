@@ -4,7 +4,7 @@ function ManualAttachUtil:getSpecTable(vehicle, name)
     return vehicle["spec_" .. name]
 end
 
-function ManualAttachUtil:getIsManualControlled(jointDesc)
+function ManualAttachUtil.isManualJointType(jointDesc)
     if not ManualAttach.AUTO_ATTACH_JOINTYPES[jointDesc.jointType] then
         if jointDesc.isManual ~= nil and not jointDesc.isManual then
             return false
