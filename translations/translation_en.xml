@@ -5,7 +5,6 @@
 
         <text name="input_MA_ATTACH_VEHICLE" text="Attach/Detach" />
         <text name="input_MA_ATTACH_HOSE" text="Attach/Detach" />
-        <text name="input_MA_ATTACH_PTO" text="Attach/Detach" />
 
         <text name="action_attach_pto" text="Attach power take off" />
         <text name="action_detach_pto" text="Detach power take off" />
@@ -15,6 +14,11 @@
 
         <text name="info_lower_warning" text="Lower %s first" />
 
+        <text name="info_detach_pto_warning" text="Detach PTO of %s first" />
+        <text name="info_attach_pto_warning" text="Attach PTO of %s first" />
+
+        <text name="info_detach_hoses_warning" text="Detach hoses of %s first" />
+        <text name="info_attach_hoses_warning" text="Attach hoses of %s first" />
 
         <text name="MANUAL_ATTACHING_ATTACH" text="Attach %s"/>
         <text name="MANUAL_ATTACHING_DETACH" text="Detach %s"/>

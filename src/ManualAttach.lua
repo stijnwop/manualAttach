@@ -140,8 +140,7 @@ function ManualAttach:draw(dt)
                 end
 
                 if object.getIsConnectionHoseUsed ~= nil then
-                    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
-                    if ManualAttachUtil.hasAttachedConnectionHoses(object, inputJointDescIndex) then
+                    if ManualAttachUtil.hasAttachedConnectionHoses(object) then
                         hoseEventText = g_i18n:getText("info_detach_hose")
                     else
                         hoseEventText = g_i18n:getText("info_attach_hose")
@@ -234,6 +233,20 @@ function ManualAttach:onAttachEvent()
             end
 
             if detachAllowed then
+                if ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle) then
+                    detachAllowed = false
+                    warning = g_i18n:getText("info_detach_pto_warning"):format(object:getName())
+                end
+            end
+
+            if detachAllowed then
+                if ManualAttachUtil.hasAttachedConnectionHoses(object) then
+                    detachAllowed = false
+                    warning = g_i18n:getText("info_detach_hoses_warning"):format(object:getName())
+                end
+            end
+
+            if detachAllowed then
                 if attacherVehicle ~= nil then
                     attacherVehicle:detachImplementByObject(object)
                 end
@@ -273,7 +286,7 @@ function ManualAttach:onConnectionHoseEvent()
         local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
         local jointDescIndex = implement.jointDescIndex
 
-        if ManualAttachUtil.hasAttachedConnectionHoses(object, inputJointDescIndex) then
+        if ManualAttachUtil.hasAttachedConnectionHoses(object) then
             object:disconnectHoses(attacherVehicle)
         else
             object:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)

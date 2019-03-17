@@ -37,7 +37,8 @@ function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
     return false
 end
 
-function ManualAttachUtil.hasAttachedConnectionHoses(object, inputJointDescIndex)
+function ManualAttachUtil.hasAttachedConnectionHoses(object)
+    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
     for _, hose in ipairs(hoses) do
         if object:getIsConnectionHoseUsed(hose) then
