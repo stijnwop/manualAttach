@@ -2,23 +2,35 @@ ManualAttachDetectionHandler = {}
 
 local ManualAttachDetectionHandler_mt = Class(ManualAttachDetectionHandler)
 
-function ManualAttachDetectionHandler:new(isServer, modDirectory)
+function ManualAttachDetectionHandler:new(isServer, isClient, modDirectory)
     local instance = setmetatable({}, ManualAttachDetectionHandler_mt)
 
     instance.isServer = isServer
+    instance.isClient = isClient
     instance.modDirectory = modDirectory
     instance.detectedVehicleInTrigger = {}
     instance.listeners = {}
 
+    Player.onEnter = Utils.appendedFunction(Player.onEnter, ManualAttachDetectionHandler.inj_onEnter)
+    Player.onLeave = Utils.appendedFunction(Player.onLeave, ManualAttachDetectionHandler.inj_onLeave)
+
     return instance
 end
 
+function ManualAttachDetectionHandler.inj_onEnter(player, isControlling)
+    if isControlling then
+        g_manualAttach.detectionHandler:loadTrigger()
+    end
+end
+
+function ManualAttachDetectionHandler.inj_onLeave(player)
+    g_manualAttach.detectionHandler:unloadTrigger()
+end
+
 function ManualAttachDetectionHandler:load()
-    self:loadTrigger()
 end
 
 function ManualAttachDetectionHandler:delete()
-    self:unloadTrigger()
 end
 
 function ManualAttachDetectionHandler:addDetectionListener(listener)
@@ -40,30 +52,34 @@ function ManualAttachDetectionHandler:updateListeners(vehicles)
 end
 
 function ManualAttachDetectionHandler:loadTrigger()
-    local detectionTriggerFilename = Utils.getFilename("resources/detectionTrigger.i3d", self.modDirectory)
-    local rootNode = loadI3DFile(detectionTriggerFilename, false, false, false)
-    local detectionTrigger = I3DUtil.indexToObject(rootNode, "0")
+    if self.isClient then
+        local detectionTriggerFilename = Utils.getFilename("resources/detectionTrigger.i3d", self.modDirectory)
+        local rootNode = loadI3DFile(detectionTriggerFilename, false, false, false)
+        local detectionTrigger = I3DUtil.indexToObject(rootNode, "0")
 
-    unlink(detectionTrigger)
-    delete(rootNode)
+        unlink(detectionTrigger)
+        delete(rootNode)
 
-    self.detectionTrigger = detectionTrigger
-    addToPhysics(self.detectionTrigger)
-    link(getRootNode(), self.detectionTrigger)
+        self.detectionTrigger = detectionTrigger
+        addToPhysics(self.detectionTrigger)
+        link(getRootNode(), self.detectionTrigger)
 
-    -- Link trigger to player
-    link(g_currentMission.player.rootNode, self.detectionTrigger)
-    --setTranslation(self.detectionTrigger, 0, 0, 0)
+        -- Link trigger to player
+        link(g_currentMission.player.rootNode, self.detectionTrigger)
+        --setTranslation(self.detectionTrigger, 0, 0, 0)
 
-    addTrigger(self.detectionTrigger, "vehicleDetectionCallback", self)
+        addTrigger(self.detectionTrigger, "vehicleDetectionCallback", self)
+    end
 end
 
 function ManualAttachDetectionHandler:unloadTrigger()
-    if self.detectionTrigger ~= nil then
-        removeFromPhysics(self.detectionTrigger)
-        removeTrigger(self.detectionTrigger)
-        delete(self.detectionTrigger)
-        self.detectionTrigger = nil
+    if self.isClient then
+        if self.detectionTrigger ~= nil then
+            removeFromPhysics(self.detectionTrigger)
+            removeTrigger(self.detectionTrigger)
+            delete(self.detectionTrigger)
+            self.detectionTrigger = nil
+        end
     end
 end
 

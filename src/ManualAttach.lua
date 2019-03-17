@@ -40,7 +40,7 @@ function ManualAttach:new(mission, modDirectory)
     self.isClient = mission:getIsClient()
     self.mission = mission
     self.modDirectory = modDirectory
-    self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, modDirectory)
+    self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, modDirectory)
 
     if self.isClient then
         self.detectionHandler:addDetectionListener(self)
