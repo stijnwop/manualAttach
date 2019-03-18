@@ -84,7 +84,7 @@ function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxD
     return attachableInRange, attachableJointDescIndex, minDist, minDistY
 end
 
-function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxAngle)
+function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxAngle, isPlayerBased)
     local attacherVehicle
     local attacherVehicleJointDescIndex
     local attachable
@@ -96,43 +96,58 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
     local minPlayerDist = math.huge
     local minPlayerAttachedImplDist = math.huge
 
-    for _, vehicle in pairs(vehicles) do
+    for _, vehicle in ipairs(vehicles) do
         local spec = vehicle.spec_attacherJoints
 
         if spec ~= nil then
             if vehicle.getAttachedImplements ~= nil then
                 for _, implement in pairs(vehicle:getAttachedImplements()) do
-                    if implement.object ~= nil then
-                        local x, _, z = localToLocal(g_currentMission.player.rootNode, spec.attacherJoints[implement.jointDescIndex].jointTransform, 0, 0, 0)
-                        local distSq = MathUtil.vector2LengthSq(x, z)
+                    local object = implement.object
+                    if object ~= nil then
+                        if isPlayerBased then
+                            local attacherJoint = spec.attacherJoints[implement.jointDescIndex]
+                            local x, _, z = localToLocal(g_currentMission.player.rootNode, attacherJoint.jointTransform, 0, 0, 0)
+                            local distSq = MathUtil.vector2LengthSq(x, z)
 
-                        local object = implement.object
+                            if attachedImplement ~= object
+                                    and distSq < ManualAttach.PLAYER_MIN_DISTANCE
+                                    and distSq < minPlayerAttachedImplDist then
+                                minPlayerAttachedImplDist = distSq
+                                attachedImplement = object
+                            end
+                        else
+                            attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement = ManualAttachUtil.findVehicleInAttachRange(object, maxDistanceSq, maxAngle, isPlayerBased)
 
-                        if attachedImplement ~= object
-                                and distSq < ManualAttach.PLAYER_DISTANCE
-                                and distSq < minPlayerAttachedImplDist then
-                            minPlayerAttachedImplDist = distSq
-                            attachedImplement = object
+                            if attacherVehicle ~= nil then
+                                return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement
+                            end
                         end
                     end
                 end
             end
 
-            for attacherJointIndex, attacherJoint in pairs(spec.attacherJoints) do
+            for attacherJointIndex, attacherJoint in ipairs(spec.attacherJoints) do
                 if not attacherJoint.jointIndex ~= 0 then
-                    local x, _, z = localToLocal(g_currentMission.player.rootNode, attacherJoint.jointTransform, 0, 0, 0)
-                    local distSq = MathUtil.vector2LengthSq(x, z)
+                    local isInRange = true
+                    if isPlayerBased then
+                        local x, _, z = localToLocal(g_currentMission.player.rootNode, attacherJoint.jointTransform, 0, 0, 0)
+                        local distSq = MathUtil.vector2LengthSq(x, z)
 
-                    if distSq < ManualAttach.PLAYER_DISTANCE
-                            and distSq < minPlayerDist then
-                        minPlayerDist = distSq
+                        if distSq > ManualAttach.PLAYER_MIN_DISTANCE
+                                and distSq > minPlayerDist then
+                            isInRange = false
+                        else
+                            minPlayerDist = distSq
+                        end
+                    end
+
+                    if isInRange then
                         attachable, attachableJointDescIndex, minDist, minDistY = ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxDistanceSq, maxAngle, minDist, minDistY)
 
                         if attachable ~= nil then
                             attacherVehicle = vehicle
                             attacherVehicleJointDescIndex = attacherJointIndex
-
-                            return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement
+                            break
                         end
                     end
                 end
@@ -140,5 +155,9 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
         end
     end
 
-    return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement
+    return attacherVehicle,
+    attacherVehicleJointDescIndex,
+    attachable,
+    attachableJointDescIndex,
+    attachedImplement
 end
