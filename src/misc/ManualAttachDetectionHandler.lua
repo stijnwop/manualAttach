@@ -45,9 +45,15 @@ function ManualAttachDetectionHandler:removeDetectionListener(listener)
     end
 end
 
-function ManualAttachDetectionHandler:updateListeners(vehicles)
+function ManualAttachDetectionHandler:notifyVehicleListChanged(vehicles)
     for _, listener in ipairs(self.listeners) do
         listener:onVehicleListChanged(vehicles)
+    end
+end
+
+function ManualAttachDetectionHandler:notifyVehicleTriggerChange(isRemoved)
+    for _, listener in ipairs(self.listeners) do
+        listener:onTriggerChanged(isRemoved)
     end
 end
 
@@ -69,17 +75,24 @@ function ManualAttachDetectionHandler:loadTrigger()
         --setTranslation(self.detectionTrigger, 0, 0, 0)
 
         addTrigger(self.detectionTrigger, "vehicleDetectionCallback", self)
+
+        self:notifyVehicleTriggerChange(false)
     end
 end
 
 function ManualAttachDetectionHandler:unloadTrigger()
     if self.isClient then
+        self:notifyVehicleTriggerChange(true)
+
         if self.detectionTrigger ~= nil then
             removeFromPhysics(self.detectionTrigger)
             removeTrigger(self.detectionTrigger)
             delete(self.detectionTrigger)
             self.detectionTrigger = nil
         end
+
+
+        self.detectedVehicleInTrigger = {}
     end
 end
 
@@ -113,7 +126,7 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
         end
 
         if amount ~= #self.detectedVehicleInTrigger then
-            self:updateListeners(self.detectedVehicleInTrigger)
+            self:notifyVehicleListChanged(self.detectedVehicleInTrigger)
         end
     end
 end
