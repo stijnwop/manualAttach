@@ -53,8 +53,9 @@ function ManualAttach:onMissionStart(mission)
     self.detectionHandler:load()
 
     self.vehicles = {}
+    self.controlledVehicle = nil
+
     self.hasHoseEventInput = 0
-    self.doFirstFrameVehicleLookup = false
     self.allowPtoEvent = true
     self.hoseEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
 
@@ -99,7 +100,10 @@ function ManualAttach:update(dt)
     end
 
     if not isValidPlayer then
-        self.vehicles = { g_currentMission.controlledVehicle }
+        if self.controlledVehicle ~= g_currentMission.controlledVehicle then
+            self.controlledVehicle = g_currentMission.controlledVehicle
+            self.vehicles = { self.controlledVehicle }
+        end
     end
 end
 
@@ -131,17 +135,24 @@ function ManualAttach:draw(dt)
     local isValidPlayer = self:isValidPlayer()
 
     if not isValidPlayer then
-        object = g_currentMission.controlledVehicle:getSelectedVehicle()
+        object = self.controlledVehicle:getSelectedVehicle()
     end
 
     if object ~= nil and not object.isDeleted and object.getAttacherVehicle ~= nil then
         local attacherVehicle = object:getAttacherVehicle()
+        local canDraw = attacherVehicle ~= nil
+        if canDraw
+                and not isValidPlayer
+                and not ManualAttachUtil.isAutoDetachable(attacherVehicle, object) then
+            canDraw = false
+        end
 
-        if attacherVehicle ~= nil then
+        if canDraw then
             if object.isDetachAllowed ~= nil and object:isDetachAllowed() then
                 attachEventVisibility = true
                 attachEventText = g_i18n:getText("action_detach")
             end
+
             -- Below is player handling only.
             if isValidPlayer then
                 if object.getInputPowerTakeOffs ~= nil then
@@ -208,7 +219,7 @@ end
 
 function ManualAttach:onTriggerChanged(isDeleted)
     if isDeleted then
-        self.doFirstFrameVehicleLookup = true
+        self.controlledVehicle = nil
     end
 end
 
@@ -288,7 +299,13 @@ function ManualAttach:onAttachEvent()
         -- detach
         local object = self.attachedImplement
         if not self:isValidPlayer() then
-            object = g_currentMission.controlledVehicle:getSelectedVehicle()
+            local selectedVehicle = self.controlledVehicle:getSelectedVehicle()
+            if selectedVehicle ~= nil then
+                local attacherVehicle = selectedVehicle:getAttacherVehicle()
+                if ManualAttachUtil.isAutoDetachable(attacherVehicle, selectedVehicle) then
+                    object = selectedVehicle
+                end
+            end
         end
 
         if object ~= nil and object ~= self.attacherVehicle and object.isDetachAllowed ~= nil then

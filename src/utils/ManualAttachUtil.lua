@@ -49,6 +49,11 @@ function ManualAttachUtil.hasAttachedConnectionHoses(object)
     return false
 end
 
+function ManualAttachUtil.isAutoDetachable(vehicle, object)
+    local jointDesc = vehicle:getAttacherJointDescFromObject(object)
+    return jointDesc ~= nil and not ManualAttachUtil.isManualJointType(jointDesc)
+end
+
 function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxDistanceSq, maxAngle, minDist, minDistY, isPlayerBased)
     local attachableInRange
     local attachableJointDescIndex
@@ -121,7 +126,7 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
                                 attachedImplement = object
                             end
                         else
-                            attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement = ManualAttachUtil.findVehicleInAttachRange(object, maxDistanceSq, maxAngle, isPlayerBased)
+                            attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement = ManualAttachUtil.findVehicleInAttachRange({ object }, maxDistanceSq, maxAngle, isPlayerBased)
 
                             if attacherVehicle ~= nil then
                                 return attacherVehicle, attacherVehicleJointDescIndex, attachable, attachableJointDescIndex, attachedImplement
