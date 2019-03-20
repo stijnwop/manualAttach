@@ -25,6 +25,7 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
     [mapJointTypeNameToInt("wheelLoader")] = true,
     [mapJointTypeNameToInt("frontloader")] = true,
     [mapJointTypeNameToInt("telehandler")] = true,
+    [mapJointTypeNameToInt("loaderFork")] = true,
     [mapJointTypeNameToInt("hookLift")] = true,
     [mapJointTypeNameToInt("semitrailer")] = true,
     [mapJointTypeNameToInt("semitrailerHook")] = true,
