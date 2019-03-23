@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <i3D name="detectionTrigger" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+  </Asset>
 
   <Files>
   </Files>
 
+
   <Materials>
-    <Material name="lambert1" materialId="1" diffuseColor="0.5 0.5 0.5 1" specularColor="0 0 0" ambientColor="1 1 1">
+    <Material name="lambert1" materialId="4" diffuseColor="0.498039 0.498039 0.498039 1">
     </Material>
   </Materials>
 
@@ -14,10 +18,12 @@
   <Shapes externalShapesFile="detectionTrigger.i3d.shapes">
   </Shapes>
 
+
+  <Dynamics>
+  </Dynamics>
+
   <Scene>
-    <Shape name="detectionTrigger" shapeId="1" kinematic="true" trigger="true" collisionMask="1088421888" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="1" nodeId="1"/>
+    <Shape shapeId="1" name="detectionTrigger" kinematic="true" trigger="true" collisionMask="1088430080" nodeId="7" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
   </Scene>
 
-  <UserAttributes>
-  </UserAttributes>
 </i3D>
