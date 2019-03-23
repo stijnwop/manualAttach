@@ -2,19 +2,20 @@ ManualAttachDetectionHandler = {}
 
 local ManualAttachDetectionHandler_mt = Class(ManualAttachDetectionHandler)
 
-function ManualAttachDetectionHandler:new(isServer, isClient, modDirectory)
-    local instance = setmetatable({}, ManualAttachDetectionHandler_mt)
+function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirectory)
+    local self = setmetatable({}, ManualAttachDetectionHandler_mt)
 
-    instance.isServer = isServer
-    instance.isClient = isClient
-    instance.modDirectory = modDirectory
-    instance.detectedVehicleInTrigger = {}
-    instance.listeners = {}
+    self.isServer = isServer
+    self.isClient = isClient
+    self.mission = mission
+    self.modDirectory = modDirectory
+    self.detectedVehicleInTrigger = {}
+    self.listeners = {}
 
     Player.onEnter = Utils.appendedFunction(Player.onEnter, ManualAttachDetectionHandler.inj_onEnter)
     Player.onLeave = Utils.appendedFunction(Player.onLeave, ManualAttachDetectionHandler.inj_onLeave)
 
-    return instance
+    return self
 end
 
 function ManualAttachDetectionHandler.inj_onEnter(player, isControlling)
@@ -71,7 +72,7 @@ function ManualAttachDetectionHandler:loadTrigger()
         link(getRootNode(), self.detectionTrigger)
 
         -- Link trigger to player
-        link(g_currentMission.player.rootNode, self.detectionTrigger)
+        link(self.mission.player.rootNode, self.detectionTrigger)
         --setTranslation(self.detectionTrigger, 0, 0, 0)
 
         addTrigger(self.detectionTrigger, "vehicleDetectionCallback", self)
@@ -82,8 +83,6 @@ end
 
 function ManualAttachDetectionHandler:unloadTrigger()
     if self.isClient then
-        self:notifyVehicleTriggerChange(true)
-
         if self.detectionTrigger ~= nil then
             removeFromPhysics(self.detectionTrigger)
             removeTrigger(self.detectionTrigger)
@@ -91,8 +90,8 @@ function ManualAttachDetectionHandler:unloadTrigger()
             self.detectionTrigger = nil
         end
 
-
         self.detectedVehicleInTrigger = {}
+        self:notifyVehicleTriggerChange(true)
     end
 end
 
@@ -109,8 +108,8 @@ end
 
 function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherId, onEnter, onLeave, onStay)
     if (onEnter or onLeave) then
-        local amount = #self.detectedVehicleInTrigger
-        local nodeVehicle = g_currentMission:getNodeObject(otherId)
+        local lastAmount = #self.detectedVehicleInTrigger
+        local nodeVehicle = self.mission:getNodeObject(otherId)
 
         if ManualAttachDetectionHandler.getIsValidVehicle(nodeVehicle) then
             if onEnter then
@@ -125,7 +124,7 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
             Logger.info("Amount in trigger", #self.detectedVehicleInTrigger)
         end
 
-        if amount ~= #self.detectedVehicleInTrigger then
+        if lastAmount ~= #self.detectedVehicleInTrigger then
             self:notifyVehicleListChanged(self.detectedVehicleInTrigger)
         end
     end

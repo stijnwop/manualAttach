@@ -29,7 +29,7 @@ end
 function _load(mission)
     assert(g_manualAttach == nil)
 
-    manualAttach = ManualAttach:new(mission, directory)
+    manualAttach = ManualAttach:new(mission, g_inputBinding, g_i18n, directory)
 
     getfenv(0)["g_manualAttach"] = manualAttach
 
