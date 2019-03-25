@@ -1,6 +1,12 @@
 ManualAttachUtil = {}
 
-function ManualAttachUtil:getSpecTable(vehicle, name)
+function ManualAttachUtil.getSpecTable(vehicle, name)
+    local modName = g_manualAttach.modName
+    local spec = vehicle["spec_" .. modName .. "." .. name]
+    if spec ~= nil then
+        return spec
+    end
+
     return vehicle["spec_" .. name]
 end
 
@@ -38,6 +44,10 @@ function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
 end
 
 function ManualAttachUtil.hasAttachedConnectionHoses(object)
+    if object.spec_attachable == nil then
+        return false
+    end
+
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
     for _, hose in ipairs(hoses) do
