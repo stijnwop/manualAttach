@@ -48,6 +48,11 @@ function ManualAttachExtension.inj_getCanBeTurnedOn(vehicle, superFunc)
 end
 
 function ManualAttachExtension:onPowerTakeOffChanged(isActive)
+    if self.getInputPowerTakeOffs == nil
+            or #self:getInputPowerTakeOffs() == 0 then
+        return
+    end
+
     local inputAttacherJoint = self:getActiveInputAttacherJoint()
     if inputAttacherJoint ~= nil then
         inputAttacherJoint.canBeTurnedOn = isActive
