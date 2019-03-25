@@ -4,7 +4,6 @@ local modName = g_currentModName
 source(directory .. "src/ManualAttach.lua")
 source(directory .. "src/utils/Logger.lua")
 source(directory .. "src/utils/ManualAttachUtil.lua")
-source(directory .. "src/vehicle/ManualAttachExtension.lua")
 source(directory .. "src/misc/ManualAttachDetectionHandler.lua")
 
 local manualAttach
@@ -21,7 +20,7 @@ function _init()
     BaseMission.unregisterActionEvents = Utils.appendedFunction(BaseMission.unregisterActionEvents, ManualAttach.inj_unregisterActionEvents)
 
     -- Noop AttacherJoints function
-    AttacherJoints.findVehicleInAttachRange = function()
+    AttacherJoints.findVehicleInAttachRange = function(...)
         return nil, nil, nil, nil
     end
 end
@@ -29,13 +28,11 @@ end
 function _load(mission)
     assert(g_manualAttach == nil)
 
-    manualAttach = ManualAttach:new(mission, g_inputBinding, g_i18n, directory)
+    manualAttach = ManualAttach:new(mission, g_inputBinding, g_i18n, directory, modName)
 
     getfenv(0)["g_manualAttach"] = manualAttach
 
     addModEventListener(manualAttach)
-
-    Logger.info("Hello Manual Attach!")
 end
 
 function _startMission(mission)
@@ -44,10 +41,6 @@ end
 
 function _unload()
     removeModEventListener(manualAttach)
-
-    if GS_IS_CONSOLE_VERSION then
-    end
-
     manualAttach:delete()
     manualAttach = nil -- Allows garbage collecting
     getfenv(0)["g_manualAttach"] = nil

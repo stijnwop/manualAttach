@@ -35,7 +35,7 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
 
 local ManualAttach_mt = Class(ManualAttach)
 
-function ManualAttach:new(mission, input, i18n, modDirectory)
+function ManualAttach:new(mission, input, i18n, modDirectory, modName)
     local self = setmetatable({}, ManualAttach_mt)
 
     self.isServer = mission:getIsServer()
@@ -44,6 +44,7 @@ function ManualAttach:new(mission, input, i18n, modDirectory)
     self.input = input
     self.i18n = i18n
     self.modDirectory = modDirectory
+    self.modName = modName
 
     self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, self.mission, modDirectory)
 
@@ -324,18 +325,26 @@ function ManualAttach:onPowerTakeOffEvent()
     if self.allowPtoEvent then
         local object = self.attachedImplement
         if object ~= nil then
+
+            if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
+                return
+            end
+
             local attacherVehicle = object:getAttacherVehicle()
             local implement = attacherVehicle:getImplementByObject(object)
             if object.getInputPowerTakeOffs ~= nil then
                 local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
                 local jointDescIndex = implement.jointDescIndex
+                local hasAttachedPowerTakeOffs = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
 
-                if ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle) then
+                if hasAttachedPowerTakeOffs then
                     attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
                 else
                     attacherVehicle:attachPowerTakeOff(object, inputJointDescIndex, jointDescIndex)
                     attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
                 end
+
+                object:onPowerTakeOffChanged(not hasAttachedPowerTakeOffs)
             end
         end
     end
@@ -387,12 +396,16 @@ end
 
 function ManualAttach.installSpecializations(vehicleTypeManager, specializationManager, modDirectory, modName)
     specializationManager:addSpecialization("manualAttachExtension", "ManualAttachExtension", Utils.getFilename("src/vehicle/ManualAttachExtension.lua", modDirectory), nil)
+    specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)
 
     for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
         if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
                 or SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
-            -- Make sure to namespace the spec again
             vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachExtension")
+        end
+
+        if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
         end
     end
 end

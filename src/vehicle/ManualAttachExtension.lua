@@ -9,12 +9,13 @@ function ManualAttachExtension.registerEvents(vehicleType)
 end
 
 function ManualAttachExtension.registerFunctions(vehicleType)
-    SpecializationUtil.registerFunction(vehicleType, "disconnectHoses", ManualAttachExtension.disconnectHoses)
+    SpecializationUtil.registerFunction(vehicleType, "onPowerTakeOffChanged", ManualAttachExtension.onPowerTakeOffChanged)
     SpecializationUtil.registerFunction(vehicleType, "handlePowerTakeOffPostAttach", ManualAttachExtension.handlePowerTakeOffPostAttach)
 end
 
 function ManualAttachExtension.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachExtension.inj_getCanToggleAttach)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachExtension.inj_getCanBeTurnedOn)
 end
 
 function ManualAttachExtension.registerEventListeners(vehicleType)
@@ -31,7 +32,14 @@ end
 function ManualAttachExtension:onLoadFinished(savegame)
 end
 
-function ManualAttachExtension.inj_getCanToggleAttach(superFunc, vehicle)
+function ManualAttachExtension:onPowerTakeOffChanged(isActive)
+    local inputAttacherJoint = self:getActiveInputAttacherJoint()
+    if inputAttacherJoint ~= nil then
+        inputAttacherJoint.canBeTurnedOn = isActive
+    end
+end
+
+function ManualAttachExtension.inj_getCanToggleAttach(vehicle, superFunc)
     if g_manualAttach ~= nil then
         return false
     end
@@ -39,31 +47,15 @@ function ManualAttachExtension.inj_getCanToggleAttach(superFunc, vehicle)
     return superFunc(vehicle)
 end
 
-function ManualAttachExtension:disconnectHoses(attacherVehicle)
-    local spec = self.spec_connectionHoses
-    if spec ~= nil then
-        local hoses = self:getConnectionHosesByInputAttacherJoint(self:getActiveInputAttacherJointDescIndex())
-        for _, hose in ipairs(hoses) do
-            self:disconnectHose(hose)
-        end
-        for _, hose in ipairs(spec.updateableHoses) do
-            if hose.connectedObject == attacherVehicle then
-                self:disconnectHose(hose)
-            end
-        end
-
-        -- remove delayed mounting if we detach the implement
-        local attacherVehicleSpec = attacherVehicle.spec_connectionHoses
-        if attacherVehicleSpec ~= nil then
-            for _, toolConnector in pairs(attacherVehicleSpec.toolConnectorHoses) do
-                if toolConnector.delayedMounting ~= nil then
-                    if toolConnector.delayedMounting.sourceObject == self then
-                        toolConnector.delayedMounting = nil
-                    end
-                end
-            end
-        end
+function ManualAttachExtension.inj_getCanBeTurnedOn(vehicle, superFunc)
+    local inputAttacherJoint = vehicle:getActiveInputAttacherJoint()
+    if inputAttacherJoint ~= nil
+            and inputAttacherJoint.canBeTurnedOn ~= nil
+            and not inputAttacherJoint.canBeTurnedOn then
+        return false
     end
+
+    return superFunc(vehicle)
 end
 
 function ManualAttachExtension:handlePowerTakeOffPostAttach(jointDescIndex)
@@ -91,8 +83,7 @@ function ManualAttachExtension:onPostAttach(attacherVehicle, inputJointDescIndex
         if attacherVehicle.detachPowerTakeOff ~= nil then
             local implement = attacherVehicle:getImplementByObject(self)
             attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+            self:onPowerTakeOffChanged(false)
         end
-
-        self:disconnectHoses(attacherVehicle)
     end
 end
