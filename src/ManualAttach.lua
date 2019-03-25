@@ -1,6 +1,6 @@
 ManualAttach = {}
 
-ManualAttach.PLAYER_MIN_DISTANCE = 8
+ManualAttach.PLAYER_MIN_DISTANCE = 9
 
 -- Todo: whats still used
 ManualAttach.COSANGLE_THRESHOLD = math.cos(math.rad(70))
