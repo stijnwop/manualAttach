@@ -299,6 +299,57 @@ function ManualAttach:detachImplement(object)
     end
 end
 
+---Attaches the pto from the given object to the vehicle.
+---@param vehicle table
+---@param object table
+---@param noEventSend boolean
+function ManualAttach:attachPowerTakeOff(vehicle, object, noEventSend)
+    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, false, noEventSend)
+
+    local implement = vehicle:getImplementByObject(object)
+    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
+    local jointDescIndex = implement.jointDescIndex
+
+    vehicle:attachPowerTakeOff(object, inputJointDescIndex, jointDescIndex)
+    vehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+end
+
+---Detaches the pto from the given object from the vehicle.
+---@param vehicle table
+---@param object table
+---@param noEventSend boolean
+function ManualAttach:detachPowerTakeOff(vehicle, object, noEventSend)
+    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, true, noEventSend)
+
+    local implement = vehicle:getImplementByObject(object)
+    vehicle:detachPowerTakeOff(vehicle, implement)
+end
+
+---Attaches the connection hoses from the given object to the vehicle.
+---@param vehicle table
+---@param object table
+---@param noEventSend boolean
+function ManualAttach:attachConnectionHoses(vehicle, object, noEventSend)
+    ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, true, noEventSend)
+
+    local implement = vehicle:getImplementByObject(object)
+    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
+    local jointDescIndex = implement.jointDescIndex
+
+    object:connectHosesToAttacherVehicle(vehicle, inputJointDescIndex, jointDescIndex)
+    object:updateAttachedConnectionHoses(vehicle) -- update once
+end
+
+---Detaches the connection hoses from the given object from the vehicle.
+---@param vehicle table
+---@param object table
+---@param noEventSend boolean
+function ManualAttach:detachConnectionHoses(vehicle, object, noEventSend)
+    ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, false, noEventSend)
+
+    object:disconnectHoses(vehicle)
+end
+
 function ManualAttach:onAttachEvent()
     if self.attachable ~= nil then
         self:attachImplement(self.attacherVehicle, self.attachable, self.attachableJointDescIndex, self.attacherVehicleJointDescIndex)
@@ -325,23 +376,18 @@ function ManualAttach:onPowerTakeOffEvent()
     if self.allowPtoEvent then
         local object = self.attachedImplement
         if object ~= nil then
-
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
                 return
             end
 
-            local attacherVehicle = object:getAttacherVehicle()
-            local implement = attacherVehicle:getImplementByObject(object)
             if object.getInputPowerTakeOffs ~= nil then
-                local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
-                local jointDescIndex = implement.jointDescIndex
+                local attacherVehicle = object:getAttacherVehicle()
                 local hasAttachedPowerTakeOffs = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
 
                 if hasAttachedPowerTakeOffs then
-                    attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+                    self:detachPowerTakeOff(attacherVehicle, object, false)
                 else
-                    attacherVehicle:attachPowerTakeOff(object, inputJointDescIndex, jointDescIndex)
-                    attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+                    self:attachPowerTakeOff(attacherVehicle, object, false)
                 end
 
                 object:onPowerTakeOffChanged(not hasAttachedPowerTakeOffs)
@@ -354,15 +400,10 @@ function ManualAttach:onConnectionHoseEvent()
     local object = self.attachedImplement
     if object ~= nil then
         local attacherVehicle = object:getAttacherVehicle()
-        local implement = attacherVehicle:getImplementByObject(object)
-        local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
-        local jointDescIndex = implement.jointDescIndex
-
         if ManualAttachUtil.hasAttachedConnectionHoses(object) then
-            object:disconnectHoses(attacherVehicle)
+            self:detachConnectionHoses(attacherVehicle, object, false)
         else
-            object:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
-            object:updateAttachedConnectionHoses(attacherVehicle) -- update once
+            self:attachConnectionHoses(attacherVehicle, object, false)
         end
     end
 end

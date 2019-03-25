@@ -2,6 +2,8 @@ local directory = g_currentModDirectory
 local modName = g_currentModName
 
 source(directory .. "src/ManualAttach.lua")
+source(directory .. "src/events/ManualAttachPowerTakeOffEvent.lua")
+source(directory .. "src/events/ManualAttachConnectionHosesEvent.lua")
 source(directory .. "src/utils/Logger.lua")
 source(directory .. "src/utils/ManualAttachUtil.lua")
 source(directory .. "src/misc/ManualAttachDetectionHandler.lua")
