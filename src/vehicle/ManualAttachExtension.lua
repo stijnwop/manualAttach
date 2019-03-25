@@ -32,19 +32,8 @@ end
 function ManualAttachExtension:onLoadFinished(savegame)
 end
 
-function ManualAttachExtension:onPowerTakeOffChanged(isActive)
-    local inputAttacherJoint = self:getActiveInputAttacherJoint()
-    if inputAttacherJoint ~= nil then
-        inputAttacherJoint.canBeTurnedOn = isActive
-    end
-end
-
 function ManualAttachExtension.inj_getCanToggleAttach(vehicle, superFunc)
-    if g_manualAttach ~= nil then
-        return false
-    end
-
-    return superFunc(vehicle)
+    return false
 end
 
 function ManualAttachExtension.inj_getCanBeTurnedOn(vehicle, superFunc)
@@ -56,6 +45,13 @@ function ManualAttachExtension.inj_getCanBeTurnedOn(vehicle, superFunc)
     end
 
     return superFunc(vehicle)
+end
+
+function ManualAttachExtension:onPowerTakeOffChanged(isActive)
+    local inputAttacherJoint = self:getActiveInputAttacherJoint()
+    if inputAttacherJoint ~= nil then
+        inputAttacherJoint.canBeTurnedOn = isActive
+    end
 end
 
 function ManualAttachExtension:handlePowerTakeOffPostAttach(jointDescIndex)
@@ -73,17 +69,17 @@ function ManualAttachExtension:handlePowerTakeOffPostAttach(jointDescIndex)
 
             ObjectChangeUtil.setObjectChanges(input.objectChanges, true)
             ObjectChangeUtil.setObjectChanges(output.objectChanges, true)
+
             table.remove(spec.delayedPowerTakeOffsMountings, i)
         end
     end
 end
 
 function ManualAttachExtension:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
-    if g_manualAttach ~= nil then
-        if attacherVehicle.detachPowerTakeOff ~= nil then
-            local implement = attacherVehicle:getImplementByObject(self)
-            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
-            self:onPowerTakeOffChanged(false)
-        end
+    if attacherVehicle.detachPowerTakeOff ~= nil then
+        local implement = attacherVehicle:getImplementByObject(self)
+
+        attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+        self:onPowerTakeOffChanged(false)
     end
 end

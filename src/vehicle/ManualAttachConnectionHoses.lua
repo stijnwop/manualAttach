@@ -31,7 +31,6 @@ end
 
 function ManualAttachConnectionHoses:onLoad(savegame)
     local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
-
     spec.doLightsUpdate = false
 end
 
@@ -70,7 +69,6 @@ end
 
 function ManualAttachConnectionHoses:toggleLightStates(isActive, noEventSend)
     local spec = self.spec_lights
-
     if spec == nil then
         return
     end
