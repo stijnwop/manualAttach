@@ -37,11 +37,13 @@ function ManualAttachExtension.inj_getCanToggleAttach(vehicle, superFunc)
 end
 
 function ManualAttachExtension.inj_getCanBeTurnedOn(vehicle, superFunc)
-    local inputAttacherJoint = vehicle:getActiveInputAttacherJoint()
-    if inputAttacherJoint ~= nil
-            and inputAttacherJoint.canBeTurnedOn ~= nil
-            and not inputAttacherJoint.canBeTurnedOn then
-        return false
+    if vehicle.getActiveInputAttacherJoint ~= nil then
+        local inputAttacherJoint = vehicle:getActiveInputAttacherJoint()
+        if inputAttacherJoint ~= nil
+                and inputAttacherJoint.canBeTurnedOn ~= nil
+                and not inputAttacherJoint.canBeTurnedOn then
+            return false
+        end
     end
 
     return superFunc(vehicle)
