@@ -60,12 +60,12 @@ function ManualAttachConnectionHoses:isHoseAttached()
     local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
     local hoses = self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
-    if #hoses ~= 0 then
-        local hose = hoses[1]
-        return self:getIsConnectionHoseUsed(hose)
+    if not ManualAttachUtil.hasConnectionHoses(self) then
+        return true
     end
 
-    return false
+    local hose = hoses[1]
+    return self:getIsConnectionHoseUsed(hose)
 end
 
 function ManualAttachConnectionHoses:toggleLightStates(isActive, noEventSend)

@@ -50,8 +50,7 @@ function ManualAttachExtension.inj_getCanBeTurnedOn(vehicle, superFunc)
 end
 
 function ManualAttachExtension:onPowerTakeOffChanged(isActive)
-    if self.getInputPowerTakeOffs == nil
-            or #self:getInputPowerTakeOffs() == 0 then
+    if not ManualAttachUtil.hasPowerTakeOffs(self) then
         return
     end
 
