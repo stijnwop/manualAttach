@@ -29,6 +29,11 @@ function ManualAttachUtil:getCosAngle(p1, p2)
     return x1 * x2 + y1 * y2 + z1 * z2
 end
 
+function ManualAttachUtil.hasPowerTakeOffs(object)
+    local spec = object.spec_powerTakeOffs
+    return spec ~= nil and #spec.inputPowerTakeOffs ~= 0
+end
+
 function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
     local spec = object.spec_powerTakeOffs
 
@@ -41,6 +46,13 @@ function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
     end
 
     return false
+end
+
+function ManualAttachUtil.hasConnectionHoses(object)
+    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
+    local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
+
+    return #hoses ~= 0
 end
 
 function ManualAttachUtil.hasAttachedConnectionHoses(object)

@@ -132,9 +132,8 @@ function ManualAttach:draw(dt)
     local attachEventPrio = GS_PRIO_VERY_LOW
     local attachEventText = ""
 
-    local ptoEventVisibility = false
-    local ptoEventText = ""
-    local hoseEventVisibility = false
+    local handleEventVisibility = false
+    local handleEventText = ""
     local hoseEventText = ""
 
     local object = self.attachedImplement
@@ -161,26 +160,29 @@ function ManualAttach:draw(dt)
 
             -- Below is player handling only.
             if isValidPlayer then
-                if object.getInputPowerTakeOffs ~= nil then
+                if ManualAttachUtil.hasPowerTakeOffs(object) then
                     if ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle) then
-                        ptoEventText = self.i18n:getText("action_detach_pto")
+                        handleEventText = self.i18n:getText("action_detach_pto")
                     else
-                        ptoEventText = self.i18n:getText("action_attach_pto")
+                        handleEventText = self.i18n:getText("action_attach_pto")
                     end
 
-                    ptoEventVisibility = true
+                    handleEventVisibility = true
                 end
 
-                if object.getIsConnectionHoseUsed ~= nil then
+                if ManualAttachUtil.hasConnectionHoses(object) then
                     if ManualAttachUtil.hasAttachedConnectionHoses(object) then
                         hoseEventText = self.i18n:getText("info_detach_hose")
                     else
                         hoseEventText = self.i18n:getText("info_attach_hose")
                     end
 
-                    self.mission:addExtraPrintText(hoseEventText)
-
-                    hoseEventVisibility = true
+                    if not handleEventVisibility then
+                        handleEventText = hoseEventText
+                        handleEventVisibility = true
+                    else
+                        self.mission:addExtraPrintText(hoseEventText)
+                    end
                 end
             end
         end
@@ -196,7 +198,7 @@ function ManualAttach:draw(dt)
     end
 
     self:setActionEventText(self.attachEvent, attachEventText, attachEventPrio, attachEventVisibility)
-    self:setActionEventText(self.handleEventId, ptoEventText, GS_PRIO_VERY_LOW, ptoEventVisibility)
+    self:setActionEventText(self.handleEventId, handleEventText, GS_PRIO_VERY_LOW, handleEventVisibility)
 end
 
 function ManualAttach:hasVehicles()
@@ -238,32 +240,12 @@ function ManualAttach:isValidPlayer()
             and not player:hasHandtoolEquipped()
 end
 
----Attaches the object to the vehicle.
----@param vehicle table
----@param object table
----@param inputJointDescIndex number
----@param jointDescIndex number
-function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, jointDescIndex)
-    if self.mission.accessHandler:canFarmAccess(vehicle:getActiveFarm(), object) then
-        local jointDesc = vehicle.spec_attacherJoints.attacherJoints[jointDescIndex]
-
-        if not jointDesc.jointIndex ~= 0 then
-            vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
-
-            local allowsLowering = object:getAllowsLowering()
-            if allowsLowering and jointDesc.allowsLowering then
-                vehicle:handleLowerImplementByAttacherJointIndex(jointDescIndex)
-            end
-        end
-    end
-end
-
----Detaches the object from the attacher vehicle.
----@param object table
-function ManualAttach:detachImplement(object)
+function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
     local detachAllowed, warning, showWarning = object:isDetachAllowed()
-    local vehicle = object:getAttacherVehicle()
-    local jointDesc = vehicle:getAttacherJointDescFromObject(object)
+
+    if not detachAllowed then
+        return detachAllowed, warning, showWarning
+    end
 
     if ManualAttachUtil.isManualJointType(jointDesc) then
         local allowsLowering = object:getAllowsLowering()
@@ -290,12 +272,42 @@ function ManualAttach:detachImplement(object)
         end
     end
 
-    if detachAllowed then
-        if vehicle ~= nil then
-            vehicle:detachImplementByObject(object)
+    return detachAllowed, warning, showWarning
+end
+
+---Attaches the object to the vehicle.
+---@param vehicle table
+---@param object table
+---@param inputJointDescIndex number
+---@param jointDescIndex number
+function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, jointDescIndex)
+    if self.mission.accessHandler:canFarmAccess(vehicle:getActiveFarm(), object) then
+        local jointDesc = vehicle.spec_attacherJoints.attacherJoints[jointDescIndex]
+
+        if not jointDesc.jointIndex ~= 0 then
+            vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
+
+            local allowsLowering = object:getAllowsLowering()
+            if allowsLowering and jointDesc.allowsLowering then
+                vehicle:handleLowerImplementByAttacherJointIndex(jointDescIndex)
+            end
         end
-    elseif showWarning == nil or showWarning then
-        self.mission:showBlinkingWarning(warning or self.i18n:getText("warning_detachNotAllowed"), 2000)
+    end
+end
+
+---Detaches the object from the attacher vehicle.
+---@param object table
+function ManualAttach:detachImplement(object)
+    local vehicle = object:getAttacherVehicle()
+    if vehicle ~= nil then
+        local jointDesc = vehicle:getAttacherJointDescFromObject(object)
+        local detachAllowed, warning, showWarning = self:isDetachAllowed(object, vehicle, jointDesc)
+
+        if detachAllowed then
+            vehicle:detachImplementByObject(object)
+        elseif showWarning == nil or showWarning then
+            self.mission:showBlinkingWarning(warning or self.i18n:getText("warning_detachNotAllowed"), 2000)
+        end
     end
 end
 
@@ -373,25 +385,28 @@ function ManualAttach:onAttachEvent()
 end
 
 function ManualAttach:onPowerTakeOffEvent()
-    if self.allowPtoEvent then
-        local object = self.attachedImplement
-        if object ~= nil then
+    if not self.allowPtoEvent then
+        return
+    end
+
+    local object = self.attachedImplement
+    if object ~= nil then
+        if ManualAttachUtil.hasPowerTakeOffs(object) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
+                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getName()), 2000)
                 return
             end
 
-            if object.getInputPowerTakeOffs ~= nil then
-                local attacherVehicle = object:getAttacherVehicle()
-                local hasAttachedPowerTakeOffs = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
+            local attacherVehicle = object:getAttacherVehicle()
+            local hasAttachedPowerTakeOffs = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
 
-                if hasAttachedPowerTakeOffs then
-                    self:detachPowerTakeOff(attacherVehicle, object, false)
-                else
-                    self:attachPowerTakeOff(attacherVehicle, object, false)
-                end
-
-                object:onPowerTakeOffChanged(not hasAttachedPowerTakeOffs)
+            if hasAttachedPowerTakeOffs then
+                self:detachPowerTakeOff(attacherVehicle, object, false)
+            else
+                self:attachPowerTakeOff(attacherVehicle, object, false)
             end
+
+            object:onPowerTakeOffChanged(not hasAttachedPowerTakeOffs)
         end
     end
 end
@@ -399,11 +414,18 @@ end
 function ManualAttach:onConnectionHoseEvent()
     local object = self.attachedImplement
     if object ~= nil then
-        local attacherVehicle = object:getAttacherVehicle()
-        if ManualAttachUtil.hasAttachedConnectionHoses(object) then
-            self:detachConnectionHoses(attacherVehicle, object, false)
-        else
-            self:attachConnectionHoses(attacherVehicle, object, false)
+        if ManualAttachUtil.hasConnectionHoses(object) then
+            if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
+                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getName()), 2000)
+                return
+            end
+            
+            local attacherVehicle = object:getAttacherVehicle()
+            if ManualAttachUtil.hasAttachedConnectionHoses(object) then
+                self:detachConnectionHoses(attacherVehicle, object, false)
+            else
+                self:attachConnectionHoses(attacherVehicle, object, false)
+            end
         end
     end
 end
@@ -416,7 +438,7 @@ function ManualAttach:registerActionEvents()
     local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
     self.input:setActionEventTextVisibility(attachEventId, false)
 
-    local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
+    local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
     self.input:setActionEventTextVisibility(handleEventId, false)
 
     self.attachEvent = attachEventId
