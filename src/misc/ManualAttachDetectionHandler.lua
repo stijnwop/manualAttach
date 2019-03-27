@@ -88,9 +88,8 @@ end
 ---Adds the trigger to the player.
 function ManualAttachDetectionHandler:addTrigger()
     if self.isClient and self.triggerCloneNode ~= nil then
-        self.trigger = clone(self.triggerCloneNode, false, false, false)
+        self.trigger = clone(self.triggerCloneNode, false, false, true)
 
-        addToPhysics(self.trigger)
         link(getRootNode(), self.trigger)
 
         -- Link trigger to player
@@ -106,7 +105,6 @@ end
 function ManualAttachDetectionHandler:removeTrigger()
     if self.isClient then
         if self.trigger ~= nil then
-            removeFromPhysics(self.trigger)
             removeTrigger(self.trigger)
             delete(self.trigger)
             self.trigger = nil
