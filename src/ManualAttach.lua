@@ -3,16 +3,7 @@ ManualAttach = {}
 ManualAttach.PLAYER_MIN_DISTANCE = 9
 ManualAttach.EMPTY_TEXT = ""
 ManualAttach.TIMER_THRESHOLD = 300 -- ms
-
--- Todo: whats still used
-ManualAttach.COSANGLE_THRESHOLD = math.cos(math.rad(70))
-ManualAttach.DETACHING_NOT_ALLOWED_TIME = 50 -- ms
-ManualAttach.DETACHING_PRIORITY_NOT_ALLOWED = 6
-ManualAttach.ATTACHING_PRIORITY_ALLOWED = 1
-ManualAttach.DEFAULT_JOINT_DISTANCE = 1.3
-ManualAttach.JOINT_DISTANCE = ManualAttach.DEFAULT_JOINT_DISTANCE
-ManualAttach.JOINT_SEQUENCE = 0.5 * 0.5
-ManualAttach.FORCED_ACTIVE_TIME_INCREASMENT = 600 -- ms
+ManualAttach.WARNING_TIMER_THRESHOLD = 2000 -- ms
 
 local function mapJointTypeNameToInt(typeName)
     local jointType = AttacherJoints.jointTypeNameToInt[typeName]
@@ -142,7 +133,7 @@ end
 ---Returns key string "attached when true, "detached" otherwise.
 ---@param isAttached boolean
 local function getAttachKey(isAttached)
-    return isAttached and "attach" or "detach"
+    return isAttached and "detach" or "attach"
 end
 
 ---Handles the input manager action event functions.
@@ -355,7 +346,7 @@ function ManualAttach:detachImplement(object)
         if detachAllowed then
             vehicle:detachImplementByObject(object)
         elseif showWarning == nil or showWarning then
-            self.mission:showBlinkingWarning(warning or self.i18n:getText("warning_detachNotAllowed"), 2000)
+            self.mission:showBlinkingWarning(warning or self.i18n:getText("warning_detachNotAllowed"), ManualAttach.WARNING_TIMER_THRESHOLD)
         end
     end
 end
@@ -443,7 +434,7 @@ function ManualAttach:onPowerTakeOffEvent()
     if object ~= nil then
         if ManualAttachUtil.hasPowerTakeOffs(object) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
-                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), 2000)
+                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), ManualAttach.WARNING_TIMER_THRESHOLD)
                 return
             end
 
@@ -455,8 +446,6 @@ function ManualAttach:onPowerTakeOffEvent()
             else
                 self:attachPowerTakeOff(attacherVehicle, object, false)
             end
-
-            object:onPowerTakeOffChanged(not hasAttachedPowerTakeOffs)
         end
     end
 end
@@ -466,7 +455,7 @@ function ManualAttach:onConnectionHoseEvent()
     if object ~= nil then
         if ManualAttachUtil.hasConnectionHoses(object) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
-                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), 2000)
+                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), ManualAttach.WARNING_TIMER_THRESHOLD)
                 return
             end
 
@@ -508,13 +497,12 @@ function ManualAttach.inj_unregisterActionEvents(mission)
 end
 
 function ManualAttach.installSpecializations(vehicleTypeManager, specializationManager, modDirectory, modName)
-    specializationManager:addSpecialization("manualAttachExtension", "ManualAttachExtension", Utils.getFilename("src/vehicle/ManualAttachExtension.lua", modDirectory), nil)
+    specializationManager:addSpecialization("manualAttachPowerTakeOff", "ManualAttachPowerTakeOff", Utils.getFilename("src/vehicle/ManualAttachPowerTakeOff.lua", modDirectory), nil)
     specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)
 
     for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
-        if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
-                or SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
-            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachExtension")
+        if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachPowerTakeOff")
         end
 
         if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
