@@ -71,8 +71,11 @@ function ManualAttachUtil.hasAttachedConnectionHoses(object)
     return false
 end
 
-function ManualAttachUtil.isAutoDetachable(vehicle, object)
+function ManualAttachUtil.isAutoDetachable(vehicle, object, jointIndex)
     local jointDesc = vehicle:getAttacherJointDescFromObject(object)
+    if jointIndex ~= nil then
+        jointDesc = vehicle:getAttacherJointByJointDescIndex(jointIndex)
+    end
     return jointDesc ~= nil and not ManualAttachUtil.isManualJointType(jointDesc)
 end
 
