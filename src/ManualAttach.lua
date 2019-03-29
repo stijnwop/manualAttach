@@ -36,7 +36,7 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
 
 local ManualAttach_mt = Class(ManualAttach)
 
-function ManualAttach:new(mission, input, i18n, modDirectory, modName)
+function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirectory, modName)
     local self = setmetatable({}, ManualAttach_mt)
 
     self.isServer = mission:getIsServer()
@@ -47,6 +47,8 @@ function ManualAttach:new(mission, input, i18n, modDirectory, modName)
     self.modDirectory = modDirectory
     self.modName = modName
 
+    self.hudAtlasPath = g_baseHUDFilename
+    self.context = ContextActionDisplay.new(self.hudAtlasPath, inputDisplayManager)
     self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, self.mission, modDirectory)
 
     if self.isClient then
@@ -112,6 +114,8 @@ function ManualAttach:update(dt)
             self.vehicles = { self.controlledVehicle }
         end
     end
+
+    self.context:update(dt)
 end
 
 ---Builds an initial event draw helper.
@@ -155,10 +159,12 @@ end
 ---Returns true if we can draw, false otherwise.
 ---@param vehicle table
 ---@param object table
-function ManualAttach:canDraw(vehicle, object)
-    return vehicle ~= nil
-            and not self:isValidPlayer()
-            and not ManualAttachUtil.isAutoDetachable(vehicle, object)
+---@param jointIndex number optional
+function ManualAttach:canHandle(vehicle, object, jointIndex)
+    local isValidPlayer = self:isValidPlayer()
+    local isAutoDetachable = ManualAttachUtil.isAutoDetachable(vehicle, object, jointIndex)
+
+    return (isValidPlayer and not isAutoDetachable) or (not isValidPlayer and isAutoDetachable)
 end
 
 ---Draw called on every frame.
@@ -181,45 +187,49 @@ function ManualAttach:draw()
     if self:isValidObject(object) then
         local attacherVehicle = object:getAttacherVehicle()
 
-        if self:canDraw(attacherVehicle, object) then
+        if self:canHandle(attacherVehicle, object) then
             if object.isDetachAllowed ~= nil and object:isDetachAllowed() then
                 setDrawEventValues(attachEvent, self.i18n:getText("action_detach"))
             end
+        end
 
-            if isValidPlayer then
-                local hasPowerTakeOffs = ManualAttachUtil.hasPowerTakeOffs(object)
-                local handleText = ManualAttach.EMPTY_TEXT
+        if isValidPlayer then
+            local hasPowerTakeOffs = ManualAttachUtil.hasPowerTakeOffs(object)
+            local handleText = ManualAttach.EMPTY_TEXT
 
-                if hasPowerTakeOffs then
-                    local isAttached = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
-                    handleText = self.i18n:getText(("action_%s_pto"):format(getAttachKey(isAttached)))
-                end
-
-                if ManualAttachUtil.hasConnectionHoses(object) then
-                    local isAttached = ManualAttachUtil.hasAttachedConnectionHoses(object)
-                    local hoseText = self.i18n:getText(("action_%s_hose"):format(getAttachKey(isAttached)))
-
-                    if not hasPowerTakeOffs then
-                        handleText = hoseText
-                    else
-                        self.mission:addExtraPrintText(hoseText)
-                    end
-                end
-
-                setDrawEventValues(handleEvent, handleText)
+            if hasPowerTakeOffs then
+                local isAttached = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
+                handleText = self.i18n:getText(("action_%s_pto"):format(getAttachKey(isAttached)))
             end
+
+            if ManualAttachUtil.hasConnectionHoses(object) then
+                local isAttached = ManualAttachUtil.hasAttachedConnectionHoses(object)
+                local hoseText = self.i18n:getText(("action_%s_hose"):format(getAttachKey(isAttached)))
+
+                if not hasPowerTakeOffs then
+                    handleText = hoseText
+                else
+                    self.mission:addExtraPrintText(hoseText)
+                end
+            end
+
+            setDrawEventValues(handleEvent, handleText)
         end
     end
 
     if self.attachable ~= nil then
-        if self.mission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
-            setDrawEventValues(attachEvent, self.i18n:getText("action_attach"), GS_PRIO_VERY_HIGH)
-            self.mission:showAttachContext(self.attachable)
+        if self:canHandle(self.attacherVehicle, self.attachable, self.attacherVehicleJointDescIndex) then
+            if self.mission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
+                setDrawEventValues(attachEvent, self.i18n:getText("action_attach"), GS_PRIO_VERY_HIGH)
+                --self.mission:showAttachContext(self.attachable)
+                self.context:setContext(InputAction.MA_ATTACH_VEHICLE, ContextActionDisplay.CONTEXT_ICON.ATTACH, self.attachable:getFullName())
+            end
         end
     end
 
     self:setActionEventText(self.attachEvent, attachEvent.text, attachEvent.priority, attachEvent.visibility)
     self:setActionEventText(self.handleEventId, handleEvent.text, handleEvent.priority, handleEvent.visibility)
+    self.context:draw()
 end
 
 ---Returns true when the current vehicles table is not empty, false otherwise.
@@ -291,7 +301,7 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
         if allowsLowering and jointDesc.allowsLowering then
             if not jointDesc.moveDown then
                 detachAllowed = false
-                warning = self.i18n:getText("info_lower_warning"):format(object:getName())
+                warning = self.i18n:getText("info_lower_warning"):format(object:getFullName())
             end
         end
     end
@@ -299,14 +309,14 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
     if detachAllowed then
         if ManualAttachUtil.hasAttachedPowerTakeOffs(object, vehicle) then
             detachAllowed = false
-            warning = self.i18n:getText("info_detach_pto_warning"):format(object:getName())
+            warning = self.i18n:getText("info_detach_pto_warning"):format(object:getFullName())
         end
     end
 
     if detachAllowed then
         if ManualAttachUtil.hasAttachedConnectionHoses(object) then
             detachAllowed = false
-            warning = self.i18n:getText("info_detach_hoses_warning"):format(object:getName())
+            warning = self.i18n:getText("info_detach_hoses_warning"):format(object:getFullName())
         end
     end
 
@@ -319,7 +329,8 @@ end
 ---@param inputJointDescIndex number
 ---@param jointDescIndex number
 function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, jointDescIndex)
-    if self.mission.accessHandler:canFarmAccess(vehicle:getActiveFarm(), object) then
+    if self.mission.accessHandler:canFarmAccess(vehicle:getActiveFarm(), object)
+            and self:canHandle(vehicle, object, jointDescIndex) then
         local jointDesc = vehicle.spec_attacherJoints.attacherJoints[jointDescIndex]
 
         if not jointDesc.jointIndex ~= 0 then
@@ -337,7 +348,7 @@ end
 ---@param object table
 function ManualAttach:detachImplement(object)
     local vehicle = object:getAttacherVehicle()
-    if vehicle ~= nil then
+    if vehicle ~= nil and self:canHandle(vehicle, object) then
         local jointDesc = vehicle:getAttacherJointDescFromObject(object)
         local detachAllowed, warning, showWarning = self:isDetachAllowed(object, vehicle, jointDesc)
 
@@ -406,6 +417,7 @@ function ManualAttach:onAttachEvent()
     else
         -- detach
         local object = self.attachedImplement
+
         if not self:isValidPlayer() then
             local selectedVehicle = self.controlledVehicle:getSelectedVehicle()
             if selectedVehicle ~= nil and selectedVehicle.getAttacherVehicle ~= nil then
@@ -431,7 +443,7 @@ function ManualAttach:onPowerTakeOffEvent()
     if object ~= nil then
         if ManualAttachUtil.hasPowerTakeOffs(object) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
-                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getName()), 2000)
+                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), 2000)
                 return
             end
 
@@ -454,7 +466,7 @@ function ManualAttach:onConnectionHoseEvent()
     if object ~= nil then
         if ManualAttachUtil.hasConnectionHoses(object) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
-                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getName()), 2000)
+                self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), 2000)
                 return
             end
 

@@ -142,7 +142,7 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
             if onEnter then
                 if not ListUtil.hasListElement(self.detectedVehicleInTrigger, nodeVehicle) then
                     ListUtil.addElementToList(self.detectedVehicleInTrigger, nodeVehicle)
-                    Logger.info("Vehicle added: ", tostring(nodeVehicle:getName()))
+                    Logger.info("Vehicle added: ", tostring(nodeVehicle:getFullName()))
                 end
             else
                 ListUtil.removeElementFromList(self.detectedVehicleInTrigger, nodeVehicle)
