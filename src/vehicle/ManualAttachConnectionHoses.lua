@@ -22,6 +22,7 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setBrakeLightsVisibility", ManualAttachConnectionHoses.inj_setBrakeLightsVisibility)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setReverseLightsVisibility", ManualAttachConnectionHoses.inj_setReverseLightsVisibility)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldAllowed", ManualAttachConnectionHoses.inj_getIsFoldAllowed)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsMovingToolActive", ManualAttachConnectionHoses.inj_getIsMovingToolActive)
 end
 
 function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
@@ -145,6 +146,14 @@ function ManualAttachConnectionHoses.inj_getIsFoldAllowed(vehicle, superFunc, di
     end
 
     return superFunc(vehicle, direction, onAiTurnOn)
+end
+
+function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFunc, movingTool)
+    if not vehicle:isHoseAttached() then
+        return false
+    end
+
+    return superFunc(vehicle, movingTool)
 end
 
 function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
