@@ -1,3 +1,10 @@
+---
+-- loader
+--
+-- Loader script to handle all sources for Manual Attach.
+--
+-- Copyright (c) Wopster, 2019
+
 local directory = g_currentModDirectory
 local modName = g_currentModName
 

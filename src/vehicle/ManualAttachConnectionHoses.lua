@@ -1,10 +1,14 @@
+---
+-- ManualAttachConnectionHoses
+--
+-- ConnectionHoses extension for Manual Attach.
+--
+-- Copyright (c) Wopster, 2019
+
 ManualAttachConnectionHoses = {}
 
 function ManualAttachConnectionHoses.prerequisitesPresent(specializations)
     return SpecializationUtil.hasSpecialization(ConnectionHoses, specializations)
-end
-
-function ManualAttachConnectionHoses.registerEvents(vehicleType)
 end
 
 function ManualAttachConnectionHoses.registerFunctions(vehicleType)
@@ -37,9 +41,6 @@ function ManualAttachConnectionHoses:onLoad(savegame)
     spec.doLightsUpdate = false
 end
 
-function ManualAttachConnectionHoses:onLoadFinished(savegame)
-end
-
 function ManualAttachConnectionHoses:onPostUpdateTick(dt)
     if self.isServer then
         if self:isHoseAttached() then
@@ -53,11 +54,14 @@ function ManualAttachConnectionHoses:onPostUpdateTick(dt)
     end
 end
 
+---Set if mod needs to force update the state.
+---@param state boolean
 function ManualAttachConnectionHoses:setUpdateLightsState(state)
     local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
     spec.doLightsUpdate = state
 end
 
+---Returns true if hoses are attached, false otherwise.
 function ManualAttachConnectionHoses:isHoseAttached()
     local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
     local hoses = self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
@@ -70,6 +74,9 @@ function ManualAttachConnectionHoses:isHoseAttached()
     return self:getIsConnectionHoseUsed(hose)
 end
 
+---Toggles the lights states.
+---@param isActive boolean
+---@param noEventSend boolean
 function ManualAttachConnectionHoses:toggleLightStates(isActive, noEventSend)
     local spec = self.spec_lights
     if spec == nil then
@@ -85,6 +92,52 @@ function ManualAttachConnectionHoses:toggleLightStates(isActive, noEventSend)
         self:setTurnLightState(rootVehicle.spec_lights.turnLightState, true, noEventSend)
     end
 end
+
+---Disconnect attached hoses, moved to function because vanilla handles this in the postDetach event.
+---@param attacherVehicle table
+function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
+    local spec = self.spec_connectionHoses
+    if spec ~= nil then
+        -- before the actual hoses are detached.
+        self:toggleLightStates(false, true)
+
+        local hoses = self:getConnectionHosesByInputAttacherJoint(self:getActiveInputAttacherJointDescIndex())
+
+        for _, hose in ipairs(hoses) do
+            self:disconnectHose(hose)
+        end
+
+        for _, hose in ipairs(spec.updateableHoses) do
+            if hose.connectedObject == attacherVehicle then
+                self:disconnectHose(hose)
+            end
+        end
+
+        -- remove delayed mounting if we detach the implement
+        local attacherVehicleSpec = attacherVehicle.spec_connectionHoses
+        if attacherVehicleSpec ~= nil then
+            for _, toolConnector in pairs(attacherVehicleSpec.toolConnectorHoses) do
+                if toolConnector.delayedMounting ~= nil then
+                    if toolConnector.delayedMounting.sourceObject == self then
+                        toolConnector.delayedMounting = nil
+                    end
+                end
+            end
+        end
+    end
+end
+
+---Called on post attache event.
+---@param attacherVehicle table
+---@param inputJointDescIndex number
+---@param jointDescIndex number
+function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
+    self:disconnectHoses(attacherVehicle)
+end
+
+---
+--- Injections.
+---
 
 function ManualAttachConnectionHoses.inj_setLightsTypesMask(vehicle, superFunc, lightsTypesMask, force, noEventSend)
     if not vehicle:isHoseAttached() then
@@ -164,40 +217,4 @@ function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
     end
 
     return superFunc(vehicle)
-end
-
-function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
-    local spec = self.spec_connectionHoses
-    if spec ~= nil then
-        -- before the actual hoses are detached.
-        self:toggleLightStates(false, true)
-
-        local hoses = self:getConnectionHosesByInputAttacherJoint(self:getActiveInputAttacherJointDescIndex())
-
-        for _, hose in ipairs(hoses) do
-            self:disconnectHose(hose)
-        end
-
-        for _, hose in ipairs(spec.updateableHoses) do
-            if hose.connectedObject == attacherVehicle then
-                self:disconnectHose(hose)
-            end
-        end
-
-        -- remove delayed mounting if we detach the implement
-        local attacherVehicleSpec = attacherVehicle.spec_connectionHoses
-        if attacherVehicleSpec ~= nil then
-            for _, toolConnector in pairs(attacherVehicleSpec.toolConnectorHoses) do
-                if toolConnector.delayedMounting ~= nil then
-                    if toolConnector.delayedMounting.sourceObject == self then
-                        toolConnector.delayedMounting = nil
-                    end
-                end
-            end
-        end
-    end
-end
-
-function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
-    self:disconnectHoses(attacherVehicle)
 end

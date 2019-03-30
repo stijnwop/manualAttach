@@ -1,10 +1,14 @@
+---
+-- ManualAttachPowerTakeOff
+--
+-- PowerTakeOffs extension for Manual Attach.
+--
+-- Copyright (c) Wopster, 2019
+
 ManualAttachPowerTakeOff = {}
 
 function ManualAttachPowerTakeOff.prerequisitesPresent(specializations)
     return SpecializationUtil.hasSpecialization(PowerTakeOffs, specializations)
-end
-
-function ManualAttachPowerTakeOff.registerEvents(vehicleType)
 end
 
 function ManualAttachPowerTakeOff.registerFunctions(vehicleType)
@@ -16,36 +20,8 @@ function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachPowerTakeOff.inj_getCanBeTurnedOn)
 end
 
-function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
-    SpecializationUtil.registerEventListener(vehicleType, "onLoad", ManualAttachPowerTakeOff)
-    SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachPowerTakeOff)
-end
-
-function ManualAttachPowerTakeOff.initSpecialization()
-end
-
-function ManualAttachPowerTakeOff:onLoad(savegame)
-end
-
-function ManualAttachPowerTakeOff:onLoadFinished(savegame)
-end
-
-function ManualAttachPowerTakeOff.inj_getCanToggleAttach(vehicle, superFunc)
-    return false
-end
-
-function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
-    if vehicle.getAttacherVehicle ~= nil then
-        local attacherVehicle = vehicle:getAttacherVehicle()
-        if ManualAttachUtil.hasPowerTakeOffs(vehicle)
-                and not ManualAttachUtil.hasAttachedPowerTakeOffs(vehicle, attacherVehicle) then
-            return false
-        end
-    end
-
-    return superFunc(vehicle)
-end
-
+---Handles post attach in a function.
+---@param jointDescIndex number
 function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
     local spec = self.spec_powerTakeOffs
     for i = #spec.delayedPowerTakeOffsMountings, 1, -1 do
@@ -67,10 +43,34 @@ function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
     end
 end
 
+---Called on post attach event.
+---@param attacherVehicle table
+---@param inputJointDescIndex number
+---@param jointDescIndex number
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     if attacherVehicle.detachPowerTakeOff ~= nil then
         local implement = attacherVehicle:getImplementByObject(self)
 
         attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
     end
+end
+
+---
+--- Injections.
+---
+
+function ManualAttachPowerTakeOff.inj_getCanToggleAttach(vehicle, superFunc)
+    return false
+end
+
+function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
+    if vehicle.getAttacherVehicle ~= nil then
+        local attacherVehicle = vehicle:getAttacherVehicle()
+        if ManualAttachUtil.hasPowerTakeOffs(vehicle)
+                and not ManualAttachUtil.hasAttachedPowerTakeOffs(vehicle, attacherVehicle) then
+            return false
+        end
+    end
+
+    return superFunc(vehicle)
 end

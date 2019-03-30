@@ -9,6 +9,11 @@ ManualAttachDetectionHandler = {}
 
 local ManualAttachDetectionHandler_mt = Class(ManualAttachDetectionHandler)
 
+---Creates a new instance of ManualAttachDetectionHandler.
+---@param isServer boolean
+---@param isClient boolean
+---@param mission table
+---@param modDirectory string
 function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirectory)
     local self = setmetatable({}, ManualAttachDetectionHandler_mt)
 

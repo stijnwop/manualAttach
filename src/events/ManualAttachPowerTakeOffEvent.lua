@@ -1,3 +1,9 @@
+---
+-- ManualAttachPowerTakeOffEvent
+--
+-- Event for handling the attach/detach for power take offs.
+--
+-- Copyright (c) Wopster, 2019
 
 ManualAttachPowerTakeOffEvent = {}
 local ManualAttachPowerTakeOffEvent_mt = Class(ManualAttachPowerTakeOffEvent, Event)

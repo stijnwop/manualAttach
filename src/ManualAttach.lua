@@ -1,15 +1,24 @@
+---
+-- ManualAttach
+--
+-- Main class for Manual Attach.
+--
+-- Copyright (c) Wopster, 2019
+
 ManualAttach = {}
 
-ManualAttach.PLAYER_MIN_DISTANCE = 9
-ManualAttach.EMPTY_TEXT = ""
-ManualAttach.TIMER_THRESHOLD = 300 -- ms
-ManualAttach.WARNING_TIMER_THRESHOLD = 2000 -- ms
-
+---Maps given name to the joint int.
+---@param typeName string
 local function mapJointTypeNameToInt(typeName)
     local jointType = AttacherJoints.jointTypeNameToInt[typeName]
     -- Custom joints need a check if it exists in the game
     return jointType ~= nil and jointType or -1
 end
+
+ManualAttach.PLAYER_MIN_DISTANCE = 9
+ManualAttach.EMPTY_TEXT = ""
+ManualAttach.TIMER_THRESHOLD = 300 -- ms
+ManualAttach.WARNING_TIMER_THRESHOLD = 2000 -- ms
 
 ManualAttach.AUTO_ATTACH_JOINTYPES = {
     [mapJointTypeNameToInt("skidSteer")] = true,
@@ -27,6 +36,13 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
 
 local ManualAttach_mt = Class(ManualAttach)
 
+---Creates a new instance of ManualAttach.
+---@param mission table
+---@param input table
+---@param i18n table
+---@param inputDisplayManager table
+---@param modDirectory string
+---@param modName string
 function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirectory, modName)
     local self = setmetatable({}, ManualAttach_mt)
 
@@ -49,6 +65,8 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirector
     return self
 end
 
+---Called when player clicks start.
+---@param mission table
 function ManualAttach:onMissionStart(mission)
     self.detectionHandler:load()
 
@@ -62,10 +80,12 @@ function ManualAttach:onMissionStart(mission)
     self:resetAttachValues()
 end
 
+---Called on delete.
 function ManualAttach:delete()
     self.detectionHandler:delete()
 end
 
+---Main update function called every frame.
 function ManualAttach:update(dt)
     if not self.isClient then
         return
@@ -147,7 +167,7 @@ function ManualAttach:setActionEventText(id, text, priority, visibility)
     self.input:setActionEventTextVisibility(id, visibility)
 end
 
----Returns true if we can draw, false otherwise.
+---Returns true if we can handle, false otherwise.
 ---@param vehicle table
 ---@param object table
 ---@param jointIndex number optional
@@ -402,6 +422,7 @@ function ManualAttach:detachConnectionHoses(vehicle, object, noEventSend)
     object:disconnectHoses(vehicle)
 end
 
+---Handles attach event.
 function ManualAttach:onAttachEvent()
     if self.attachable ~= nil then
         self:attachImplement(self.attacherVehicle, self.attachable, self.attachableJointDescIndex, self.attacherVehicleJointDescIndex)
@@ -425,6 +446,7 @@ function ManualAttach:onAttachEvent()
     end
 end
 
+---Handles pto event.
 function ManualAttach:onPowerTakeOffEvent()
     if not self.allowPtoEvent then
         return
@@ -450,6 +472,7 @@ function ManualAttach:onPowerTakeOffEvent()
     end
 end
 
+---Handles connection hose event.
 function ManualAttach:onConnectionHoseEvent()
     local object = self.attachedImplement
     if object ~= nil then
@@ -469,10 +492,12 @@ function ManualAttach:onConnectionHoseEvent()
     end
 end
 
+---Handles actual input for pto and connection hoses event.
 function ManualAttach:onPowerTakeOffAndConnectionHoseEvent(actionName, inputValue)
     self.hasHoseEventInput = inputValue
 end
 
+---Register input actions.
 function ManualAttach:registerActionEvents()
     local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
     self.input:setActionEventTextVisibility(attachEventId, false)
@@ -484,9 +509,14 @@ function ManualAttach:registerActionEvents()
     self.handleEventId = handleEventId
 end
 
+---Unregister input actions.
 function ManualAttach:unregisterActionEvents()
     self.input:removeActionEventsByTarget(self)
 end
+
+---
+--- Injections.
+---
 
 function ManualAttach.inj_registerActionEvents(mission)
     g_manualAttach:registerActionEvents()
@@ -501,12 +531,14 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
     specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)
 
     for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
-        if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
-            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachPowerTakeOff")
-        end
+        if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
+            if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
+                vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachPowerTakeOff")
+            end
 
-        if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
-            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
+            if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) then
+                vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
+            end
         end
     end
 end

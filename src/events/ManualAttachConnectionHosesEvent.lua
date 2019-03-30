@@ -1,3 +1,10 @@
+---
+-- ManualAttachConnectionHosesEvent
+--
+-- Event for handling the attach/detach for connection hoses.
+--
+-- Copyright (c) Wopster, 2019
+
 ManualAttachConnectionHosesEvent = {}
 local ManualAttachConnectionHosesEvent_mt = Class(ManualAttachConnectionHosesEvent, Event)
 
