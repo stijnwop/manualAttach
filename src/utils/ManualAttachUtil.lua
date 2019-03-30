@@ -142,7 +142,7 @@ function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxD
         end
     end
 
-    return attachableInRange, attachableJointDescIndex, minDist, minDistY
+    return attachableInRange, attachableJointDescIndex
 end
 
 ---Finds the attachable in range based on player or controlled vehicle.
@@ -202,11 +202,13 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
                     end
 
                     if isInRange then
-                        attachable, attachableJointDescIndex = ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxDistanceSq, maxAngle, isPlayerBased)
+                        local attachableInRange, attachableJointDescIndexInRange = ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxDistanceSq, maxAngle, isPlayerBased)
 
-                        if attachable ~= nil then
+                        if attachableInRange ~= nil then
                             attacherVehicle = vehicle
                             attacherVehicleJointDescIndex = attacherJointIndex
+                            attachable = attachableInRange
+                            attachableJointDescIndex = attachableJointDescIndexInRange
                             minPlayerDist = isPlayerBased and distSq or minPlayerDist
                         end
                     end
