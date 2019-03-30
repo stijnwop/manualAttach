@@ -20,6 +20,10 @@ function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachPowerTakeOff.inj_getCanBeTurnedOn)
 end
 
+function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
+    SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachPowerTakeOff)
+end
+
 ---Handles post attach in a function.
 ---@param jointDescIndex number
 function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
