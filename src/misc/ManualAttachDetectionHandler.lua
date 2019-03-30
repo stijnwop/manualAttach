@@ -99,6 +99,7 @@ function ManualAttachDetectionHandler:addTrigger()
 
         -- Link trigger to player
         link(self.mission.player.rootNode, self.trigger)
+        setTranslation(self.trigger, 0, 0, -1)
 
         addTrigger(self.trigger, "vehicleDetectionCallback", self)
 
@@ -127,9 +128,10 @@ function ManualAttachDetectionHandler.getIsValidVehicle(vehicle)
     return vehicle ~= nil
             and vehicle.isa ~= nil
             and vehicle:isa(Vehicle)
-            and not vehicle:isa(StationCrane) -- Dismiss trains and the station cranes
+            and not vehicle:isa(StationCrane) -- Dismiss the station cranes
+            and not SpecializationUtil.hasSpecialization(SplineVehicle, vehicle.specializations)
             and vehicle.getAttacherJoints ~= nil
-            and vehicle:getAttacherJoints() ~= nil
+            and next(vehicle:getAttacherJoints()) ~= nil
 end
 
 ---Callback when trigger changes state.

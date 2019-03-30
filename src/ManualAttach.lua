@@ -15,8 +15,8 @@ local function mapJointTypeNameToInt(typeName)
     return jointType ~= nil and jointType or -1
 end
 
-ManualAttach.PLAYER_MIN_DISTANCE = 9
 ManualAttach.EMPTY_TEXT = ""
+ManualAttach.PLAYER_MIN_DISTANCE = 8 -- sq
 ManualAttach.TIMER_THRESHOLD = 300 -- ms
 ManualAttach.WARNING_TIMER_THRESHOLD = 2000 -- ms
 
@@ -121,8 +121,10 @@ function ManualAttach:update(dt)
 
     if not isValidPlayer then
         if self.controlledVehicle ~= self.mission.controlledVehicle then
-            self.controlledVehicle = self.mission.controlledVehicle
-            self.vehicles = { self.controlledVehicle }
+            if self.detectionHandler.getIsValidVehicle(self.mission.controlledVehicle) then
+                self.controlledVehicle = self.mission.controlledVehicle
+                self.vehicles = { self.controlledVehicle }
+            end
         end
     end
 
@@ -191,7 +193,7 @@ function ManualAttach:draw()
     local isValidPlayer = self:isValidPlayer()
 
     local object = self.attachedImplement
-    if not isValidPlayer then
+    if not isValidPlayer and self.controlledVehicle ~= nil then
         object = self.controlledVehicle:getSelectedVehicle()
     end
 
@@ -430,7 +432,7 @@ function ManualAttach:onAttachEvent()
         -- detach
         local object = self.attachedImplement
 
-        if not self:isValidPlayer() then
+        if not self:isValidPlayer() and self.controlledVehicle ~= nil then
             local selectedVehicle = self.controlledVehicle:getSelectedVehicle()
             if selectedVehicle ~= nil and selectedVehicle.getAttacherVehicle ~= nil then
                 local attacherVehicle = selectedVehicle:getAttacherVehicle()
@@ -499,14 +501,16 @@ end
 
 ---Register input actions.
 function ManualAttach:registerActionEvents()
-    local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
-    self.input:setActionEventTextVisibility(attachEventId, false)
+    if self.isClient then
+        local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
+        self.input:setActionEventTextVisibility(attachEventId, false)
 
-    local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
-    self.input:setActionEventTextVisibility(handleEventId, false)
+        local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
+        self.input:setActionEventTextVisibility(handleEventId, false)
 
-    self.attachEvent = attachEventId
-    self.handleEventId = handleEventId
+        self.attachEvent = attachEventId
+        self.handleEventId = handleEventId
+    end
 end
 
 ---Unregister input actions.
@@ -531,14 +535,12 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
     specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)
 
     for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
-        if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
-            if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
-                vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachPowerTakeOff")
-            end
+        if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachPowerTakeOff")
+        end
 
-            if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) then
-                vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
-            end
+        if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
         end
     end
 end
