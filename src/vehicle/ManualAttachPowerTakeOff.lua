@@ -13,6 +13,7 @@ end
 
 function ManualAttachPowerTakeOff.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "handlePowerTakeOffPostAttach", ManualAttachPowerTakeOff.handlePowerTakeOffPostAttach)
+    SpecializationUtil.registerFunction(vehicleType, "isPtoAttached", ManualAttachPowerTakeOff.isPtoAttached)
 end
 
 function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
@@ -22,6 +23,43 @@ end
 
 function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachPowerTakeOff)
+    SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachPowerTakeOff)
+end
+
+function ManualAttachPowerTakeOff:onPostLoad(savegame)
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachPowerTakeOff")
+    spec.isBlockingInitialPtoDetach = false
+
+    if savegame ~= nil then
+        local key = savegame.key .. "." .. g_manualAttach.modName
+        spec.isBlockingInitialPtoDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachPowerTakeOff#hasAttachedPowerTakeOffs"), false)
+    end
+end
+
+function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
+    if self.getAttacherVehicle ~= nil then
+        local attacherVehicle = self:getAttacherVehicle()
+
+        if attacherVehicle ~= nil and ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
+            setXMLBool(xmlFile, key .. "#hasAttachedPowerTakeOffs", ManualAttachUtil.hasAttachedPowerTakeOffs(self, attacherVehicle))
+        end
+    end
+end
+
+function ManualAttachPowerTakeOff:isPtoAttached()
+    if self.getAttacherVehicle ~= nil then
+        local attacherVehicle = self:getAttacherVehicle()
+
+        if attacherVehicle ~= nil then
+            if not ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
+                return true
+            end
+
+            return ManualAttachUtil.hasAttachedPowerTakeOffs(self, attacherVehicle)
+        end
+    end
+
+    return false
 end
 
 ---Handles post attach in a function.
@@ -52,10 +90,14 @@ end
 ---@param inputJointDescIndex number
 ---@param jointDescIndex number
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
-    if attacherVehicle.detachPowerTakeOff ~= nil then
-        local implement = attacherVehicle:getImplementByObject(self)
-
-        attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachPowerTakeOff")
+    if not spec.isBlockingInitialPtoDetach then
+        if attacherVehicle.detachPowerTakeOff ~= nil then
+            local implement = attacherVehicle:getImplementByObject(self)
+            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+        end
+    else
+        spec.isBlockingInitialPtoDetach = false
     end
 end
 
@@ -68,12 +110,8 @@ function ManualAttachPowerTakeOff.inj_getCanToggleAttach(vehicle, superFunc)
 end
 
 function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
-    if vehicle.getAttacherVehicle ~= nil then
-        local attacherVehicle = vehicle:getAttacherVehicle()
-        if attacherVehicle ~= nil and ManualAttachUtil.hasPowerTakeOffs(vehicle, attacherVehicle)
-                and not ManualAttachUtil.hasAttachedPowerTakeOffs(vehicle, attacherVehicle) then
-            return false
-        end
+    if not vehicle:isPtoAttached() then
+        return false
     end
 
     return superFunc(vehicle)

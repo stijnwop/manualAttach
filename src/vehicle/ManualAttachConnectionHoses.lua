@@ -33,14 +33,30 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
 end
 
 function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
-    SpecializationUtil.registerEventListener(vehicleType, "onLoad", ManualAttachConnectionHoses)
+    SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostUpdateTick", ManualAttachConnectionHoses)
 end
 
-function ManualAttachConnectionHoses:onLoad(savegame)
+function ManualAttachConnectionHoses:onPostLoad(savegame)
     local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
     spec.doLightsUpdate = false
+    spec.isBlockingInitialHoseDetach = false
+
+    if savegame ~= nil then
+        local key = savegame.key .. "." .. g_manualAttach.modName
+        spec.isBlockingInitialHoseDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses"), false)
+    end
+end
+
+function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
+    if self.getAttacherVehicle ~= nil then
+        local attacherVehicle = self:getAttacherVehicle()
+
+        if attacherVehicle ~= nil and ManualAttachUtil.hasConnectionHoses(self, attacherVehicle) then
+            setXMLBool(xmlFile, key .. "#hasAttachedConnectionHoses", ManualAttachUtil.hasAttachedConnectionHoses(self))
+        end
+    end
 end
 
 function ManualAttachConnectionHoses:onPostUpdateTick(dt)
@@ -133,7 +149,12 @@ end
 ---@param inputJointDescIndex number
 ---@param jointDescIndex number
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
-    self:disconnectHoses(attacherVehicle)
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    if not spec.isBlockingInitialHoseDetach then
+        self:disconnectHoses(attacherVehicle)
+    else
+        spec.isBlockingInitialHoseDetach = false
+    end
 end
 
 ---
