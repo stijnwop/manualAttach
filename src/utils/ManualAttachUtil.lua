@@ -36,9 +36,12 @@ end
 
 ---Returns true when object has power take offs, false otherwise.
 ---@param object table
-function ManualAttachUtil.hasPowerTakeOffs(object)
-    local spec = object.spec_powerTakeOffs
-    return spec ~= nil and #spec.inputPowerTakeOffs ~= 0
+---@param vehicle table
+function ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
+    local outputs = vehicle:getOutputPowerTakeOffs()
+    local inputs = object:getInputPowerTakeOffs()
+
+    return #outputs ~= 0 and #inputs ~= 0
 end
 
 ---Returns true when object has attached power take offs, false otherwise.
@@ -58,9 +61,33 @@ function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
     return false
 end
 
+---Checks if vehicle has connection targets for the attacherJoints.
+---@param vehicle table
+---@param attacherJointIndex number
+function ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
+    local nodes = vehicle.spec_connectionHoses.targetNodes
+    if nodes ~= nil then
+        for _, node in ipairs(nodes) do
+            if node.attacherJointIndices[attacherJointIndex] ~= nil then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 ---Returns true when object has connection hoses, false otherwise.
 ---@param object table
-function ManualAttachUtil.hasConnectionHoses(object)
+---@param vehicle table
+function ManualAttachUtil.hasConnectionHoses(object, vehicle)
+    local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
+    local hasTarget = ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
+
+    if not hasTarget then
+        return false
+    end
+
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
@@ -76,13 +103,9 @@ function ManualAttachUtil.hasAttachedConnectionHoses(object)
 
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
-    for _, hose in ipairs(hoses) do
-        if object:getIsConnectionHoseUsed(hose) then
-            return true
-        end
-    end
 
-    return false
+    local hose = hoses[1]
+    return hose ~= nil and object:getIsConnectionHoseUsed(hose)
 end
 
 ---Returns true when the jointDesc is not manually handled, false otherwise.¶

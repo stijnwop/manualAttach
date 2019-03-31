@@ -63,15 +63,14 @@ end
 
 ---Returns true if hoses are attached, false otherwise.
 function ManualAttachConnectionHoses:isHoseAttached()
-    local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
-    local hoses = self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
-
-    if not ManualAttachUtil.hasConnectionHoses(self) then
-        return true
+    local attacherVehicle = self:getAttacherVehicle()
+    if attacherVehicle ~= nil then
+        if not ManualAttachUtil.hasConnectionHoses(self, attacherVehicle) then
+            return true
+        end
     end
 
-    local hose = hoses[1]
-    return self:getIsConnectionHoseUsed(hose)
+    return ManualAttachUtil.hasAttachedConnectionHoses(self)
 end
 
 ---Toggles the lights states.
@@ -211,9 +210,12 @@ function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFun
 end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
-    if ManualAttachUtil.hasConnectionHoses(vehicle)
-            and not ManualAttachUtil.hasAttachedConnectionHoses(vehicle) then
-        return false
+    local attacherVehicle = vehicle:getAttacherVehicle()
+    if attacherVehicle ~= nil then
+        if ManualAttachUtil.hasConnectionHoses(vehicle, attacherVehicle)
+                and not ManualAttachUtil.hasAttachedConnectionHoses(vehicle) then
+            return false
+        end
     end
 
     return superFunc(vehicle)

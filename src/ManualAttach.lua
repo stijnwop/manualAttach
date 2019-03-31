@@ -120,12 +120,7 @@ function ManualAttach:update(dt)
     end
 
     if not isValidPlayer then
-        if self.controlledVehicle ~= self.mission.controlledVehicle then
-            if self.detectionHandler.getIsValidVehicle(self.mission.controlledVehicle) then
-                self.controlledVehicle = self.mission.controlledVehicle
-                self.vehicles = { self.controlledVehicle }
-            end
-        end
+        self:addControllingVehicle()
     end
 
     self.context:update(dt)
@@ -207,7 +202,7 @@ function ManualAttach:draw()
         end
 
         if isValidPlayer then
-            local hasPowerTakeOffs = ManualAttachUtil.hasPowerTakeOffs(object)
+            local hasPowerTakeOffs = ManualAttachUtil.hasPowerTakeOffs(object, attacherVehicle)
             local handleText = ManualAttach.EMPTY_TEXT
 
             if hasPowerTakeOffs then
@@ -215,7 +210,7 @@ function ManualAttach:draw()
                 handleText = self.i18n:getText(("action_%s_pto"):format(getAttachKey(isAttached)))
             end
 
-            if ManualAttachUtil.hasConnectionHoses(object) then
+            if ManualAttachUtil.hasConnectionHoses(object, attacherVehicle) then
                 local isAttached = ManualAttachUtil.hasAttachedConnectionHoses(object)
                 local hoseText = self.i18n:getText(("action_%s_hose"):format(getAttachKey(isAttached)))
 
@@ -243,6 +238,21 @@ function ManualAttach:draw()
     self:setActionEventText(self.attachEvent, attachEvent.text, attachEvent.priority, attachEvent.visibility)
     self:setActionEventText(self.handleEventId, handleEvent.text, handleEvent.priority, handleEvent.visibility)
     self.context:draw()
+end
+
+---Adds the current controlled vehicle to the list if valid.
+function ManualAttach:addControllingVehicle()
+    if self.controlledVehicle ~= self.mission.controlledVehicle then
+        local vehicles = {}
+        if self.detectionHandler.getIsValidVehicle(self.mission.controlledVehicle) then
+            self.controlledVehicle = self.mission.controlledVehicle
+            ListUtil.addElementToList(vehicles, self.controlledVehicle)
+        else
+            self.controlledVehicle = nil
+        end
+
+        self:onVehicleListChanged(vehicles)
+    end
 end
 
 ---Returns true when the current vehicles table is not empty, false otherwise.
@@ -456,15 +466,15 @@ function ManualAttach:onPowerTakeOffEvent()
 
     local object = self.attachedImplement
     if object ~= nil then
-        if ManualAttachUtil.hasPowerTakeOffs(object) then
+        local attacherVehicle = object:getAttacherVehicle()
+
+        if ManualAttachUtil.hasPowerTakeOffs(object, attacherVehicle) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
                 self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), ManualAttach.WARNING_TIMER_THRESHOLD)
                 return
             end
 
-            local attacherVehicle = object:getAttacherVehicle()
             local hasAttachedPowerTakeOffs = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
-
             if hasAttachedPowerTakeOffs then
                 self:detachPowerTakeOff(attacherVehicle, object, false)
             else
@@ -478,13 +488,14 @@ end
 function ManualAttach:onConnectionHoseEvent()
     local object = self.attachedImplement
     if object ~= nil then
-        if ManualAttachUtil.hasConnectionHoses(object) then
+        local attacherVehicle = object:getAttacherVehicle()
+
+        if ManualAttachUtil.hasConnectionHoses(object, attacherVehicle) then
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
                 self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), ManualAttach.WARNING_TIMER_THRESHOLD)
                 return
             end
 
-            local attacherVehicle = object:getAttacherVehicle()
             if ManualAttachUtil.hasAttachedConnectionHoses(object) then
                 self:detachConnectionHoses(attacherVehicle, object, false)
             else
