@@ -28,7 +28,6 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldAllowed", ManualAttachConnectionHoses.inj_getIsFoldAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsMovingToolActive", ManualAttachConnectionHoses.inj_getIsMovingToolActive)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachConnectionHoses.inj_getCanBeTurnedOn)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getAllowsLowering", ManualAttachConnectionHoses.inj_getAllowsLowering)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
 end
 
@@ -233,14 +232,6 @@ function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFun
 end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
-    if not vehicle:isHoseAttached() then
-        return false
-    end
-
-    return superFunc(vehicle)
-end
-
-function ManualAttachConnectionHoses.inj_getAllowsLowering(vehicle, superFunc)
     if not vehicle:isHoseAttached() then
         return false
     end
