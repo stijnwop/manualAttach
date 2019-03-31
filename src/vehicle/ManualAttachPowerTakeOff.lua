@@ -59,7 +59,7 @@ function ManualAttachPowerTakeOff:isPtoAttached()
         end
     end
 
-    return false
+    return true
 end
 
 ---Handles post attach in a function.
