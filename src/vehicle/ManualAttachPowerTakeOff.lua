@@ -70,7 +70,7 @@ end
 function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
     if vehicle.getAttacherVehicle ~= nil then
         local attacherVehicle = vehicle:getAttacherVehicle()
-        if ManualAttachUtil.hasPowerTakeOffs(vehicle, attacherVehicle)
+        if attacherVehicle ~= nil and ManualAttachUtil.hasPowerTakeOffs(vehicle, attacherVehicle)
                 and not ManualAttachUtil.hasAttachedPowerTakeOffs(vehicle, attacherVehicle) then
             return false
         end
