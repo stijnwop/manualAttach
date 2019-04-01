@@ -17,7 +17,6 @@ function ManualAttachPowerTakeOff.registerFunctions(vehicleType)
 end
 
 function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachPowerTakeOff.inj_getCanToggleAttach)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachPowerTakeOff.inj_getCanBeTurnedOn)
 end
 
@@ -104,10 +103,6 @@ end
 ---
 --- Injections.
 ---
-
-function ManualAttachPowerTakeOff.inj_getCanToggleAttach(vehicle, superFunc)
-    return false
-end
 
 function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
     if not vehicle:isPtoAttached() then

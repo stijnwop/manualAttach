@@ -544,6 +544,7 @@ end
 function ManualAttach.installSpecializations(vehicleTypeManager, specializationManager, modDirectory, modName)
     specializationManager:addSpecialization("manualAttachPowerTakeOff", "ManualAttachPowerTakeOff", Utils.getFilename("src/vehicle/ManualAttachPowerTakeOff.lua", modDirectory), nil)
     specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)
+    specializationManager:addSpecialization("manualAttachVehicle", "ManualAttachVehicle", Utils.getFilename("src/vehicle/ManualAttachVehicle.lua", modDirectory), nil)
 
     for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
         if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
@@ -552,6 +553,10 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
 
         if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations) and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
             vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
+        end
+
+        if SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachVehicle")
         end
     end
 end
