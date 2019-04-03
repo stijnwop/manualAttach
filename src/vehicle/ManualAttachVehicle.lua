@@ -1,11 +1,11 @@
-ManualAttachVehicle = {}
-
 ---
 -- ManualAttachVehicle
 --
 -- AttacherJoints extension for Manual Attach.
 --
 -- Copyright (c) Wopster, 2019
+
+ManualAttachVehicle = {}
 
 function ManualAttachVehicle.prerequisitesPresent(specializations)
     return SpecializationUtil.hasSpecialization(AttacherJoints, specializations)
@@ -19,6 +19,6 @@ end
 --- Injections.
 ---
 
-function ManualAttachVehicle.inj_getCanToggleAttach(vehicle, superFunc)
+function ManualAttachVehicle.inj_getCanToggleAttach()
     return false
 end
