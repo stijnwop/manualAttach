@@ -38,6 +38,11 @@ end
 ---@param object table
 ---@param vehicle table
 function ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
+    if vehicle.getOutputPowerTakeOffs == nil
+            or object.getInputPowerTakeOffs == nil then
+        return false
+    end
+
     local outputs = vehicle:getOutputPowerTakeOffs()
     local inputs = object:getInputPowerTakeOffs()
 
