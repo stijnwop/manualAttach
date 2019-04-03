@@ -330,14 +330,16 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
     end
 
     if detachAllowed then
-        if ManualAttachUtil.hasAttachedPowerTakeOffs(object, vehicle) then
+        if ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
+                and ManualAttachUtil.hasAttachedPowerTakeOffs(object, vehicle) then
             detachAllowed = false
             warning = self.i18n:getText("info_detach_pto_warning"):format(object:getFullName())
         end
     end
 
     if detachAllowed then
-        if ManualAttachUtil.hasAttachedConnectionHoses(object) then
+        if ManualAttachUtil.hasConnectionHoses(object, vehicle)
+                and ManualAttachUtil.hasAttachedConnectionHoses(object) then
             detachAllowed = false
             warning = self.i18n:getText("info_detach_hoses_warning"):format(object:getFullName())
         end
@@ -516,10 +518,16 @@ function ManualAttach:registerActionEvents()
         local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
         self.input:setActionEventTextVisibility(attachEventId, false)
 
+        self.attachEvent = attachEventId
+    end
+end
+
+---Register player input actions.
+function ManualAttach:registerPlayerActionEvents()
+    if self.isClient then
         local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
         self.input:setActionEventTextVisibility(handleEventId, false)
 
-        self.attachEvent = attachEventId
         self.handleEventId = handleEventId
     end
 end
@@ -539,6 +547,23 @@ end
 
 function ManualAttach.inj_unregisterActionEvents(mission)
     g_manualAttach:unregisterActionEvents()
+end
+
+---Injects in the player onEnter function to load the trigger when controlling the player.
+---@param player table
+---@param isControlling boolean
+function ManualAttach.inj_onEnter(player, isControlling)
+    if isControlling then
+        g_manualAttach:registerPlayerActionEvents()
+        g_manualAttach.detectionHandler:addTrigger()
+    end
+end
+
+---Injects in the player onLeave function
+---@param player table
+function ManualAttach.inj_onLeave(player)
+    g_manualAttach:unregisterActionEvents()
+    g_manualAttach.detectionHandler:removeTrigger()
 end
 
 function ManualAttach.installSpecializations(vehicleTypeManager, specializationManager, modDirectory, modName)

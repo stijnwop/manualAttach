@@ -17,16 +17,19 @@ source(directory .. "src/misc/ManualAttachDetectionHandler.lua")
 
 local manualAttach
 
-function _init()
-    FSBaseMission.delete = Utils.appendedFunction(FSBaseMission.delete, _unload)
+function init()
+    FSBaseMission.delete = Utils.appendedFunction(FSBaseMission.delete, unload)
 
-    Mission00.load = Utils.prependedFunction(Mission00.load, _load)
-    Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, _startMission)
+    Mission00.load = Utils.prependedFunction(Mission00.load, load)
+    Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, startMission)
 
-    VehicleTypeManager.validateVehicleTypes = Utils.prependedFunction(VehicleTypeManager.validateVehicleTypes, _validateVehicleTypes)
+    VehicleTypeManager.validateVehicleTypes = Utils.prependedFunction(VehicleTypeManager.validateVehicleTypes, validateVehicleTypes)
 
     FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, ManualAttach.inj_registerActionEvents)
     BaseMission.unregisterActionEvents = Utils.appendedFunction(BaseMission.unregisterActionEvents, ManualAttach.inj_unregisterActionEvents)
+
+    Player.onEnter = Utils.appendedFunction(Player.onEnter, ManualAttach.inj_onEnter)
+    Player.onLeave = Utils.appendedFunction(Player.onLeave, ManualAttach.inj_onLeave)
 
     -- Noop AttacherJoints function
     AttacherJoints.findVehicleInAttachRange = function(...)
@@ -34,7 +37,7 @@ function _init()
     end
 end
 
-function _load(mission)
+function load(mission)
     assert(g_manualAttach == nil)
 
     manualAttach = ManualAttach:new(mission, g_inputBinding, g_i18n, g_inputDisplayManager, directory, modName)
@@ -44,19 +47,19 @@ function _load(mission)
     addModEventListener(manualAttach)
 end
 
-function _startMission(mission)
+function startMission(mission)
     manualAttach:onMissionStart(mission)
 end
 
-function _unload()
+function unload()
     removeModEventListener(manualAttach)
     manualAttach:delete()
     manualAttach = nil -- Allows garbage collecting
     getfenv(0)["g_manualAttach"] = nil
 end
 
-function _validateVehicleTypes(vehicleTypeManager)
+function validateVehicleTypes(vehicleTypeManager)
     ManualAttach.installSpecializations(g_vehicleTypeManager, g_specializationManager, directory, modName)
 end
 
-_init()
+init()

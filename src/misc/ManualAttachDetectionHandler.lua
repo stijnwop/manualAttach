@@ -25,10 +25,7 @@ function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirect
     self.triggerCloneNode = nil
     self.detectedVehicleInTrigger = {}
     self.listeners = {}
-
-    Player.onEnter = Utils.appendedFunction(Player.onEnter, ManualAttachDetectionHandler.inj_onEnter)
-    Player.onLeave = Utils.appendedFunction(Player.onLeave, ManualAttachDetectionHandler.inj_onLeave)
-
+    
     return self
 end
 
@@ -160,19 +157,4 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
             self:notifyVehicleListChanged(self.detectedVehicleInTrigger)
         end
     end
-end
-
----Injects in the player onEnter function to load the trigger when controlling the player.
----@param player table
----@param isControlling boolean
-function ManualAttachDetectionHandler.inj_onEnter(player, isControlling)
-    if isControlling then
-        g_manualAttach.detectionHandler:addTrigger()
-    end
-end
-
----Injects in the player onLeave function
----@param player table
-function ManualAttachDetectionHandler.inj_onLeave(player)
-    g_manualAttach.detectionHandler:removeTrigger()
 end
