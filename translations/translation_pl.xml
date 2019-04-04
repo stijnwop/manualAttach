@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
-    <translationContributors>KITT3000, Dzi4d3k</translationContributors>
+    <translationContributors>Ziuta</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="Zaczep %s"/>
-        <text name="MANUAL_ATTACHING_DETACH" text="Odczep %s"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="Zaczep/Odczep"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="Podłącz/Odłącz WPM i węże"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Podłącz WOM od %s"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="Odłącz WOM od %s"/>
+        <text name="action_attach_pto" text="Podłącz wał przekazu mocy"/>
+        <text name="action_detach_pto" text="Odłącz wał przekazu mocy"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Przytrzymaj, aby podłączyć węże od %s"/>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Przytrzymaj, aby odłączyć węże od %s"/>
+        <text name="action_attach_hose" text="Przytrzymaj, aby podłączyć węże"/>
+        <text name="action_detach_hose" text="Przytrzymaj, aby odłączyć węże"/>
 
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Najpierw opuść %s"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Najpierw odłącz WOM od %s"/>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Najpierw podłącz WOM od %s"/>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Najpierw odłącz węże od %s"/>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Najpierw wyłącz %s"/>
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Umieść %s poprawnie nad przyczepą"/>
+        <text name="info_lower_warning" text="Najpierw opuść %s"/>
+        <text name="info_turn_off_warning" text="Najpierw wyłącz %s"/>
+
+        <text name="info_detach_pto_warning" text="Najpierw odłącz WPM od %s"/>
+        <text name="info_attach_pto_warning" text="Najpierw podłącz WPM od %s"/>
+
+        <text name="info_detach_hoses_warning" text="Najpierw odłącz węże od %s"/>
+        <text name="info_attach_hoses_warning" text="Najpierw podłącz węże od %s"/>
     </texts>
 </l10n>
