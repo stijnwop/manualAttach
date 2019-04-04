@@ -302,7 +302,7 @@ end
 ---Returns true when the given object is valid, false otherwise.
 ---@param object table
 function ManualAttach:isValidObject(object)
-    return object ~= nil and not object.isDeleted and object.getAttacherVehicle ~= nil
+    return object ~= nil and not object.isDeleted and object.getAttacherVehicle ~= nil and object:getAttacherVehicle() ~= nil
 end
 
 ---Returns true if allowed, false otherwise.
@@ -443,18 +443,11 @@ function ManualAttach:onAttachEvent()
     else
         -- detach
         local object = self.attachedImplement
-
         if not self:isValidPlayer() and self.controlledVehicle ~= nil then
-            local selectedVehicle = self.controlledVehicle:getSelectedVehicle()
-            if selectedVehicle ~= nil and selectedVehicle.getAttacherVehicle ~= nil then
-                local attacherVehicle = selectedVehicle:getAttacherVehicle()
-                if ManualAttachUtil.isAutoDetachable(attacherVehicle, selectedVehicle) then
-                    object = selectedVehicle
-                end
-            end
+            object = self.controlledVehicle:getSelectedVehicle()
         end
 
-        if object ~= nil and object ~= self.attacherVehicle and object.isDetachAllowed ~= nil then
+        if self:isValidObject(object) then
             self:detachImplement(object)
         end
     end
