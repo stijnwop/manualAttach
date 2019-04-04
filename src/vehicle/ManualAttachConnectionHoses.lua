@@ -87,7 +87,7 @@ function ManualAttachConnectionHoses:isHoseAttached()
         end
     end
 
-    return ManualAttachUtil.hasAttachedConnectionHoses(self)
+    return ManualAttachUtil.hasEdgeCaseHose(self) or ManualAttachUtil.hasAttachedConnectionHoses(self)
 end
 
 ---Toggles the lights states.

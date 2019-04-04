@@ -99,6 +99,29 @@ function ManualAttachUtil.hasConnectionHoses(object, vehicle)
     return #hoses ~= 0
 end
 
+---Todo: Check when this dirty hack can be deleted in the next patch.
+---Checks weather or not we are dealing with an edge case scenario for the connection hoses.
+---Returns true when we are dealing with an edge case scenario, false otherwise.
+---@param object table
+function ManualAttachUtil.hasEdgeCaseHose(object)
+    if object.spec_attachable == nil then
+        return false
+    end
+
+    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
+    local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
+
+    local hose = hoses[1]
+    -- Total edge case with the Amazone Catros.. needs a proper fix from Giants.
+    if hose ~= nil and #hoses == 1 then
+        if hose.type == "TOOL_CONNECTOR_TOP_RIGHT" then
+            return true
+        end
+    end
+
+    return false
+end
+
 ---Returns true when object has attached connection hoses, false otherwise.
 ---@param object table
 function ManualAttachUtil.hasAttachedConnectionHoses(object)
