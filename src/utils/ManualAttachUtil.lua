@@ -70,9 +70,9 @@ end
 ---@param vehicle table
 ---@param attacherJointIndex number
 function ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
-    local nodes = vehicle.spec_connectionHoses.targetNodes
-    if nodes ~= nil then
-        for _, node in ipairs(nodes) do
+    local hoses = vehicle.spec_connectionHoses
+    if hoses ~= nil then
+        for _, node in ipairs(hoses.targetNodes) do
             if node.attacherJointIndices[attacherJointIndex] ~= nil then
                 return true
             end
@@ -89,7 +89,7 @@ function ManualAttachUtil.hasConnectionHoses(object, vehicle)
     local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
     local hasTarget = ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
 
-    if not hasTarget then
+    if not hasTarget or object.getConnectionHosesByInputAttacherJoint == nil then
         return false
     end
 
