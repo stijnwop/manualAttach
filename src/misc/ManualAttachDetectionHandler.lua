@@ -25,7 +25,7 @@ function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirect
     self.triggerCloneNode = nil
     self.detectedVehicleInTrigger = {}
     self.listeners = {}
-    
+
     return self
 end
 
@@ -91,8 +91,6 @@ end
 function ManualAttachDetectionHandler:addTrigger()
     if self.isClient and self.triggerCloneNode ~= nil then
         self.trigger = clone(self.triggerCloneNode, false, false, true)
-
-        link(getRootNode(), self.trigger)
 
         -- Link trigger to player
         link(self.mission.player.rootNode, self.trigger)

@@ -55,6 +55,14 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirector
     self.modName = modName
 
     self.hudAtlasPath = g_baseHUDFilename
+
+    self.vehicles = {}
+    self.controlledVehicle = nil
+
+    self.hasHoseEventInput = 0
+    self.allowPtoEvent = true
+    self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
+
     self.context = ContextActionDisplay.new(self.hudAtlasPath, inputDisplayManager)
     self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, self.mission, modDirectory)
 
@@ -70,12 +78,7 @@ end
 function ManualAttach:onMissionStart(mission)
     self.detectionHandler:load()
 
-    self.vehicles = {}
-    self.controlledVehicle = nil
-
-    self.hasHoseEventInput = 0
-    self.allowPtoEvent = true
-    self.hoseEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
+    self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
 
     self:resetAttachValues()
 end
@@ -83,6 +86,7 @@ end
 ---Called on delete.
 function ManualAttach:delete()
     self.detectionHandler:delete()
+    self.context:delete()
 end
 
 ---Main update function called every frame.
@@ -95,22 +99,22 @@ function ManualAttach:update(dt)
     self.hasHoseEventInput = 0
 
     if lastHasHoseEventInput ~= 0 then
-        self.hoseEventCurrentDelay = self.hoseEventCurrentDelay - dt
+        self.handleEventCurrentDelay = self.handleEventCurrentDelay - dt
 
-        if self.hoseEventCurrentDelay < 0 then
-            self.hoseEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
+        if self.handleEventCurrentDelay < 0 then
+            self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
             self.allowPtoEvent = false
 
             self:onConnectionHoseEvent()
         end
     else
         if self.allowPtoEvent then
-            if self.hoseEventCurrentDelay ~= ManualAttach.TIMER_THRESHOLD and self.hoseEventCurrentDelay ~= 0 then
+            if self.handleEventCurrentDelay ~= ManualAttach.TIMER_THRESHOLD and self.handleEventCurrentDelay ~= 0 then
                 self:onPowerTakeOffEvent()
             end
         end
 
-        self.hoseEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
+        self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
         self.allowPtoEvent = true
     end
 
@@ -262,6 +266,7 @@ end
 
 ---Resets all in range values and hides the action events.
 function ManualAttach:resetAttachValues()
+    self.vehicles = {}
     self.attacherVehicle = nil
     self.attacherVehicleJointDescIndex = nil
     self.attachable = nil
@@ -556,6 +561,12 @@ end
 ---@param player table
 function ManualAttach.inj_onLeave(player)
     g_manualAttach:unregisterActionEvents()
+    g_manualAttach.detectionHandler:removeTrigger()
+end
+
+---Injects in the player delete function
+---@param player table
+function ManualAttach.inj_delete(player)
     g_manualAttach.detectionHandler:removeTrigger()
 end
 
