@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
-    <translationContributors>Gonimy-Vetrom</translationContributors>
+    <translationContributors>Gonimy_Vetrom</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="Присоединить %s"/>
-        <text name="MANUAL_ATTACHING_DETACH" text="Отсоединить %s"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Присоединить/Отсоединить"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Присоединить/Отсоединить ВОМ и шланги"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Присоединить вал %s"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="Отсоединить вал %s"/>
+        <text name="action_attach_pto" text="Присоединить вал отбора мощности"/>
+        <text name="action_detach_pto" text="Отсоединить вал отбора мощности"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Удерживайте, чтобы присоединить шланги %s"/>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Удерживайте, чтобы отсоединить шланги %s"/>
+        <text name="action_attach_hose" text="Удерживайте, чтобы присоединить шланги"/>
+        <text name="action_detach_hose" text="Удерживайте, чтобы отсоединить шланги"/>
 
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Сначала опустите %s"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Сначала отсоедините вал %s"/>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Сначала присоединить вал %s"/>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Сначала отсоедините шланги %s"/>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Сначала выключите %s"/>
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Правильное положение %s выше прицепа"/>
+        <text name="info_lower_warning" text="Сначала опустите %s"/>
+        <text name="info_turn_off_warning" text="Сначала выключите %s"/>
+
+        <text name="info_detach_pto_warning" text="Сначала отсоедините ВОМ от %s"/>
+        <text name="info_attach_pto_warning" text="Сначала присоедините ВОМ к %s"/>
+
+        <text name="info_detach_hoses_warning" text="Сначала отсоедините шланги от %s"/>
+        <text name="info_attach_hoses_warning" text="Сначала присоедините шланги к %s"/>
     </texts>
 </l10n>
