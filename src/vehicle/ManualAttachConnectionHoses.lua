@@ -16,6 +16,7 @@ function ManualAttachConnectionHoses.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "setUpdateLightsState", ManualAttachConnectionHoses.setUpdateLightsState)
     SpecializationUtil.registerFunction(vehicleType, "toggleLightStates", ManualAttachConnectionHoses.toggleLightStates)
     SpecializationUtil.registerFunction(vehicleType, "isHoseAttached", ManualAttachConnectionHoses.isHoseAttached)
+    SpecializationUtil.registerFunction(vehicleType, "hasAttachedHoses", ManualAttachConnectionHoses.hasAttachedHoses)
 end
 
 function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
@@ -29,6 +30,7 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsMovingToolActive", ManualAttachConnectionHoses.inj_getIsMovingToolActive)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachConnectionHoses.inj_getCanBeTurnedOn)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "canFoldRidgeMarker", ManualAttachConnectionHoses.inj_canFoldRidgeMarker)
 end
 
 function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
@@ -41,6 +43,7 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
     local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
     spec.doLightsUpdate = false
     spec.isBlockingInitialHoseDetach = false
+    spec.hasAttachedHoses = false
 
     if savegame ~= nil then
         local key = savegame.key .. "." .. g_manualAttach.modName
@@ -59,9 +62,13 @@ function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
 end
 
 function ManualAttachConnectionHoses:onPostUpdateTick(dt)
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    if self.brake ~= nil and not spec.hasAttachedHoses then
+        self:brake(1, true)
+    end
+
     if self.isServer then
-        if self:isHoseAttached() then
-            local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+        if self:hasAttachedHoses() then
 
             if spec.doLightsUpdate then
                 self:toggleLightStates(true, false)
@@ -78,7 +85,7 @@ function ManualAttachConnectionHoses:setUpdateLightsState(state)
     spec.doLightsUpdate = state
 end
 
----Returns true if hoses are attached, false otherwise.
+---Returns true if vehicle has attached hoses, false otherwise.
 function ManualAttachConnectionHoses:isHoseAttached()
     local attacherVehicle = self:getAttacherVehicle()
     if attacherVehicle ~= nil then
@@ -88,6 +95,21 @@ function ManualAttachConnectionHoses:isHoseAttached()
     end
 
     return ManualAttachUtil.hasEdgeCaseHose(self) or ManualAttachUtil.hasAttachedConnectionHoses(self)
+end
+
+---Returns true if hoses are attached, false otherwise.
+function ManualAttachConnectionHoses:hasAttachedHoses()
+    if self.getAttacherVehicle ~= nil then
+        local attacherVehicle = self:getAttacherVehicle()
+        if attacherVehicle ~= nil
+                and attacherVehicle.hasAttachedHoses ~= nil
+                and not attacherVehicle:hasAttachedHoses() then
+            return false
+        end
+    end
+
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    return spec.hasAttachedHoses
 end
 
 ---Toggles the lights states.
@@ -141,6 +163,9 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
             end
         end
     end
+
+    local spec_manualAttach = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    spec_manualAttach.hasAttachedHoses = self:isHoseAttached()
 end
 
 ---Called on post attache event.
@@ -160,8 +185,18 @@ end
 --- Injections.
 ---
 
+function ManualAttachConnectionHoses.inj_connectHosesToAttacherVehicle(vehicle, superFunc, attacherVehicle, inputJointDescIndex, jointDescIndex, updateToolConnections, excludeVehicle)
+    superFunc(vehicle, attacherVehicle, inputJointDescIndex, jointDescIndex, updateToolConnections, excludeVehicle)
+    vehicle:toggleLightStates(true, true)
+
+    if attacherVehicle.getConnectionTarget ~= nil then
+        local spec_manualAttach = ManualAttachUtil.getSpecTable(vehicle, "manualAttachConnectionHoses")
+        spec_manualAttach.hasAttachedHoses = vehicle:isHoseAttached()
+    end
+end
+
 function ManualAttachConnectionHoses.inj_setLightsTypesMask(vehicle, superFunc, lightsTypesMask, force, noEventSend)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         vehicle:setUpdateLightsState(lightsTypesMask > 0)
 
         return false
@@ -171,7 +206,7 @@ function ManualAttachConnectionHoses.inj_setLightsTypesMask(vehicle, superFunc, 
 end
 
 function ManualAttachConnectionHoses.inj_setBeaconLightsVisibility(vehicle, superFunc, visibility, force, noEventSend)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         vehicle:setUpdateLightsState(visibility)
 
         return false
@@ -181,7 +216,7 @@ function ManualAttachConnectionHoses.inj_setBeaconLightsVisibility(vehicle, supe
 end
 
 function ManualAttachConnectionHoses.inj_setTurnLightState(vehicle, superFunc, state, force, noEventSend)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         vehicle:setUpdateLightsState(state ~= 0)
 
         return false
@@ -191,7 +226,7 @@ function ManualAttachConnectionHoses.inj_setTurnLightState(vehicle, superFunc, s
 end
 
 function ManualAttachConnectionHoses.inj_setBrakeLightsVisibility(vehicle, superFunc, visibility)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         vehicle:setUpdateLightsState(visibility)
 
         return false
@@ -201,7 +236,7 @@ function ManualAttachConnectionHoses.inj_setBrakeLightsVisibility(vehicle, super
 end
 
 function ManualAttachConnectionHoses.inj_setReverseLightsVisibility(vehicle, superFunc, visibility)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         vehicle:setUpdateLightsState(visibility)
 
         return false
@@ -210,13 +245,8 @@ function ManualAttachConnectionHoses.inj_setReverseLightsVisibility(vehicle, sup
     return superFunc(vehicle, visibility)
 end
 
-function ManualAttachConnectionHoses.inj_connectHosesToAttacherVehicle(vehicle, superFunc, attacherVehicle, inputJointDescIndex, jointDescIndex, updateToolConnections, excludeVehicle)
-    superFunc(vehicle, attacherVehicle, inputJointDescIndex, jointDescIndex, updateToolConnections, excludeVehicle)
-    vehicle:toggleLightStates(true, true)
-end
-
 function ManualAttachConnectionHoses.inj_getIsFoldAllowed(vehicle, superFunc, direction, onAiTurnOn)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         return false
     end
 
@@ -224,7 +254,7 @@ function ManualAttachConnectionHoses.inj_getIsFoldAllowed(vehicle, superFunc, di
 end
 
 function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFunc, movingTool)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         return false
     end
 
@@ -232,7 +262,7 @@ function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFun
 end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         return false
     end
 
@@ -240,9 +270,17 @@ function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
 end
 
 function ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed(vehicle, superFunc)
-    if not vehicle:isHoseAttached() then
+    if not vehicle:hasAttachedHoses() then
         return false
     end
 
     return superFunc(vehicle)
+end
+
+function ManualAttachConnectionHoses.inj_canFoldRidgeMarker(vehicle, superFunc, state)
+    if not vehicle:hasAttachedHoses() then
+        return false
+    end
+
+    return superFunc(vehicle, state)
 end
