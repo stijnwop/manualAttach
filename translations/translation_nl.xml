@@ -2,8 +2,8 @@
 <l10n>
     <translationContributors>Wopster</translationContributors>
     <texts>
-        <text name="input_MA_ATTACH_VEHICLE" text="Aan-/Afkoppelen"/>
-        <text name="input_MA_ATTACH_PTO_HOSE" text="Aan-/Afkoppelen van aftakas en slangen"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Aan-/Afkoppelen"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Aan-/Afkoppelen van aftakas en slangen"/>
 
         <text name="action_attach_pto" text="Aftakas aankoppelen"/>
         <text name="action_detach_pto" text="Aftakas afkoppelen"/>

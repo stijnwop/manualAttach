@@ -2,8 +2,8 @@
 <l10n>
     <translationContributors>Wopster</translationContributors>
     <texts>
-        <text name="input_MA_ATTACH_VEHICLE" text="Attach/Detach"/>
-        <text name="input_MA_ATTACH_PTO_HOSE" text="Attach/Detach PTO and connection hoses"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Attach/Detach"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Attach/Detach PTO and connection hoses"/>
 
         <text name="action_attach_pto" text="Attach power take off"/>
         <text name="action_detach_pto" text="Detach power take off"/>
@@ -12,7 +12,7 @@
         <text name="action_detach_hose" text="Hold to detach hoses"/>
 
         <text name="info_lower_warning" text="Lower %s first"/>
-        <text name="info_turn_off_warning" text="Turn %s off first"/>
+        <text name="info_turn_off_warning" text="Turn off %s first"/>
 
         <text name="info_detach_pto_warning" text="Detach PTO of %s first"/>
         <text name="info_attach_pto_warning" text="Attach PTO of %s first"/>
