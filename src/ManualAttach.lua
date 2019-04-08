@@ -151,7 +151,7 @@ local function setDrawEventValues(event, text, priority)
     event.visibility = text ~= ManualAttach.EMPTY_TEXT
 end
 
----Returns key string "attached when true, "detached" otherwise.
+---Returns key string "attach" when true, "detach" otherwise.
 ---@param isAttached boolean
 local function getAttachKey(isAttached)
     return isAttached and "detach" or "attach"
@@ -233,7 +233,6 @@ function ManualAttach:draw()
         if self:canHandle(self.attacherVehicle, self.attachable, self.attacherVehicleJointDescIndex) then
             if self.mission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
                 setDrawEventValues(attachEvent, self.i18n:getText("action_attach"), GS_PRIO_VERY_HIGH)
-                --self.mission:showAttachContext(self.attachable)
                 self.context:setContext(InputAction.MA_ATTACH_VEHICLE, ContextActionDisplay.CONTEXT_ICON.ATTACH, self.attachable:getFullName())
             end
         end
@@ -539,10 +538,12 @@ end
 --- Injections.
 ---
 
+---Injects in the mission register action events.
 function ManualAttach.inj_registerActionEvents(mission)
     g_manualAttach:registerActionEvents()
 end
 
+---Injects in the mission unregister action events.
 function ManualAttach.inj_unregisterActionEvents(mission)
     g_manualAttach:unregisterActionEvents()
 end
@@ -570,6 +571,11 @@ function ManualAttach.inj_delete(player)
     g_manualAttach.detectionHandler:removeTrigger()
 end
 
+---Early hook into adding vehicle specializations.
+---@param vehicleTypeManager table
+---@param specializationManager table
+---@param modDirectory string
+---@param modName string
 function ManualAttach.installSpecializations(vehicleTypeManager, specializationManager, modDirectory, modName)
     specializationManager:addSpecialization("manualAttachPowerTakeOff", "ManualAttachPowerTakeOff", Utils.getFilename("src/vehicle/ManualAttachPowerTakeOff.lua", modDirectory), nil)
     specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)

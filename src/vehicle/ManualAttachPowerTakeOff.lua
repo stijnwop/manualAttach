@@ -45,6 +45,7 @@ function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
     end
 end
 
+---Returns true when the vehicle doesn't have a pto or when the vehicle has a pto and the pto is attached, false otherwise.
 function ManualAttachPowerTakeOff:isPtoAttached()
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()

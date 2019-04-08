@@ -7,15 +7,18 @@
 
 local directory = g_currentModDirectory
 local modName = g_currentModName
+local isDevVersion = true -- only for dev -> false on production.
+local manualAttach
 
 source(directory .. "src/ManualAttach.lua")
 source(directory .. "src/events/ManualAttachPowerTakeOffEvent.lua")
 source(directory .. "src/events/ManualAttachConnectionHosesEvent.lua")
-source(directory .. "src/utils/Logger.lua")
 source(directory .. "src/utils/ManualAttachUtil.lua")
 source(directory .. "src/misc/ManualAttachDetectionHandler.lua")
 
-local manualAttach
+if isDevVersion then
+    source(directory .. "src/utils/Logger.lua")
+end
 
 function init()
     FSBaseMission.delete = Utils.appendedFunction(FSBaseMission.delete, unload)
