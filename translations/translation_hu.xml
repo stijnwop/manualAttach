@@ -2,20 +2,22 @@
 <l10n>
     <translationContributors>n0tr3adY</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="Felcsatolás %s"/>
-        <text name="MANUAL_ATTACHING_DETACH" text="Lecsatolás %s"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="Felcsatolás / Lecsatolás"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="PTO és kábelek fel / lecsatolása"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="PTO csatolása a %s -hoz"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="PTO lecsatolása a %s -ról"/>
+        <text name="action_attach_pto" text="PTO csatlakoztatása"/>
+        <text name="action_detach_pto" text="PTO leválasztása"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Tartsd nyomva a csövek %s -hoz csatolásához"/>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Tartsd nyomva a csövek %s -hoz lecsatolásához"/>
+        <text name="action_attach_hose" text="Tartsd nyomva a kábelek csatlakoztatásához"/>
+        <text name="action_detach_hose" text="Tartsd nyomva a kábelek leválasztásához"/>
 
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Előbb engedd le a  %s -t"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Előbb csatold le a PTO-t a %s -ról"/>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Előbb csatlakoztasd a PTO-t a %s -hoz"/>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Előbb csatold le a csöveket a %s -ról"/>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Előbb kapcsold ki a %s -t"/>
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Pozicionáld a %s -t a trailer fölé helyesen"/>
+        <text name="info_lower_warning" text="Előbb engedd le ezt: %s !"/>
+        <text name="info_turn_off_warning" text="Előbb kapcsold ki ezt: %s !"/>
+
+        <text name="info_detach_pto_warning" text="Előbb válaszd le a PTO-t erről: %s !"/>
+        <text name="info_attach_pto_warning" text="Előbb csatlakoztasd a PTO-t ehhez: %s !"/>
+
+        <text name="info_detach_hoses_warning" text="Előbb a kábeleket válaszd le erről: %s !"/>
+        <text name="info_attach_hoses_warning" text="Előbb a kábeleket csatlakoztasd le erről: %s !"/>
     </texts>
 </l10n>
