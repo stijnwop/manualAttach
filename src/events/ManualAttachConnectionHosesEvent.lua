@@ -5,11 +5,15 @@
 --
 -- Copyright (c) Wopster, 2019
 
+---@class ManualAttachConnectionHosesEvent
+---@field public manualAttach ManualAttach
 ManualAttachConnectionHosesEvent = {}
+
 local ManualAttachConnectionHosesEvent_mt = Class(ManualAttachConnectionHosesEvent, Event)
 
 InitEventClass(ManualAttachConnectionHosesEvent, 'ManualAttachConnectionHosesEvent')
 
+---@return ManualAttachConnectionHosesEvent
 function ManualAttachConnectionHosesEvent:emptyNew()
     local self = Event:new(ManualAttachConnectionHosesEvent_mt)
 

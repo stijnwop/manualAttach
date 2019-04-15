@@ -5,11 +5,15 @@
 --
 -- Copyright (c) Wopster, 2019
 
+---@class ManualAttachPowerTakeOffEvent
+---@field public manualAttach ManualAttach
 ManualAttachPowerTakeOffEvent = {}
+
 local ManualAttachPowerTakeOffEvent_mt = Class(ManualAttachPowerTakeOffEvent, Event)
 
 InitEventClass(ManualAttachPowerTakeOffEvent, 'ManualAttachPowerTakeOffEvent')
 
+---@return ManualAttachPowerTakeOffEvent
 function ManualAttachPowerTakeOffEvent:emptyNew()
     local self = Event:new(ManualAttachPowerTakeOffEvent_mt)
 

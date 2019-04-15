@@ -5,11 +5,13 @@
 --
 -- Copyright (c) Wopster, 2019
 
+---@class ManualAttachUtil
 ManualAttachUtil = {}
 
 ---Gets the spec table for the given spec.
 ---@param vehicle table
 ---@param name string
+---@return table
 function ManualAttachUtil.getSpecTable(vehicle, name)
     local modName = g_manualAttach.modName
     local spec = vehicle["spec_" .. modName .. "." .. name]
@@ -22,6 +24,7 @@ end
 
 ---Return true if given joint desc should be manually controlled, false otherwise.
 ---@param jointDesc number
+---@return boolean
 function ManualAttachUtil.isManualJointType(jointDesc)
     if not ManualAttach.AUTO_ATTACH_JOINTYPES[jointDesc.jointType] then
         if jointDesc.isManual ~= nil and not jointDesc.isManual then
@@ -37,6 +40,7 @@ end
 ---Returns true when object has power take offs, false otherwise.
 ---@param object table
 ---@param vehicle table
+---@return boolean
 function ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
     if vehicle.getOutputPowerTakeOffs == nil
             or object.getInputPowerTakeOffs == nil then
@@ -52,6 +56,7 @@ end
 ---Returns true when object has attached power take offs, false otherwise.
 ---@param object table
 ---@param attacherVehicle table
+---@return boolean
 function ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
     local spec = object.spec_powerTakeOffs
 
@@ -69,6 +74,7 @@ end
 ---Checks if vehicle has connection targets for the attacherJoints.
 ---@param vehicle table
 ---@param attacherJointIndex number
+---@return boolean
 function ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
     local hoses = vehicle.spec_connectionHoses
     if hoses ~= nil then
@@ -85,6 +91,7 @@ end
 ---Returns true when object has connection hoses, false otherwise.
 ---@param object table
 ---@param vehicle table
+---@return boolean
 function ManualAttachUtil.hasConnectionHoses(object, vehicle)
     local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
     local hasTarget = ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
@@ -103,6 +110,7 @@ end
 ---Checks weather or not we are dealing with an edge case scenario for the connection hoses.
 ---Returns true when we are dealing with an edge case scenario, false otherwise.
 ---@param object table
+---@return boolean
 function ManualAttachUtil.hasEdgeCaseHose(object)
     if object.spec_attachable == nil then
         return false
@@ -124,6 +132,7 @@ end
 
 ---Returns true when object has attached connection hoses, false otherwise.
 ---@param object table
+---@return boolean
 function ManualAttachUtil.hasAttachedConnectionHoses(object)
     if object.spec_attachable == nil then
         return false
@@ -140,6 +149,7 @@ end
 ---@param vehicle table
 ---@param object table
 ---@param jointIndex number
+---@return boolean
 function ManualAttachUtil.isAutoDetachable(vehicle, object, jointIndex)
     local jointDesc = vehicle:getAttacherJointDescFromObject(object)
     if jointIndex ~= nil then
@@ -154,6 +164,7 @@ end
 ---@param maxDistanceSq number
 ---@param maxAngle number
 ---@param isPlayerBased boolean when player controlled.
+---@return table, number
 function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxDistanceSq, maxAngle, isPlayerBased)
     local attachableInRange
     local attachableJointDescIndex
@@ -201,6 +212,7 @@ end
 ---@param maxDistanceSq number
 ---@param maxAngle number
 ---@param isPlayerBased boolean when player controlled.
+---@return table, number, table, number, table
 function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxAngle, isPlayerBased)
     local attacherVehicle
     local attacherVehicleJointDescIndex

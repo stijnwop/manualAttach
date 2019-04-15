@@ -5,21 +5,28 @@
 --
 -- Copyright (c) Wopster, 2019
 
+---@class ManualAttach
+---@field public detectionHandler ManualAttachDetectionHandler
 ManualAttach = {}
 
 ---Maps given name to the joint int.
 ---@param typeName string
+---@return number the int joint type.
 local function mapJointTypeNameToInt(typeName)
     local jointType = AttacherJoints.jointTypeNameToInt[typeName]
     -- Custom joints need a check if it exists in the game
     return jointType ~= nil and jointType or -1
 end
 
+---@type string Empty string placeholder.
 ManualAttach.EMPTY_TEXT = ""
+---@type number Minimum player distance.
 ManualAttach.PLAYER_MIN_DISTANCE = 8 -- sq
+---@type number The handle timer threshold in MS.
 ManualAttach.TIMER_THRESHOLD = 300 -- ms
+---@type number The warning timer threshold in MS.
 ManualAttach.WARNING_TIMER_THRESHOLD = 2000 -- ms
-
+---@type table<number, boolean> The automatic attach joint types.
 ManualAttach.AUTO_ATTACH_JOINTYPES = {
     [mapJointTypeNameToInt("skidSteer")] = true,
     [mapJointTypeNameToInt("cutter")] = true,
@@ -43,6 +50,7 @@ local ManualAttach_mt = Class(ManualAttach)
 ---@param inputDisplayManager table
 ---@param modDirectory string
 ---@param modName string
+---@return ManualAttach
 function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirectory, modName)
     local self = setmetatable({}, ManualAttach_mt)
 
@@ -64,6 +72,7 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirector
     self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
 
     self.context = ContextActionDisplay.new(self.hudAtlasPath, inputDisplayManager)
+
     self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, self.mission, modDirectory)
 
     if self.isClient then
@@ -90,6 +99,7 @@ function ManualAttach:delete()
 end
 
 ---Main update function called every frame.
+---@param dt number
 function ManualAttach:update(dt)
     if not self.isClient then
         return
@@ -131,6 +141,7 @@ function ManualAttach:update(dt)
 end
 
 ---Builds an initial event draw helper.
+---@return table
 local function getInitialDrawEventValues()
     local event = {}
 
@@ -153,6 +164,7 @@ end
 
 ---Returns key string "attach" when true, "detach" otherwise.
 ---@param isAttached boolean
+---@return string The attach key.
 local function getAttachKey(isAttached)
     return isAttached and "detach" or "attach"
 end
@@ -172,6 +184,7 @@ end
 ---@param vehicle table
 ---@param object table
 ---@param jointIndex number optional
+---@return boolean
 function ManualAttach:canHandle(vehicle, object, jointIndex)
     local isValidPlayer = self:isValidPlayer()
     local isAutoDetachable = ManualAttachUtil.isAutoDetachable(vehicle, object, jointIndex)
@@ -259,6 +272,7 @@ function ManualAttach:addControllingVehicle()
 end
 
 ---Returns true when the current vehicles table is not empty, false otherwise.
+---@return boolean
 function ManualAttach:hasVehicles()
     return #self.vehicles ~= 0
 end
@@ -295,6 +309,7 @@ function ManualAttach:onTriggerChanged(isDeleted)
 end
 
 ---Returns true when the player is valid, false otherwise.
+---@return boolean
 function ManualAttach:isValidPlayer()
     local player = self.mission.player
     return player ~= nil
@@ -305,6 +320,7 @@ end
 
 ---Returns true when the given object is valid, false otherwise.
 ---@param object table
+---@return boolean
 function ManualAttach:isValidObject(object)
     return object ~= nil and not object.isDeleted and object.getAttacherVehicle ~= nil and object:getAttacherVehicle() ~= nil
 end
@@ -315,6 +331,7 @@ end
 ---@param object table
 ---@param vehicle table
 ---@param jointDesc table
+---@return boolean, string, boolean
 function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
     local detachAllowed, warning, showWarning = object:isDetachAllowed()
 

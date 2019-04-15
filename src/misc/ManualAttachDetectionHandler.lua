@@ -5,6 +5,7 @@
 --
 -- Copyright (c) Wopster, 2019
 
+---@class ManualAttachDetectionHandler @parent class
 ManualAttachDetectionHandler = {}
 
 local ManualAttachDetectionHandler_mt = Class(ManualAttachDetectionHandler)
@@ -14,6 +15,7 @@ local ManualAttachDetectionHandler_mt = Class(ManualAttachDetectionHandler)
 ---@param isClient boolean
 ---@param mission table
 ---@param modDirectory string
+---@return ManualAttachDetectionHandler returns ManualAttachDetectionHandler instance
 function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirectory)
     local self = setmetatable({}, ManualAttachDetectionHandler_mt)
 
@@ -118,7 +120,7 @@ end
 
 ---Checks if the detected vehicle is valid.
 ---@param vehicle table
----returns true if valid, false otherwise.
+---@return boolean true if valid, false otherwise.
 function ManualAttachDetectionHandler.getIsValidVehicle(vehicle)
     return vehicle ~= nil
             and vehicle.isa ~= nil
