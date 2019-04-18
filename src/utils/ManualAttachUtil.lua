@@ -226,7 +226,7 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
     for _, vehicle in ipairs(vehicles) do
         local spec = vehicle.spec_attacherJoints
 
-        if spec ~= nil then
+        if not vehicle.isDeleted and spec ~= nil then
             if vehicle.getAttachedImplements ~= nil then
                 for _, implement in pairs(vehicle:getAttachedImplements()) do
                     local object = implement.object
