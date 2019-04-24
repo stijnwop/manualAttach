@@ -2,20 +2,22 @@
 <l10n>
     <translationContributors>Wopster</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="%s aankoppelen"/>
-        <text name="MANUAL_ATTACHING_DETACH" text="%s afkoppelen"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Aan-/Afkoppelen"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Aan-/Afkoppelen van aftakas en slangen"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="PTO van %s aankoppelen"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="PTO van %s afkoppelen"/>
+        <text name="action_attach_pto" text="Aftakas aankoppelen"/>
+        <text name="action_detach_pto" text="Aftakas afkoppelen"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Houd ingedrukt om de slangen van %s aan te koppelen"/>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Houd ingedrukt om de slangen van %s af te koppelen"/>
+        <text name="action_attach_hose" text="Houd ingedrukt om de slangen aan te koppelen"/>
+        <text name="action_detach_hose" text="Houd ingedrukt om de slangen af te koppelen"/>
 
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Laat %s eerst zakken"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Koppel eerst de PTO van %s af"/>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Koppel eerst de PTO van %s aan"/>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Koppel eerst de slangen van %s af"/>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Zet %s eerst uit"/>
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Positioneer %s correct boven de trailer"/>
+        <text name="info_lower_warning" text="Laat %s eerst zakken"/>
+        <text name="info_turn_off_warning" text="Zet %s eerst uit"/>
+
+        <text name="info_detach_pto_warning" text="Koppel eerst de aftakas van %s af"/>
+        <text name="info_attach_pto_warning" text="Koppel eerst de aftakas van %s aan"/>
+
+        <text name="info_detach_hoses_warning" text="Koppel eerst de slangen van %s af"/>
+        <text name="info_attach_hoses_warning" text="Koppel eerst de slangen van %s aan"/>
     </texts>
 </l10n>

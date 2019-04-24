@@ -2,20 +2,22 @@
 <l10n>
     <translationContributors>Wopster</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="Attach %s"/>
-        <text name="MANUAL_ATTACHING_DETACH" text="Detach %s"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Attach/Detach"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Attach/Detach PTO and connection hoses"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Attach PTO of %s"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="Detach PTO of %s"/>
+        <text name="action_attach_pto" text="Attach power take off"/>
+        <text name="action_detach_pto" text="Detach power take off"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Hold to attach hoses of %s"/>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Hold to detach hoses of %s"/>
+        <text name="action_attach_hose" text="Hold to attach hoses"/>
+        <text name="action_detach_hose" text="Hold to detach hoses"/>
 
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="Lower %s first"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Detach PTO of %s first"/>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Attach PTO of %s first"/>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Detach hoses of %s first"/>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="Turn %s off first"/>
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Position %s above the trailer correctly"/>
+        <text name="info_lower_warning" text="Lower %s first"/>
+        <text name="info_turn_off_warning" text="Turn off %s first"/>
+
+        <text name="info_detach_pto_warning" text="Detach PTO of %s first"/>
+        <text name="info_attach_pto_warning" text="Attach PTO of %s first"/>
+
+        <text name="info_detach_hoses_warning" text="Detach hoses of %s first"/>
+        <text name="info_attach_hoses_warning" text="Attach hoses of %s first"/>
     </texts>
 </l10n>

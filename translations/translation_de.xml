@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
-    <translationContributors>Wopster</translationContributors>
+    <translationContributors>MrMarcel5</translationContributors>
     <texts>
-        <text name="MANUAL_ATTACHING_ATTACH" text="%s ankuppeln"/>
-        <text name="MANUAL_ATTACHING_DETACH" text="%s abkuppeln"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: An-/Abkoppeln"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: An-/Abkoppeln der Zapfwelle und Schläuche"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHPTO" text="Zapfwelle von %s ankuppeln"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO" text="Zapfwelle von %s abkuppeln"/>
+        <text name="action_attach_pto" text="Zapfwelle ankuppeln"/>
+        <text name="action_detach_pto" text="Zapfwelle abkuppeln"/>
 
-        <text name="MANUAL_ATTACHING_ATTACHDYNAMICHOSES" text="Schläuche von %s ankuppeln"/>
-        <text name="MANUAL_ATTACHING_DETACHDYNAMICHOSES" text="Schläuche von %s abkuppeln"/>
+        <text name="action_attach_hose" text="Halten um Schläuche anzukuppeln"/>
+        <text name="action_detach_hose" text="Halten um Schläuche abzukuppeln"/>
 
-        <text name="MANUAL_ATTACHING_LOWER_WARNING" text="%s zuerst herunterlassen"/>
-        <text name="MANUAL_ATTACHING_DETACHPTO_WARNING" text="Zapfwelle von %s zuerst abbauen"/>
-        <text name="MANUAL_ATTACHING_ATTACHPTO_WARNING" text="Zapfwelle von %s anbauen"/>
-        <text name="MANUAL_ATTACHING_DYNAMICHOSES_WARNING" text="Schläuche von %s zuerst abbauen"/>
-        <text name="MANUAL_ATTACHING_TURNOFF_WARNING" text="%s zuerst ausschalten"/>
-        <text name="MANUAL_ATTACHING_CUT_WARNING" text="Positioniere %s korrekt über dem Anhänger"/>
+        <text name="info_lower_warning" text="%s zuerst herunterlassen"/>
+        <text name="info_turn_off_warning" text="%s zuerst ausschalten"/>
+
+        <text name="info_attach_pto_warning" text="Zapfwelle von %s anbauen"/>
+        <text name="info_detach_pto_warning" text="Zapfwelle von %s zuerst abbauen"/>
+
+        <text name="info_attach_hoses_warning" text="Schläuche von %s anbauen"/>
+        <text name="info_detach_hoses_warning" text="Schläuche von %s zuerst abbauen"/>
     </texts>
 </l10n>
