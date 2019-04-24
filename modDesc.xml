@@ -59,7 +59,7 @@
         </actionBinding>
         <actionBinding action="MA_ATTACH_PTO_HOSE">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10" />
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_9" />
         </actionBinding>
     </inputBinding>
 </modDesc>
