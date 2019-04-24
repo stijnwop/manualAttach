@@ -1,6 +1,6 @@
 # ManualAttach for Farming Simulator 19
 
-![For Farming Simulator 19](https://img.shields.io/badge/Farming%20Simulator-19-FF7C00.svg) [![Releases](https://img.shields.io/github/release/stijnwop/guidanceSteering.svg)](https://github.com/stijnwop/guidanceSteering/releases)
+![For Farming Simulator 19](https://img.shields.io/badge/Farming%20Simulator-19-FF7C00.svg) [![Releases](https://img.shields.io/github/release/stijnwop/guidanceSteering.svg)](https://github.com/stijnwop/manualAttach/releases)
 
 ## Warning!
 Please be aware that this is a ***DEVELOPMENT VERSION***!
