@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <translationContributors>Farmer1602</translationContributors>
+    <texts>
+        <text name="input_MA_ATTACH_VEHICLE" text="Attache manuelle : Attacher/Détacher"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="Attache manuelle : Attacher/Détacher la prise de force et les flexibles hydrauliques"/>
+
+        <text name="action_attach_pto" text="Attacher la prise de force"/>
+        <text name="action_detach_pto" text="Détacher la prise de force"/>
+
+        <text name="action_attach_hose" text="Maintenir pour attacher les flexibles"/>
+        <text name="action_detach_hose" text="Maintenir pour détacher les flexibles"/>
+
+        <text name="info_lower_warning" text="Abaiser %s d'abord"/>
+        <text name="info_turn_off_warning" text="Arrêter %s d'abord"/>
+
+        <text name="info_detach_pto_warning" text="Détacher la prise de force de %s d'abord"/>
+        <text name="info_attach_pto_warning" text="Attacher la prise de force de %s d'abord"/>
+
+        <text name="info_detach_hoses_warning" text="Détacher les flexibles de %s d'abord"/>
+        <text name="info_attach_hoses_warning" text="Attacher les flexibles de %s d'abord"/>
+    </texts>
+</l10n>
