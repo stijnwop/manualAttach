@@ -6,6 +6,7 @@
     <title>
         <en>Manual Attach</en>
         <de>Manuelles Ankuppeln</de>
+        <fr>Attacher manuellement</fr>
         <nl>Handmatig aankoppelen</nl>
         <pl>Ręczne zaczepianie</pl>
         <ru>Ручная сцепка</ru>
@@ -20,6 +21,9 @@
         <de>
             <![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.]]>
         </de>
+        <fr>
+            <![CDATA[Ce mod vous oblige à attacher/détacher manuellement les outils et les remorques.]]>
+        </fr>
         <pl>
             <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!]]>
         </pl>
