@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <translationContributors>kiki</translationContributors>
+    <texts>
+        <text name="input_MA_ATTACH_VEHICLE" text="Připojit/Odpojit"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="Připojit/Odpojit náhon/hadice"/>
+
+        <text name="action_attach_pto" text="Připojit náhon"/>
+        <text name="action_detach_pto" text="Odpojit náhon"/>
+
+        <text name="action_attach_hose" text="Držet pro připojení hadic"/>
+        <text name="action_detach_hose" text="Držet pro odpojení hadic"/>
+
+        <text name="info_lower_warning" text="Nejdříve snižte %s"/>
+        <text name="info_turn_off_warning" text="Nejdříve vypněte %s"/>
+
+        <text name="info_detach_pto_warning" text="Nejdříve odpojte náhon"/>
+        <text name="info_attach_pto_warning" text="Nejdříve připojte náhon"/>
+
+        <text name="info_detach_hoses_warning" text="Nejdříve odpojte hadice"/>
+        <text name="info_attach_hoses_warning" text="Nejdříve připojte hadice"/>
+    </texts>
+</l10n>
