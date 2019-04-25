@@ -111,7 +111,7 @@ function ManualAttach:update(dt)
     if lastHasHoseEventInput ~= 0 then
         self.handleEventCurrentDelay = self.handleEventCurrentDelay - dt
 
-        if self.handleEventCurrentDelay < 0 then
+        if self.allowPtoEvent and self.handleEventCurrentDelay < 0 then
             self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
             self.allowPtoEvent = false
 
