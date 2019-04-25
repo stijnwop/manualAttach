@@ -48,9 +48,9 @@ end
 
 function ManualAttachConnectionHosesEvent:run(connection)
     if self.doAttach then
-        self.manualAttach:attachDynamicHoses(self.vehicle, self.object, true)
+        self.manualAttach:attachConnectionHoses(self.vehicle, self.object, true)
     else
-        self.manualAttach:detachDynamicHoses(self.vehicle, self.object, true)
+        self.manualAttach:detachConnectionHoses(self.vehicle, self.object, true)
     end
 
     if not connection:getIsServer() then
