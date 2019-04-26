@@ -96,7 +96,8 @@ function ManualAttachDetectionHandler:addTrigger()
 
         -- Link trigger to player
         link(self.mission.player.rootNode, self.trigger)
-        setTranslation(self.trigger, 0, 0, -1)
+        setTranslation(self.trigger, 0, 0, -2.5)
+        setRotation(self.trigger, 0, math.rad(25), 0)
 
         addTrigger(self.trigger, "vehicleDetectionCallback", self)
 
@@ -143,7 +144,7 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
         local nodeVehicle = self.mission:getNodeObject(otherId)
 
         if ManualAttachDetectionHandler.getIsValidVehicle(nodeVehicle) then
-            if onEnter then
+            if onEnter or onStay then
                 if not ListUtil.hasListElement(self.detectedVehicleInTrigger, nodeVehicle) then
                     ListUtil.addElementToList(self.detectedVehicleInTrigger, nodeVehicle)
                 end
