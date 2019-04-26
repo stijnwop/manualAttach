@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="43">
     <author>Wopster</author>
-    <version>1.0.0.0</version>
+    <version>1.0.1.0</version>
 
     <title>
         <en>Manual Attach</en>
@@ -52,18 +52,18 @@
     </extraSourceFiles>
 
     <actions>
-        <action name="MA_ATTACH_VEHICLE" axisType="HALF" />
-        <action name="MA_ATTACH_PTO_HOSE" axisType="HALF" />
+        <action name="MA_ATTACH_VEHICLE" axisType="HALF"/>
+        <action name="MA_ATTACH_PTO_HOSE" axisType="HALF"/>
     </actions>
 
     <inputBinding>
         <actionBinding action="MA_ATTACH_VEHICLE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_q" />
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_q"/>
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10"/>
         </actionBinding>
         <actionBinding action="MA_ATTACH_PTO_HOSE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_9" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_z"/>
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_9"/>
         </actionBinding>
     </inputBinding>
 </modDesc>
