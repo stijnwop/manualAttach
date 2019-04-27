@@ -342,7 +342,7 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
     if ManualAttachUtil.isManualJointType(jointDesc) then
         local allowsLowering = object:getAllowsLowering()
 
-        if allowsLowering and jointDesc.allowsLowering then
+        if allowsLowering and jointDesc.allowsLowering and not object:getIsFoldMiddleAllowed() then
             if not jointDesc.moveDown then
                 detachAllowed = false
                 warning = self.i18n:getText("info_lower_warning"):format(object:getFullName())
@@ -383,8 +383,13 @@ function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, join
             vehicle:attachImplement(object, inputJointDescIndex, jointDescIndex)
 
             local allowsLowering = object:getAllowsLowering()
-            if allowsLowering and jointDesc.allowsLowering then
+            if allowsLowering and jointDesc.allowsLowering and not object:getIsFoldMiddleAllowed() then
                 vehicle:handleLowerImplementByAttacherJointIndex(jointDescIndex)
+
+                local spec = object.spec_sprayer
+                if spec ~= nil and spec.activateOnLowering then
+                    object:setIsTurnedOn(false)
+                end
             end
         end
     end
