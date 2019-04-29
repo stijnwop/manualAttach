@@ -14,7 +14,7 @@ When attaching an implement the script forces the implement to stay at the lower
 *Note: The connection hoses and power take off still requires to be attached manually for those implements.*
 In order to detach the implement needs to be lowered first! Also make sure the power take off and conenction hoses are detached before detaching the implement.
 
-The mod disables disables attaching and detaching from inside the vehicle (expections are mentioned above). Like the mod tile already suggests it’s not possible anymore to do the quick switches between implements.. get out that vehicle for real this time! 
+The mod disables attaching and detaching from inside the vehicle (expections are mentioned above). Like the mod tile already suggests it’s not possible anymore to do the quick switches between implements.. get out that vehicle for real this time! 
 
 ### Attach/Detach power take off
 Hit `Z` in order to attach/detach the power take off.
@@ -27,7 +27,7 @@ Hold `Z` (for a short amount of time) in order to attach/detach the connection h
 Without attached connection hoses the following can occur:
 - You won't be able to control hydraulics (e.g. moving parts, folding, use ridge markers etc)
 - You won't be able to use the lights.
-- You trailer will be on air brakes.
+- Brakes will be blocked.
 
 
 ## Copyright

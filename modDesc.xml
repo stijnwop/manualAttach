@@ -21,7 +21,7 @@
 Attach/Detach implements:
 When attaching an implement the script forces the implement to stay at the lowered state. There are some exceptions made for the frontloaders, skidsteers, shovels, telehandlers, combines and hooklift implements. You're still able to attach and detach those implements from the inside of your vehicle. Note: The connection hoses and power take off still requires to be attached manually for those implements. In order to detach the implement needs to be lowered first! Also make sure the power take off and conenction hoses are detached before detaching the implement.
 
-The mod disables disables attaching and detaching from inside the vehicle (expections are mentioned above). Like the mod tile already suggests it’s not possible anymore to do the quick switches between implements.. get out that vehicle for real this time!
+The mod disables attaching and detaching from inside the vehicle (expections are mentioned above). Like the mod tile already suggests it’s not possible anymore to do the quick switches between implements.. get out that vehicle for real this time!
 
 Attach/Detach power take off:
 Hit Z in order to attach/detach the power take off.
@@ -34,7 +34,7 @@ Hold Z (for a short amount of time) in order to attach/detach the connection hos
 Without attached connection hoses the following can occur:
 - You won't be able to control hydraulics (e.g. moving parts, folding, use ridge markers etc)
 - You won't be able to use the lights.
-- You trailer will be on air brakes.
+- Brakes will be blocked.
 
 Changelog v1.0.1.0:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
@@ -46,25 +46,108 @@ Changelog v1.0.1.0:
         ]]>
         </en>
         <de>
-            <![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.]]>
+            <![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
+
+Anhängen/Abhängen von Anbaugeräten:
+
+Wenn ein Anbaugerät angehangen wird, zwingt das Skript das Anbaugerät im abgesenkten Zustand zu bleiben. Es gibt ein paar Ausnahmen, Frontlader, Skidsteers, Schaufeln, Telelader, Mähdrescher und Hakenlift Anbaugeräte.
+Es ist weiterhin möglich diese Anbaugeräte vom Fahrzeug aus an und abzubauen.
+Anmerkung: Die Schläuche und die Zapfwelle müssen trotzdem noch manuell angebaut werden.
+Man muss das Anbaugerät erst absenken um es abzuhängen! Bevor du das Anbaugerät abhängst,
+sei dir sicher,dass die Schläuche und die Zapfwelle nicht angeschlossen sind.
+
+Der Mod deaktiviert das An-/Abkuppeln vom Fahrzeug aus (Ausnahmen wurden oben erwähnt).
+Wie der Modname schon sagt, ist es nun nicht mehr möglich mal eben schnell zwischen den Anbaugeräten zu wechseln...
+steig endlich aus!
+
+An-/abbauen der Zapfwelle:
+
+Drücke y um die Zapfwelle an oder abzubauen.
+Behalte im Kopf, dass die Zapfwelle angeschlossen sein muss, andernfalls kannst du das Gerät nicht anschalten.
+
+An-/abkuppeln der Verbindungsschläuche:
+
+Halte y (für eine kurze Zeit) gedrückt um die Schläuche an bzw. abzukuppeln.
+
+Ohne angeschlossene Schläuche kann folgendes passieren:
+- Du wirst nicht in der Lage sein die Hydraulik zu kontrollieren (z.B. sich bewegende Teile, ein-/ausklappen, Spuranreißer benutzen etc.)
+- Du kannst keine Lichter benutzen.
+- Blockierte Bremsen.
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.
+]]>
         </de>
         <fr>
-            <![CDATA[Ce mod vous oblige à attacher/détacher manuellement les outils et les remorques.]]>
+            <![CDATA[Ce mod vous oblige à attacher/détacher manuellement les outils et les remorques.
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.]]>
         </fr>
         <pl>
-            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!]]>
+            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.]]>
         </pl>
         <ru>
-            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.]]>
+            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.]]>
         </ru>
         <cz>
-            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.]]>
+            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.]]>
         </cz>
         <hu>
-            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]>
+            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.]]>
         </hu>
         <it>
-            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.]]>
+            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.
+
+Changelog v1.0.1.0:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Tweaked detection handler.
+- Added French and Czech translations.]]>
         </it>
     </description>
 
