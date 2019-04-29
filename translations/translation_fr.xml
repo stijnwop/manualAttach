@@ -8,8 +8,8 @@
         <text name="action_attach_pto" text="Attacher la prise de force"/>
         <text name="action_detach_pto" text="Détacher la prise de force"/>
 
-        <text name="action_attach_hose" text="Maintenir pour attacher les flexibles"/>
-        <text name="action_detach_hose" text="Maintenir pour détacher les flexibles"/>
+        <text name="action_attach_hose" text="Maintenir pour brancher les flexibles"/>
+        <text name="action_detach_hose" text="Maintenir pour débrancher les flexibles"/>
 
         <text name="info_lower_warning" text="Abaiser %s d'abord"/>
         <text name="info_turn_off_warning" text="Arrêter %s d'abord"/>
@@ -17,7 +17,7 @@
         <text name="info_detach_pto_warning" text="Détacher la prise de force de %s d'abord"/>
         <text name="info_attach_pto_warning" text="Attacher la prise de force de %s d'abord"/>
 
-        <text name="info_detach_hoses_warning" text="Détacher les flexibles de %s d'abord"/>
-        <text name="info_attach_hoses_warning" text="Attacher les flexibles de %s d'abord"/>
+        <text name="info_detach_hoses_warning" text="Débrancher les flexibles de %s d'abord"/>
+        <text name="info_attach_hoses_warning" text="Brancher les flexibles de %s d'abord"/>
     </texts>
 </l10n>
