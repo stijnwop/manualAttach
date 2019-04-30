@@ -416,7 +416,7 @@ end
 ---@param object table
 ---@param noEventSend boolean
 function ManualAttach:attachPowerTakeOff(vehicle, object, noEventSend)
-    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, false, noEventSend)
+    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, true, noEventSend)
 
     local implement = vehicle:getImplementByObject(object)
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
@@ -431,7 +431,7 @@ end
 ---@param object table
 ---@param noEventSend boolean
 function ManualAttach:detachPowerTakeOff(vehicle, object, noEventSend)
-    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, true, noEventSend)
+    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, false, noEventSend)
 
     local implement = vehicle:getImplementByObject(object)
     vehicle:detachPowerTakeOff(vehicle, implement)
