@@ -13,6 +13,7 @@ end
 
 function ManualAttachVehicle.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachVehicle.inj_getCanToggleAttach)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "actionEventAttach", ManualAttachVehicle.inj_actionEventAttach)
 end
 
 ---
@@ -21,4 +22,8 @@ end
 
 function ManualAttachVehicle.inj_getCanToggleAttach()
     return false
+end
+
+function ManualAttachVehicle.inj_actionEventAttach(...)
+    return -- We completely block the attach action event.
 end
