@@ -36,9 +36,12 @@ function init()
     Player.delete = Utils.prependedFunction(Player.delete, ManualAttach.inj_delete)
 
     -- Noop AttacherJoints function
-    AttacherJoints.findVehicleInAttachRange = function(...)
-        return nil, nil, nil, nil
+    local noop = function(...)
+        return nil
     end
+
+    AttacherJoints.findVehicleInAttachRange = noop
+    AttacherJoints.actionEventAttach = noop
 end
 
 function load(mission)
