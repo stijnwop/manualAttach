@@ -88,6 +88,20 @@ function ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
     return false
 end
 
+---Returns true when vehicle supports all hose types, false otherwise.
+---@param vehicle table
+---@param attacherJointIndex number
+---@param hoses table
+function ManualAttach.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
+    for _, hose in ipairs(hoses) do
+        if vehicle:getConnectionTarget(attacherJointIndex, hose.type, true) == nil then
+            return false
+        end
+    end
+
+    return true
+end
+
 ---Returns true when object has connection hoses, false otherwise.
 ---@param object table
 ---@param vehicle table
@@ -103,7 +117,7 @@ function ManualAttachUtil.hasConnectionHoses(object, vehicle)
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
-    return #hoses ~= 0
+    return #hoses ~= 0 and ManualAttach.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
 end
 
 ---Todo: Check when this dirty hack can be deleted in the next patch.
