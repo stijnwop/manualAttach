@@ -75,10 +75,28 @@ end
 ---@param vehicle table
 ---@param attacherJointIndex number
 ---@return boolean
-function ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
+function ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
     local hoses = vehicle.spec_connectionHoses
     if hoses ~= nil then
         for _, node in ipairs(hoses.targetNodes) do
+            if node.attacherJointIndices[attacherJointIndex] ~= nil then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+---Returns true when the attacherJoint has the given hose type.
+---@param vehicle table
+---@param attacherJointIndex number
+---@param type string
+function ManualAttachUtil.doesAttacherJointSupportHoseType(vehicle, attacherJointIndex, type)
+    local spec = vehicle.spec_connectionHoses
+    local nodes = spec.targetNodesByType[type]
+    if nodes ~= nil then
+        for _, node in ipairs(nodes) do
             if node.attacherJointIndices[attacherJointIndex] ~= nil then
                 return true
             end
@@ -92,9 +110,9 @@ end
 ---@param vehicle table
 ---@param attacherJointIndex number
 ---@param hoses table
-function ManualAttach.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
+function ManualAttachUtil.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
     for _, hose in ipairs(hoses) do
-        if vehicle:getConnectionTarget(attacherJointIndex, hose.type, true) == nil then
+        if not ManualAttachUtil.supportsAttacherJointHoseType(vehicle, attacherJointIndex, hose.type) then
             return false
         end
     end
@@ -108,7 +126,7 @@ end
 ---@return boolean
 function ManualAttachUtil.hasConnectionHoses(object, vehicle)
     local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
-    local hasTarget = ManualAttach.hasConnectionTarget(vehicle, attacherJointIndex)
+    local hasTarget = ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
 
     if not hasTarget or object.getConnectionHosesByInputAttacherJoint == nil then
         return false
@@ -117,7 +135,7 @@ function ManualAttachUtil.hasConnectionHoses(object, vehicle)
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
-    return #hoses ~= 0 and ManualAttach.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
+    return #hoses ~= 0 and ManualAttachUtil.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
 end
 
 ---Todo: Check when this dirty hack can be deleted in the next patch.
