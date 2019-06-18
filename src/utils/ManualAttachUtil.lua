@@ -112,7 +112,7 @@ end
 ---@param hoses table
 function ManualAttachUtil.doesVehicleSupportAllHoseTypes(vehicle, attacherJointIndex, hoses)
     for _, hose in ipairs(hoses) do
-        if not ManualAttachUtil.supportsAttacherJointHoseType(vehicle, attacherJointIndex, hose.type) then
+        if not ManualAttachUtil.doesAttacherJointSupportHoseType(vehicle, attacherJointIndex, hose.type) then
             return false
         end
     end
