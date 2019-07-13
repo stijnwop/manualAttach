@@ -8,6 +8,9 @@
 ---@class ManualAttachDetectionHandler @parent class
 ManualAttachDetectionHandler = {}
 
+---@type number The clear timer threshold in MS.
+ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD = 5000 --ms
+
 local ManualAttachDetectionHandler_mt = Class(ManualAttachDetectionHandler)
 
 ---Creates a new instance of ManualAttachDetectionHandler.
@@ -24,6 +27,7 @@ function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirect
     self.mission = mission
     self.modDirectory = modDirectory
 
+    self.lastDetectedTime = 0
     self.triggerCloneNode = nil
     self.detectedVehicleInTrigger = {}
     self.listeners = {}
@@ -39,6 +43,16 @@ end
 ---Called on delete.
 function ManualAttachDetectionHandler:delete()
     delete(self.triggerCloneNode)
+end
+
+---Main update function called every frame.
+---@param dt number
+function ManualAttachDetectionHandler:update(dt)
+    if #self.detectedVehicleInTrigger ~= 0 and
+            (self.mission.time - self.lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
+        self.detectedVehicleInTrigger = {}
+        self:notifyVehicleListChanged(self.detectedVehicleInTrigger)
+    end
 end
 
 ---Adds listener from the list.
@@ -128,8 +142,8 @@ function ManualAttachDetectionHandler.getIsValidVehicle(vehicle)
             and vehicle:isa(Vehicle)
             and not vehicle:isa(StationCrane) -- Dismiss the station cranes
             and not SpecializationUtil.hasSpecialization(SplineVehicle, vehicle.specializations)
-            and vehicle.getAttacherJoints ~= nil
-            and next(vehicle:getAttacherJoints()) ~= nil
+            and (SpecializationUtil.hasSpecialization(AttacherJoints, vehicle.specializations)
+            or SpecializationUtil.hasSpecialization(Attachable, vehicle.specializations))
 end
 
 ---Callback when trigger changes state.
@@ -144,12 +158,30 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
         local nodeVehicle = self.mission:getNodeObject(otherId)
 
         if ManualAttachDetectionHandler.getIsValidVehicle(nodeVehicle) then
+            self.lastDetectedTime = self.mission.time
+
             if onEnter or onStay then
                 if not ListUtil.hasListElement(self.detectedVehicleInTrigger, nodeVehicle) then
                     ListUtil.addElementToList(self.detectedVehicleInTrigger, nodeVehicle)
                 end
-            else
-                ListUtil.removeElementFromList(self.detectedVehicleInTrigger, nodeVehicle)
+
+                if nodeVehicle.getAttacherVehicle ~= nil then
+                    local attacherVehicle = nodeVehicle:getAttacherVehicle()
+                    if attacherVehicle ~= nil and not ListUtil.hasListElement(self.detectedVehicleInTrigger, attacherVehicle) then
+                        ListUtil.addElementToList(self.detectedVehicleInTrigger, attacherVehicle)
+                    end
+                end
+
+                if nodeVehicle.getAttachedImplements ~= nil then
+                    for _, implement in pairs(nodeVehicle:getAttachedImplements()) do
+                        local object = implement.object
+                        if object ~= nil then
+                            if not ListUtil.hasListElement(self.detectedVehicleInTrigger, object) then
+                                ListUtil.addElementToList(self.detectedVehicleInTrigger, object)
+                            end
+                        end
+                    end
+                end
             end
         end
 

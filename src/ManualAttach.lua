@@ -138,6 +138,7 @@ function ManualAttach:update(dt)
     end
 
     self.context:update(dt)
+    self.detectionHandler:update(dt)
 end
 
 ---Builds an initial event draw helper.
