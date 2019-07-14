@@ -10,11 +10,11 @@ Please be aware that this is a ***DEVELOPMENT VERSION***!
 ## Documentation
 
 ### Attach/Detach implements
-When attaching an implement the script forces the implement to stay at the lowered state. There are some exceptions made for the frontloaders, skidsteers, shovels, telehandlers, combines and hooklift implements. You're still able to attach and detach those implements from the inside of your vehicle. 
-*Note: The connection hoses and power take off still requires to be attached manually for those implements.*
-In order to detach the implement needs to be lowered first! Also make sure the power take off and conenction hoses are detached before detaching the implement.
+When attaching an implement the script forces the implement to stay at it's lowered state. There are some exceptions made for frontloaders, skidsteers, shovels, telehandlers, combines and hooklift implements. You're still able to attach and detach those implements without having to leave your vehicle. 
+*Note: The connection hoses and power take off still require to be attached manually for those implements.*
+In order to detach, the implement needs to be lowered first! Also make sure that the power take off and connection hoses are detached before detaching the implement.
 
-The mod disables attaching and detaching from inside the vehicle (expections are mentioned above). Like the mod tile already suggests it’s not possible anymore to do the quick switches between implements.. get out that vehicle for real this time! 
+The mod disables attaching and detaching from inside the vehicle (exceptions are mentioned above). Like the mod title already suggests it’s not possible anymore to do the quick switches between implements.. get out that vehicle for real this time! 
 
 ### Attach/Detach power take off
 Hit `Z` in order to attach/detach the power take off.
