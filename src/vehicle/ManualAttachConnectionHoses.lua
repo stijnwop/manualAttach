@@ -35,6 +35,7 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
 end
 
 function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
+    SpecializationUtil.registerEventListener(vehicleType, "onLoad", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostUpdateTick", ManualAttachConnectionHoses)
@@ -42,8 +43,13 @@ function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachConnectionHoses)
 end
 
+function ManualAttachConnectionHoses:onLoad(savegame)
+    self.spec_manualAttachConnectionHoses = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+end
+
 function ManualAttachConnectionHoses:onPostLoad(savegame)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
+
     spec.doLightsUpdate = false
     spec.isBlockingInitialHoseDetach = false
     spec.hasAttachedHoses = false
@@ -58,7 +64,7 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachConnectionHoses:onReadStream(streamId, connection)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
 
     local hasAttachedHoses = streamReadBool(streamId)
     spec.hasAttachedHoses = hasAttachedHoses
@@ -75,7 +81,7 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachConnectionHoses:onWriteStream(streamId, connection)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
     streamWriteBool(streamId, spec.hasAttachedHoses)
 end
 
@@ -90,7 +96,7 @@ function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
 end
 
 function ManualAttachConnectionHoses:onPostUpdateTick(dt)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
     if self.brake ~= nil and not spec.hasAttachedHoses then
         self:brake(1, true)
     end
@@ -109,7 +115,7 @@ end
 ---Set if mod needs to force update the state.
 ---@param state boolean
 function ManualAttachConnectionHoses:setUpdateLightsState(state)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
     spec.doLightsUpdate = state
 end
 
@@ -136,7 +142,7 @@ function ManualAttachConnectionHoses:hasAttachedHoses()
         end
     end
 
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
     return spec.hasAttachedHoses
 end
 
@@ -192,7 +198,7 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
         end
     end
 
-    local spec_manualAttach = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec_manualAttach = self.spec_manualAttachConnectionHoses
     spec_manualAttach.hasAttachedHoses = self:isHoseAttached()
 end
 
@@ -201,7 +207,7 @@ end
 ---@param inputJointDescIndex number
 ---@param jointDescIndex number
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
     if not spec.isBlockingInitialHoseDetach then
         self:disconnectHoses(attacherVehicle)
     else
@@ -218,7 +224,7 @@ function ManualAttachConnectionHoses.inj_connectHosesToAttacherVehicle(vehicle, 
     vehicle:toggleLightStates(true, true)
 
     if attacherVehicle.getConnectionTarget ~= nil then
-        local spec_manualAttach = ManualAttachUtil.getSpecTable(vehicle, "manualAttachConnectionHoses")
+        local spec_manualAttach = vehicle.spec_manualAttachConnectionHoses
         spec_manualAttach.hasAttachedHoses = vehicle:isHoseAttached()
     end
 end

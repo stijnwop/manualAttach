@@ -21,14 +21,19 @@ function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
 end
 
 function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
+    SpecializationUtil.registerEventListener(vehicleType, "onLoad", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onReadStream", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachPowerTakeOff)
 end
 
+function ManualAttachPowerTakeOff:onLoad(savegame)
+    self.spec_manualAttachPowerTakeOff = ManualAttachUtil.getSpecTable(self, "manualAttachPowerTakeOff")
+end
+
 function ManualAttachPowerTakeOff:onPostLoad(savegame)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachPowerTakeOff")
+    local spec = self.spec_manualAttachPowerTakeOff
     spec.isBlockingInitialPtoDetach = false
 
     if savegame ~= nil then
@@ -114,7 +119,7 @@ end
 ---@param inputJointDescIndex number
 ---@param jointDescIndex number
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
-    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachPowerTakeOff")
+    local spec = self.spec_manualAttachPowerTakeOff
     if not spec.isBlockingInitialPtoDetach then
         if attacherVehicle.detachPowerTakeOff ~= nil then
             local implement = attacherVehicle:getImplementByObject(self)
