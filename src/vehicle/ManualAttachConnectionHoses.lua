@@ -38,6 +38,8 @@ function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostUpdateTick", ManualAttachConnectionHoses)
+    SpecializationUtil.registerEventListener(vehicleType, "onReadStream", ManualAttachConnectionHoses)
+    SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachConnectionHoses)
 end
 
 function ManualAttachConnectionHoses:onPostLoad(savegame)
@@ -50,6 +52,31 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
         local key = savegame.key .. "." .. g_manualAttach.modName
         spec.isBlockingInitialHoseDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses"), false)
     end
+end
+
+---Called on client side on join
+---@param streamId number
+---@param connection number
+function ManualAttachConnectionHoses:onReadStream(streamId, connection)
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+
+    local hasAttachedHoses = streamReadBool(streamId)
+    spec.hasAttachedHoses = hasAttachedHoses
+
+    if not hasAttachedHoses then
+        local attacherVehicle = self:getAttacherVehicle()
+        if attacherVehicle ~= nil then
+            self:disconnectHoses(attacherVehicle)
+        end
+    end
+end
+
+---Called on server side on join
+---@param streamId number
+---@param connection number
+function ManualAttachConnectionHoses:onWriteStream(streamId, connection)
+    local spec = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    streamWriteBool(streamId, spec.hasAttachedHoses)
 end
 
 function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
@@ -103,8 +130,8 @@ function ManualAttachConnectionHoses:hasAttachedHoses()
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
         if attacherVehicle ~= nil
-                and attacherVehicle.hasAttachedHoses ~= nil
-                and not attacherVehicle:hasAttachedHoses() then
+            and attacherVehicle.hasAttachedHoses ~= nil
+            and not attacherVehicle:hasAttachedHoses() then
             return false
         end
     end

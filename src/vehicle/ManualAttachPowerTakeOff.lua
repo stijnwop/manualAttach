@@ -23,6 +23,8 @@ end
 function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachPowerTakeOff)
+    SpecializationUtil.registerEventListener(vehicleType, "onReadStream", ManualAttachPowerTakeOff)
+    SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachPowerTakeOff)
 end
 
 function ManualAttachPowerTakeOff:onPostLoad(savegame)
@@ -33,6 +35,28 @@ function ManualAttachPowerTakeOff:onPostLoad(savegame)
         local key = savegame.key .. "." .. g_manualAttach.modName
         spec.isBlockingInitialPtoDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachPowerTakeOff#hasAttachedPowerTakeOffs"), false)
     end
+end
+
+---Called on client side on join
+---@param streamId number
+---@param connection number
+function ManualAttachPowerTakeOff:onReadStream(streamId, connection)
+    local isPtoAttached = streamReadBool(streamId)
+
+    if not isPtoAttached then
+        local attacherVehicle = self:getAttacherVehicle()
+        if attacherVehicle ~= nil and attacherVehicle.detachPowerTakeOff ~= nil then
+            local implement = attacherVehicle:getImplementByObject(self)
+            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+        end
+    end
+end
+
+---Called on server side on join
+---@param streamId number
+---@param connection number
+function ManualAttachPowerTakeOff:onWriteStream(streamId, connection)
+    streamWriteBool(streamId, self:isPtoAttached())
 end
 
 function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
