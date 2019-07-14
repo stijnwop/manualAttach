@@ -28,8 +28,10 @@ function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirect
     self.modDirectory = modDirectory
 
     self.lastDetectedTime = 0
+    self.lastDetectedVehicle = nil
     self.triggerCloneNode = nil
-    self.detectedVehicleInTrigger = {}
+    self.detectedVehiclesInTrigger = {}
+    self.detectedVehiclesOnLeaveTimes = {}
     self.listeners = {}
 
     return self
@@ -48,10 +50,22 @@ end
 ---Main update function called every frame.
 ---@param dt number
 function ManualAttachDetectionHandler:update(dt)
-    if #self.detectedVehicleInTrigger ~= 0 and
-            (self.mission.time - self.lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
-        self.detectedVehicleInTrigger = {}
-        self:notifyVehicleListChanged(self.detectedVehicleInTrigger)
+    local lastAmount = #self.detectedVehiclesInTrigger
+    local currentTime = self.mission.time
+    if lastAmount ~= 0 and
+            (currentTime - self.lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
+        for vehicle, lastDetectedTime in pairs(self.detectedVehiclesOnLeaveTimes) do
+            if (currentTime - lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
+                if vehicle ~= self.lastDetectedVehicle then
+                    ListUtil.removeElementFromList(self.detectedVehiclesInTrigger, vehicle)
+                    self.detectedVehiclesOnLeaveTimes[vehicle] = nil -- GC
+                end
+            end
+        end
+
+        if lastAmount ~= #self.detectedVehiclesInTrigger then
+            self:notifyVehicleListChanged(self.detectedVehiclesInTrigger)
+        end
     end
 end
 
@@ -128,7 +142,10 @@ function ManualAttachDetectionHandler:removeTrigger()
             self.trigger = nil
         end
 
-        self.detectedVehicleInTrigger = {}
+        self.lastDetectedTime = 0
+        self.lastDetectedVehicle = nil
+        self.detectedVehiclesInTrigger = {}
+        self.detectedVehiclesOnLeaveTimes = {}
         self:notifyVehicleTriggerChange(true)
     end
 end
@@ -146,6 +163,13 @@ function ManualAttachDetectionHandler.getIsValidVehicle(vehicle)
             or SpecializationUtil.hasSpecialization(Attachable, vehicle.specializations))
 end
 
+---Checks if the given vehicle has attacherJoints.
+---@param vehicle table
+---@return boolean Returns true when the given vehicle has actual attacherJoints in the table, false otherwise.
+function ManualAttachDetectionHandler.getHasAttacherJoints(vehicle)
+    return vehicle.getAttacherJoints ~= nil and next(vehicle:getAttacherJoints()) ~= nil
+end
+
 ---Callback when trigger changes state.
 ---@param triggerId number
 ---@param otherId number
@@ -154,21 +178,25 @@ end
 ---@param onStay boolean
 function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherId, onEnter, onLeave, onStay)
     if (onEnter or onLeave) then
-        local lastAmount = #self.detectedVehicleInTrigger
+        local lastAmount = #self.detectedVehiclesInTrigger
         local nodeVehicle = self.mission:getNodeObject(otherId)
 
         if ManualAttachDetectionHandler.getIsValidVehicle(nodeVehicle) then
             self.lastDetectedTime = self.mission.time
+            -- Only save the last vehicle with attacher joints.
+            if ManualAttachDetectionHandler.getHasAttacherJoints(nodeVehicle) then
+                self.lastDetectedVehicle = nodeVehicle
+            end
 
-            if onEnter or onStay then
-                if not ListUtil.hasListElement(self.detectedVehicleInTrigger, nodeVehicle) then
-                    ListUtil.addElementToList(self.detectedVehicleInTrigger, nodeVehicle)
+            if onEnter then
+                if not ListUtil.hasListElement(self.detectedVehiclesInTrigger, nodeVehicle) then
+                    ListUtil.addElementToList(self.detectedVehiclesInTrigger, nodeVehicle)
                 end
 
                 if nodeVehicle.getAttacherVehicle ~= nil then
                     local attacherVehicle = nodeVehicle:getAttacherVehicle()
-                    if attacherVehicle ~= nil and not ListUtil.hasListElement(self.detectedVehicleInTrigger, attacherVehicle) then
-                        ListUtil.addElementToList(self.detectedVehicleInTrigger, attacherVehicle)
+                    if attacherVehicle ~= nil and not ListUtil.hasListElement(self.detectedVehiclesInTrigger, attacherVehicle) then
+                        ListUtil.addElementToList(self.detectedVehiclesInTrigger, attacherVehicle)
                     end
                 end
 
@@ -176,17 +204,19 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
                     for _, implement in pairs(nodeVehicle:getAttachedImplements()) do
                         local object = implement.object
                         if object ~= nil then
-                            if not ListUtil.hasListElement(self.detectedVehicleInTrigger, object) then
-                                ListUtil.addElementToList(self.detectedVehicleInTrigger, object)
+                            if not ListUtil.hasListElement(self.detectedVehiclesInTrigger, object) then
+                                ListUtil.addElementToList(self.detectedVehiclesInTrigger, object)
                             end
                         end
                     end
                 end
+            else
+                self.detectedVehiclesOnLeaveTimes[nodeVehicle] = self.lastDetectedTime
             end
         end
 
-        if lastAmount ~= #self.detectedVehicleInTrigger then
-            self:notifyVehicleListChanged(self.detectedVehicleInTrigger)
+        if lastAmount ~= #self.detectedVehiclesInTrigger then
+            self:notifyVehicleListChanged(self.detectedVehiclesInTrigger)
         end
     end
 end
