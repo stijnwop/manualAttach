@@ -611,7 +611,7 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
 
         if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations)
                 and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
-                and not SpecializationUtil.hasSpecialization(ConveyorBelt, typeEntry.specializations) then
+                and not SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) then
             vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
         end
 
