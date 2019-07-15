@@ -120,14 +120,15 @@ end
 ---Adds the trigger to the player.
 function ManualAttachDetectionHandler:addTrigger()
     if self.isClient and self.triggerCloneNode ~= nil then
-        self.trigger = clone(self.triggerCloneNode, false, false, true)
+        self.mission.player.manualAttachDetectionTrigger = clone(self.triggerCloneNode, false, false, true)
+        local trigger = self.mission.player.manualAttachDetectionTrigger
 
         -- Link trigger to player
-        link(self.mission.player.rootNode, self.trigger)
-        setTranslation(self.trigger, 0, 0, -2.5)
-        setRotation(self.trigger, 0, math.rad(25), 0)
+        link(self.mission.player.rootNode, trigger)
+        setTranslation(trigger, 0, 0, -2.5)
+        setRotation(trigger, 0, math.rad(25), 0)
 
-        addTrigger(self.trigger, "vehicleDetectionCallback", self)
+        addTrigger(trigger, "vehicleDetectionCallback", self)
 
         self:notifyVehicleTriggerChange(false)
     end
@@ -136,10 +137,11 @@ end
 ---Removes the trigger from the player.
 function ManualAttachDetectionHandler:removeTrigger()
     if self.isClient then
-        if self.trigger ~= nil then
-            removeTrigger(self.trigger)
-            delete(self.trigger)
-            self.trigger = nil
+        local trigger = self.mission.player.manualAttachDetectionTrigger
+        if trigger ~= nil then
+            removeTrigger(trigger)
+            delete(trigger)
+            self.mission.player.manualAttachDetectionTrigger = nil
         end
 
         self.lastDetectedTime = 0
