@@ -67,6 +67,7 @@ function ManualAttachConnectionHoses:onReadStream(streamId, connection)
     local spec = self.spec_manualAttachConnectionHoses
 
     local hasAttachedHoses = streamReadBool(streamId)
+    spec.isBlockingInitialHoseDetach = hasAttachedHoses
     spec.hasAttachedHoses = hasAttachedHoses
 
     if not hasAttachedHoses then

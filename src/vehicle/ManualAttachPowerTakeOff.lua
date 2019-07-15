@@ -47,7 +47,10 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachPowerTakeOff:onReadStream(streamId, connection)
+    local spec = self.spec_manualAttachPowerTakeOff
+
     local isPtoAttached = streamReadBool(streamId)
+    spec.isBlockingInitialPtoDetach = isPtoAttached
 
     if not isPtoAttached then
         local attacherVehicle = self:getAttacherVehicle()
