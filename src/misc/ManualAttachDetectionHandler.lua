@@ -205,7 +205,7 @@ end
 ---@param onStay boolean
 function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherId, onEnter, onLeave, onStay)
     if (onEnter or onLeave) then
-        local lastAmount = #self.detectedVehiclesInTriggerk
+        local lastAmount = #self.detectedVehiclesInTrigger
         local nodeVehicle = self.mission:getNodeObject(otherId)
 
         if ManualAttachDetectionHandler.getIsValidVehicle(nodeVehicle) then
