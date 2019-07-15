@@ -583,7 +583,7 @@ end
 ---@param player table
 function ManualAttach.inj_onLeave(player)
     g_manualAttach:unregisterActionEvents()
-    g_manualAttach.detectionHandler:removeTrigger(player)
+    g_manualAttach.detectionHandler:disableTrigger(player)
 end
 
 ---Injects in the player load function

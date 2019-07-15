@@ -56,7 +56,7 @@ function ManualAttachDetectionHandler:update(dt)
     local lastAmount = #self.detectedVehiclesInTrigger
     local currentTime = self.mission.time
     if lastAmount ~= 0 and
-            (currentTime - self.lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
+        (currentTime - self.lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
         for vehicle, lastDetectedTime in pairs(self.detectedVehiclesOnLeaveTimes) do
             if (currentTime - lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
                 if vehicle ~= self.lastDetectedVehicle then
@@ -104,6 +104,18 @@ function ManualAttachDetectionHandler:notifyVehicleTriggerChange(isRemoved)
     end
 end
 
+---Ghost remove node to physics.
+function ManualAttachDetectionHandler:onGhostRemove(nodeId)
+    setVisibility(nodeId, false)
+    removeFromPhysics(nodeId)
+end
+
+---Ghost add node to physics.
+function ManualAttachDetectionHandler:onGhostAdd(nodeId)
+    setVisibility(nodeId, true)
+    addToPhysics(nodeId)
+end
+
 ---Loads the trigger from the i3d file.
 function ManualAttachDetectionHandler:loadCloneableTrigger()
     local filename = Utils.getFilename("resources/detectionTrigger.i3d", self.modDirectory)
@@ -121,7 +133,7 @@ end
 ---@param player table the current player
 function ManualAttachDetectionHandler:addTrigger(player)
     if self.isClient and self.triggerCloneNode ~= nil and player == self.mission.player then
-        player.manualAttachDetectionTrigger = clone(self.triggerCloneNode, false, false, true)
+        player.manualAttachDetectionTrigger = clone(self.triggerCloneNode, false, false, false)
         local trigger = player.manualAttachDetectionTrigger
 
         -- Link trigger to player
@@ -131,7 +143,24 @@ function ManualAttachDetectionHandler:addTrigger(player)
 
         addTrigger(trigger, "vehicleDetectionCallback", self)
 
+        self:onGhostAdd(trigger)
         self:notifyVehicleTriggerChange(false)
+    end
+end
+
+---Disables the trigger from the player.
+---@param player table the current player
+function ManualAttachDetectionHandler:disableTrigger(player)
+    if self.isClient and player == self.mission.player then
+        local trigger = player.manualAttachDetectionTrigger
+
+        self:onGhostRemove(trigger)
+        self:notifyVehicleTriggerChange(true)
+
+        self.lastDetectedTime = 0
+        self.lastDetectedVehicle = nil
+        self.detectedVehiclesInTrigger = {}
+        self.detectedVehiclesOnLeaveTimes = {}
     end
 end
 
@@ -145,12 +174,6 @@ function ManualAttachDetectionHandler:removeTrigger(player)
             delete(trigger)
             player.manualAttachDetectionTrigger = nil
         end
-
-        self.lastDetectedTime = 0
-        self.lastDetectedVehicle = nil
-        self.detectedVehiclesInTrigger = {}
-        self.detectedVehiclesOnLeaveTimes = {}
-        self:notifyVehicleTriggerChange(true)
     end
 end
 
@@ -159,12 +182,12 @@ end
 ---@return boolean true if valid, false otherwise.
 function ManualAttachDetectionHandler.getIsValidVehicle(vehicle)
     return vehicle ~= nil
-            and vehicle.isa ~= nil
-            and vehicle:isa(Vehicle)
-            and not vehicle:isa(StationCrane) -- Dismiss the station cranes
-            and not SpecializationUtil.hasSpecialization(SplineVehicle, vehicle.specializations)
-            and (SpecializationUtil.hasSpecialization(AttacherJoints, vehicle.specializations)
-            or SpecializationUtil.hasSpecialization(Attachable, vehicle.specializations))
+        and vehicle.isa ~= nil
+        and vehicle:isa(Vehicle)
+        and not vehicle:isa(StationCrane) -- Dismiss the station cranes
+        and not SpecializationUtil.hasSpecialization(SplineVehicle, vehicle.specializations)
+        and (SpecializationUtil.hasSpecialization(AttacherJoints, vehicle.specializations)
+        or SpecializationUtil.hasSpecialization(Attachable, vehicle.specializations))
 end
 
 ---Checks if the given vehicle has attacherJoints.
@@ -182,7 +205,7 @@ end
 ---@param onStay boolean
 function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherId, onEnter, onLeave, onStay)
     if (onEnter or onLeave) then
-        local lastAmount = #self.detectedVehiclesInTrigger
+        local lastAmount = #self.detectedVehiclesInTriggerk
         local nodeVehicle = self.mission:getNodeObject(otherId)
 
         if ManualAttachDetectionHandler.getIsValidVehicle(nodeVehicle) then
