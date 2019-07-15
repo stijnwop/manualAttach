@@ -194,7 +194,7 @@ end
 ---Draw called on every frame.
 function ManualAttach:draw()
     if not self.isClient
-            or not self:hasVehicles() then
+        or not self:hasVehicles() then
         return
     end
 
@@ -312,9 +312,9 @@ end
 function ManualAttach:isValidPlayer()
     local player = self.mission.player
     return player ~= nil
-            and self.mission.controlPlayer
-            and not player.isCarryingObject
-            and not player:hasHandtoolEquipped()
+        and self.mission.controlPlayer
+        and not player.isCarryingObject
+        and not player:hasHandtoolEquipped()
 end
 
 ---Returns true when the given object is valid, false otherwise.
@@ -351,7 +351,7 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
 
     if detachAllowed then
         if ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
-                and ManualAttachUtil.hasAttachedPowerTakeOffs(object, vehicle) then
+            and ManualAttachUtil.hasAttachedPowerTakeOffs(object, vehicle) then
             detachAllowed = false
             warning = self.i18n:getText("info_detach_pto_warning"):format(object:getFullName())
         end
@@ -359,7 +359,7 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
 
     if detachAllowed then
         if ManualAttachUtil.hasConnectionHoses(object, vehicle)
-                and ManualAttachUtil.hasAttachedConnectionHoses(object) then
+            and ManualAttachUtil.hasAttachedConnectionHoses(object) then
             detachAllowed = false
             warning = self.i18n:getText("info_detach_hoses_warning"):format(object:getFullName())
         end
@@ -375,7 +375,7 @@ end
 ---@param jointDescIndex number
 function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, jointDescIndex)
     if self.mission.accessHandler:canFarmAccess(vehicle:getActiveFarm(), object)
-            and self:canHandle(vehicle, object, jointDescIndex) then
+        and self:canHandle(vehicle, object, jointDescIndex) then
         local jointDesc = vehicle.spec_attacherJoints.attacherJoints[jointDescIndex]
 
         if not jointDesc.jointIndex ~= 0 then
@@ -550,6 +550,11 @@ function ManualAttach:registerPlayerActionEvents()
     end
 end
 
+---Remove player input actions.
+function ManualAttach:unregisterPlayerActionEvents()
+    self.input:removeActionEvent(self.handleEventId)
+end
+
 ---Unregister input actions.
 function ManualAttach:unregisterActionEvents()
     self.input:removeActionEventsByTarget(self)
@@ -582,8 +587,8 @@ end
 ---Injects in the player onLeave function
 ---@param player table
 function ManualAttach.inj_onLeave(player)
-    g_manualAttach:unregisterActionEvents()
-    g_manualAttach.detectionHandler:disableTrigger(player)
+    g_manualAttach:unregisterPlayerActionEvents()
+    g_manualAttach.detectionHandler:removeTrigger(player)
 end
 
 ---Injects in the player load function
@@ -614,8 +619,8 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
         end
 
         if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations)
-                and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
-                and not SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) then
+            and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations)
+            and not SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) then
             vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
         end
 
