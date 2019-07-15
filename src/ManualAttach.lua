@@ -85,8 +85,6 @@ end
 ---Called when player clicks start.
 ---@param mission table
 function ManualAttach:onMissionStart(mission)
-    self.detectionHandler:load()
-
     self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
 
     self:resetAttachValues()
@@ -577,7 +575,7 @@ end
 function ManualAttach.inj_onEnter(player, isControlling)
     if isControlling then
         g_manualAttach:registerPlayerActionEvents()
-        g_manualAttach.detectionHandler:addTrigger()
+        g_manualAttach.detectionHandler:addTrigger(player)
     end
 end
 
@@ -585,13 +583,19 @@ end
 ---@param player table
 function ManualAttach.inj_onLeave(player)
     g_manualAttach:unregisterActionEvents()
-    g_manualAttach.detectionHandler:removeTrigger()
+    g_manualAttach.detectionHandler:removeTrigger(player)
+end
+
+---Injects in the player load function
+---@param player table
+function ManualAttach.inj_load(player)
+    g_manualAttach.detectionHandler:load(player)
 end
 
 ---Injects in the player delete function
 ---@param player table
 function ManualAttach.inj_delete(player)
-    g_manualAttach.detectionHandler:removeTrigger()
+    g_manualAttach.detectionHandler:removeTrigger(player)
 end
 
 ---Early hook into adding vehicle specializations.

@@ -38,8 +38,11 @@ function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirect
 end
 
 ---Called on load.
-function ManualAttachDetectionHandler:load()
+---@param player table the current player
+function ManualAttachDetectionHandler:load(player)
     self:loadCloneableTrigger()
+    -- Add trigger on initial load.
+    self:addTrigger(player)
 end
 
 ---Called on delete.
@@ -112,19 +115,17 @@ function ManualAttachDetectionHandler:loadCloneableTrigger()
 
     self.triggerCloneNode = trigger
     link(getRootNode(), self.triggerCloneNode)
-
-    -- Add trigger on initial load.
-    self:addTrigger()
 end
 
 ---Adds the trigger to the player.
-function ManualAttachDetectionHandler:addTrigger()
-    if self.isClient and self.triggerCloneNode ~= nil then
-        self.mission.player.manualAttachDetectionTrigger = clone(self.triggerCloneNode, false, false, true)
-        local trigger = self.mission.player.manualAttachDetectionTrigger
+---@param player table the current player
+function ManualAttachDetectionHandler:addTrigger(player)
+    if self.isClient and self.triggerCloneNode ~= nil and player == self.mission.player then
+        player.manualAttachDetectionTrigger = clone(self.triggerCloneNode, false, false, true)
+        local trigger = player.manualAttachDetectionTrigger
 
         -- Link trigger to player
-        link(self.mission.player.rootNode, trigger)
+        link(player.rootNode, trigger)
         setTranslation(trigger, 0, 0, -2.5)
         setRotation(trigger, 0, math.rad(25), 0)
 
@@ -135,13 +136,14 @@ function ManualAttachDetectionHandler:addTrigger()
 end
 
 ---Removes the trigger from the player.
-function ManualAttachDetectionHandler:removeTrigger()
-    if self.isClient then
-        local trigger = self.mission.player.manualAttachDetectionTrigger
+---@param player table the current player
+function ManualAttachDetectionHandler:removeTrigger(player)
+    if self.isClient and player == self.mission.player then
+        local trigger = player.manualAttachDetectionTrigger
         if trigger ~= nil then
             removeTrigger(trigger)
             delete(trigger)
-            self.mission.player.manualAttachDetectionTrigger = nil
+            player.manualAttachDetectionTrigger = nil
         end
 
         self.lastDetectedTime = 0

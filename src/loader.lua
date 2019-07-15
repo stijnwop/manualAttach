@@ -33,6 +33,7 @@ function init()
 
     Player.onEnter = Utils.appendedFunction(Player.onEnter, ManualAttach.inj_onEnter)
     Player.onLeave = Utils.appendedFunction(Player.onLeave, ManualAttach.inj_onLeave)
+    Player.load = Utils.appendedFunction(Player.load, ManualAttach.inj_load)
     Player.delete = Utils.prependedFunction(Player.delete, ManualAttach.inj_delete)
 
     -- Noop AttacherJoints function
