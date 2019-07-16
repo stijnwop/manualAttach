@@ -321,7 +321,8 @@ function ManualAttachConnectionHoses.inj_canFoldRidgeMarker(vehicle, superFunc, 
 end
 
 function ManualAttachConnectionHoses.inj_getCanDischargeToGround(vehicle, superFunc, dischargeNode)
-    if not vehicle:hasAttachedHoses() then
+    if vehicle.spec_shovel == nil -- dismiss shovels
+        and not vehicle:hasAttachedHoses() then
         return false
     end
 
