@@ -541,8 +541,9 @@ function ManualAttach:registerActionEvents()
 end
 
 ---Register player input actions.
-function ManualAttach:registerPlayerActionEvents()
-    if self.isClient then
+---@param player table
+function ManualAttach:registerPlayerActionEvents(player)
+    if self.isClient and player == self.mission.player then
         local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
         self.input:setActionEventTextVisibility(handleEventId, false)
 
@@ -551,8 +552,11 @@ function ManualAttach:registerPlayerActionEvents()
 end
 
 ---Remove player input actions.
-function ManualAttach:unregisterPlayerActionEvents()
-    self.input:removeActionEvent(self.handleEventId)
+---@param player table
+function ManualAttach:unregisterPlayerActionEvents(player)
+    if player == self.mission.player then
+        self.input:removeActionEvent(self.handleEventId)
+    end
 end
 
 ---Unregister input actions.
@@ -565,11 +569,13 @@ end
 ---
 
 ---Injects in the mission register action events.
+---@param mission table
 function ManualAttach.inj_registerActionEvents(mission)
     g_manualAttach:registerActionEvents()
 end
 
 ---Injects in the mission unregister action events.
+---@param mission table
 function ManualAttach.inj_unregisterActionEvents(mission)
     g_manualAttach:unregisterActionEvents()
 end
@@ -579,7 +585,7 @@ end
 ---@param isControlling boolean
 function ManualAttach.inj_onEnter(player, isControlling)
     if isControlling then
-        g_manualAttach:registerPlayerActionEvents()
+        g_manualAttach:registerPlayerActionEvents(player)
         g_manualAttach.detectionHandler:addTrigger(player)
     end
 end
@@ -587,7 +593,7 @@ end
 ---Injects in the player onLeave function
 ---@param player table
 function ManualAttach.inj_onLeave(player)
-    g_manualAttach:unregisterPlayerActionEvents()
+    g_manualAttach:unregisterPlayerActionEvents(player)
     g_manualAttach.detectionHandler:removeTrigger(player)
 end
 
