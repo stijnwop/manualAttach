@@ -38,14 +38,21 @@ Without attached connection hoses the following can occur:
 - You won't be able to use the lights.
 - Brakes will be blocked.
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.
-        ]]>
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </en>
         <de>
             <![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
@@ -76,13 +83,20 @@ Ohne angeschlossene Schläuche kann folgendes passieren:
 - Du kannst keine Lichter benutzen.
 - Blockierte Bremsen.
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
 ]]>
         </de>
         <fr>
@@ -106,94 +120,142 @@ En l'absence de tuyaux de raccordement raccordés, les situations suivantes peuv
 - Vous ne pourrez pas utiliser les lumières.
 - Votre remorque sera freinée par l'air comprimé.
 
-Changelog v1.0.1.0 :
-- Corection de la pile d'appels lorsque le véhicule est toujours dans le trigger mais effacé/rechargé à la boutique ou en mission.
-- Correction des contrôleurs de jeu.
-- Correction de la boucle de raccordement tout en maintenant la touche enfoncée pour raccorder les flexibles.
-- Correction d'une pile d'appels MP lors du raccordement des tuyaux.
-- Gestionnaire de détection modifié.
-- Ajouté les traductions française et tchèque.]]>
+Changelog v1.0.1.1:
+- Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
+- Fixed gamepad controls.
+- Fixed connection loop while holding down the key for connecting hoses.
+- Fixed MP callstack while connecting hoses.
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </fr>
         <pl>
             <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.]]>
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </pl>
         <ru>
             <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.]]>
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </ru>
         <cz>
             <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.]]>
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </cz>
         <hu>
             <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.]]>
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </hu>
         <it>
             <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.
 
-Changelog v1.0.1.0:
+Changelog v1.0.1.1:
 - Fixed callstack when vehicle is still in the trigger but deleted/reloaded at the shop or mission.
 - Fixed gamepad controls.
 - Fixed connection loop while holding down the key for connecting hoses.
 - Fixed MP callstack while connecting hoses.
-- Tweaked detection handler.
-- Added French and Czech translations.]]>
+- Optimized player trigger mechanism.
+- Added French, Spanish and Czech translations.
+- Added better vehicle support checks.
+- Fixed non-cpu mesh at runtime warning.
+- Added workaround for implements that are hard-attached.
+- Fixed MP multi client bug for the input events.
+- Disallow discharge when PTO or hoses are detached. (Exception for shovel)
+- Synchronize attach state of PTO and connection hoses in MP.
+- Fixed issue with non usable enterable implement for the Anderson DLC.
+]]>
         </it>
     </description>
 
     <iconFilename>icon.png</iconFilename>
 
-    <multiplayer supported="true"/>
+    <multiplayer supported="true" />
 
-    <l10n filenamePrefix="translations/translation"/>
+    <l10n filenamePrefix="translations/translation" />
 
     <extraSourceFiles>
-        <sourceFile filename="src/loader.lua"/>
+        <sourceFile filename="src/loader.lua" />
     </extraSourceFiles>
 
     <actions>
-        <action name="MA_ATTACH_VEHICLE" axisType="HALF"/>
-        <action name="MA_ATTACH_PTO_HOSE" axisType="HALF"/>
+        <action name="MA_ATTACH_VEHICLE" axisType="HALF" />
+        <action name="MA_ATTACH_PTO_HOSE" axisType="HALF" />
     </actions>
 
     <inputBinding>
         <actionBinding action="MA_ATTACH_VEHICLE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_q"/>
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10"/>
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_q" />
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10" />
         </actionBinding>
         <actionBinding action="MA_ATTACH_PTO_HOSE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_z"/>
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_9"/>
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
+            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_9" />
         </actionBinding>
     </inputBinding>
 </modDesc>
