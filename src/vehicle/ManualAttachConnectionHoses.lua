@@ -51,7 +51,7 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
     local spec = self.spec_manualAttachConnectionHoses
 
     spec.doLightsUpdate = false
-    spec.isBlockingInitialHoseDetach = true -- always block detach because we don't have attached hoses at first load.
+    spec.isBlockingInitialHoseDetach = false -- always block detach because we don't have attached hoses at first load.
     spec.hasAttachedHoses = false
 
     if savegame ~= nil then
@@ -64,10 +64,15 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachConnectionHoses:onReadStream(streamId, connection)
-    if not streamReadBool(streamId) then
+    if streamReadBool(streamId) then
         local attacherVehicle = self:getAttacherVehicle()
         if attacherVehicle ~= nil then
-            self:disconnectHoses(attacherVehicle)
+            local implement = attacherVehicle:getImplementByObject(self)
+            local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
+            local jointDescIndex = implement.jointDescIndex
+
+            self:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
+            self:updateAttachedConnectionHoses(attacherVehicle) -- update once
         end
     end
 end

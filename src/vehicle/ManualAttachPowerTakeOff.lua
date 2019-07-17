@@ -35,7 +35,7 @@ end
 
 function ManualAttachPowerTakeOff:onPostLoad(savegame)
     local spec = self.spec_manualAttachPowerTakeOff
-    spec.isBlockingInitialPtoDetach = true -- always block detach because we don't have an attached PTO at first load.
+    spec.isBlockingInitialPtoDetach = false -- always block detach because we don't have an attached PTO at first load.
 
     if savegame ~= nil then
         local key = savegame.key .. "." .. g_manualAttach.modName
@@ -47,11 +47,14 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachPowerTakeOff:onReadStream(streamId, connection)
-    if not streamReadBool(streamId) then
+    if streamReadBool(streamId) then
         local attacherVehicle = self:getAttacherVehicle()
-        if attacherVehicle ~= nil and attacherVehicle.detachPowerTakeOff ~= nil then
+        if attacherVehicle ~= nil and attacherVehicle.attachPowerTakeOff ~= nil then
             local implement = attacherVehicle:getImplementByObject(self)
-            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+            local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
+            local jointDescIndex = implement.jointDescIndex
+            attacherVehicle:attachPowerTakeOff(self, inputJointDescIndex, jointDescIndex)
+            attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
         end
     end
 end
