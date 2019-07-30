@@ -48,13 +48,16 @@ end
 ---@param connection number
 function ManualAttachPowerTakeOff:onReadStream(streamId, connection)
     if streamReadBool(streamId) then
-        local attacherVehicle = self:getAttacherVehicle()
-        if attacherVehicle ~= nil and attacherVehicle.attachPowerTakeOff ~= nil then
-            local implement = attacherVehicle:getImplementByObject(self)
-            local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
-            local jointDescIndex = implement.jointDescIndex
-            attacherVehicle:attachPowerTakeOff(self, inputJointDescIndex, jointDescIndex)
-            attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+        local isPtoAttached = streamReadBool(streamId)
+        if isPtoAttached then
+            local attacherVehicle = self:getAttacherVehicle()
+            if attacherVehicle ~= nil and attacherVehicle.attachPowerTakeOff ~= nil then
+                local implement = attacherVehicle:getImplementByObject(self)
+                local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
+                local jointDescIndex = implement.jointDescIndex
+                attacherVehicle:attachPowerTakeOff(self, inputJointDescIndex, jointDescIndex)
+                attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+            end
         end
     end
 end
@@ -63,7 +66,11 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachPowerTakeOff:onWriteStream(streamId, connection)
-    streamWriteBool(streamId, self:isPtoAttached())
+    local hasAttacherVehicle = self.getAttacherVehicle ~= nil
+    streamWriteBool(streamId, hasAttacherVehicle)
+    if hasAttacherVehicle then
+        streamWriteBool(streamId, self:isPtoAttached())
+    end
 end
 
 function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)

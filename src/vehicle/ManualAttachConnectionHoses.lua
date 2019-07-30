@@ -65,14 +65,17 @@ end
 ---@param connection number
 function ManualAttachConnectionHoses:onReadStream(streamId, connection)
     if streamReadBool(streamId) then
-        local attacherVehicle = self:getAttacherVehicle()
-        if attacherVehicle ~= nil then
-            local implement = attacherVehicle:getImplementByObject(self)
-            local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
-            local jointDescIndex = implement.jointDescIndex
+        local hasAttachedConnectionHoses = streamReadBool(streamId)
+        if hasAttachedConnectionHoses then
+            local attacherVehicle = self:getAttacherVehicle()
+            if attacherVehicle ~= nil then
+                local implement = attacherVehicle:getImplementByObject(self)
+                local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
+                local jointDescIndex = implement.jointDescIndex
 
-            self:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
-            self:updateAttachedConnectionHoses(attacherVehicle) -- update once
+                self:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
+                self:updateAttachedConnectionHoses(attacherVehicle) -- update once
+            end
         end
     end
 end
@@ -81,7 +84,11 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachConnectionHoses:onWriteStream(streamId, connection)
-    streamWriteBool(streamId, self:hasAttachedHoses())
+    local hasAttacherVehicle = self.getAttacherVehicle ~= nil
+    streamWriteBool(streamId, hasAttacherVehicle)
+    if hasAttacherVehicle then
+        streamWriteBool(streamId, self:hasAttachedHoses())
+    end
 end
 
 function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
