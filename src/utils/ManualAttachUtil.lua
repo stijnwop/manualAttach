@@ -43,7 +43,7 @@ end
 ---@return boolean
 function ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
     if vehicle.getOutputPowerTakeOffs == nil
-            or object.getInputPowerTakeOffs == nil then
+        or object.getInputPowerTakeOffs == nil then
         return false
     end
 
@@ -269,8 +269,8 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
                             local distSq = MathUtil.vector3LengthSq(x, y, z)
 
                             if attachedImplement ~= object
-                                    and distSq < ManualAttach.PLAYER_MIN_DISTANCE
-                                    and distSq < minPlayerAttachedImplDist then
+                                and distSq < ManualAttach.PLAYER_MIN_DISTANCE
+                                and distSq < minPlayerAttachedImplDist then
                                 minPlayerAttachedImplDist = distSq
                                 attachedImplement = object
                             end
@@ -286,7 +286,7 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
             end
 
             for attacherJointIndex, attacherJoint in ipairs(spec.attacherJoints) do
-                if not attacherJoint.jointIndex ~= 0 then
+                if attacherJoint.jointIndex == 0 then
                     local isInRange = not isPlayerBased
                     local distSq = math.huge
 
