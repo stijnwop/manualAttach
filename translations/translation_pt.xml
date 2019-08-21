@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <translationContributors>TheChoseOne</translationContributors>
+    <texts>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Acopolar/Desacopolar"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Acopolar/Desacopolar PTO e mangueiras de conexão"/>
+
+        <text name="action_attach_pto" text="Acopolar eixo cardã"/>
+        <text name="action_detach_pto" text="Desacopolar eixo cardã"/>
+
+        <text name="action_attach_hose" text="Segure para acopolar as mangueiras"/>
+        <text name="action_detach_hose" text="Segure para desacopolar as mangueiras"/>
+
+        <text name="info_lower_warning" text="Baixe primeiro %s"/>
+        <text name="info_turn_off_warning" text="Desligue primeiro %s"/>
+
+        <text name="info_detach_pto_warning" text="Retire primeiro o PTO de %s"/>
+        <text name="info_attach_pto_warning" text="Acople primeiro o PTO de %s"/>
+
+        <text name="info_detach_hoses_warning" text="Retire primeiro as mangueiras de %s"/>
+        <text name="info_attach_hoses_warning" text="Acople primeiro as mangueiras de %s"/>
+    </texts>
+</l10n>
