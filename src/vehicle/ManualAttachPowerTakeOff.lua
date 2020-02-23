@@ -18,6 +18,7 @@ end
 
 function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachPowerTakeOff.inj_getCanBeTurnedOn)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToObject", ManualAttachPowerTakeOff.inj_getCanDischargeToObject)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToGround", ManualAttachPowerTakeOff.inj_getCanDischargeToGround)
 end
 
@@ -149,6 +150,14 @@ function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
     end
 
     return superFunc(vehicle)
+end
+
+function ManualAttachPowerTakeOff.inj_getCanDischargeToObject(vehicle, superFunc, dischargeNode)
+    if not vehicle:isPtoAttached() then
+        return false
+    end
+
+    return superFunc(vehicle, dischargeNode)
 end
 
 function ManualAttachPowerTakeOff.inj_getCanDischargeToGround(vehicle, superFunc, dischargeNode)
