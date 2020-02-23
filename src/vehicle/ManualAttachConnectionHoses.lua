@@ -31,6 +31,7 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachConnectionHoses.inj_getCanBeTurnedOn)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "canFoldRidgeMarker", ManualAttachConnectionHoses.inj_canFoldRidgeMarker)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToObject", ManualAttachConnectionHoses.inj_getCanDischargeToObject)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToGround", ManualAttachConnectionHoses.inj_getCanDischargeToGround)
 end
 
@@ -323,6 +324,15 @@ function ManualAttachConnectionHoses.inj_canFoldRidgeMarker(vehicle, superFunc, 
     end
 
     return superFunc(vehicle, state)
+end
+
+function ManualAttachConnectionHoses.inj_getCanDischargeToObject(vehicle, superFunc, dischargeNode)
+    if vehicle.spec_shovel == nil -- dismiss shovels
+        and not vehicle:hasAttachedHoses() then
+        return false
+    end
+
+    return superFunc(vehicle, dischargeNode)
 end
 
 function ManualAttachConnectionHoses.inj_getCanDischargeToGround(vehicle, superFunc, dischargeNode)
