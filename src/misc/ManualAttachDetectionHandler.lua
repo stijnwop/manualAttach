@@ -173,6 +173,7 @@ function ManualAttachDetectionHandler:removeTrigger(player)
             removeTrigger(trigger)
             delete(trigger)
             player.manualAttachDetectionTrigger = nil
+            self:notifyVehicleTriggerChange(true)
         end
     end
 end
