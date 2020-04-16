@@ -17,6 +17,7 @@ function ManualAttachConnectionHoses.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "toggleLightStates", ManualAttachConnectionHoses.toggleLightStates)
     SpecializationUtil.registerFunction(vehicleType, "isHoseAttached", ManualAttachConnectionHoses.isHoseAttached)
     SpecializationUtil.registerFunction(vehicleType, "hasAttachedHoses", ManualAttachConnectionHoses.hasAttachedHoses)
+    SpecializationUtil.registerFunction(vehicleType, "playHoseAttachSound", ManualAttachConnectionHoses.playHoseAttachSound)
 end
 
 function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
@@ -38,6 +39,7 @@ end
 function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onLoad", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachConnectionHoses)
+    SpecializationUtil.registerEventListener(vehicleType, "onDelete", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostUpdateTick", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onReadStream", ManualAttachConnectionHoses)
@@ -46,6 +48,18 @@ end
 
 function ManualAttachConnectionHoses:onLoad(savegame)
     self.spec_manualAttachConnectionHoses = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    local spec = self.spec_manualAttachConnectionHoses
+
+    if self.isClient then
+        spec.samples = {}
+
+        local sampleAttach = g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachHoses", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        if sampleAttach == nil then
+            sampleAttach = g_soundManager:cloneSample(g_manualAttach.samples.hosesAttach, self.components[1].node, self)
+        end
+
+        spec.samples.attach = sampleAttach
+    end
 end
 
 function ManualAttachConnectionHoses:onPostLoad(savegame)
@@ -58,6 +72,14 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
     if savegame ~= nil then
         local key = savegame.key .. "." .. g_manualAttach.modName
         spec.isBlockingInitialHoseDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses"), false)
+    end
+end
+
+function ManualAttachConnectionHoses:onDelete()
+    local spec = self.spec_manualAttachConnectionHoses
+
+    if self.isClient then
+        g_soundManager:deleteSample(spec.samples.attach)
     end
 end
 
@@ -207,6 +229,21 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
 
     local spec_manualAttach = self.spec_manualAttachConnectionHoses
     spec_manualAttach.hasAttachedHoses = self:isHoseAttached()
+end
+
+---Play attach sound for the given jointDesc.
+function ManualAttachConnectionHoses:playHoseAttachSound(jointDesc)
+    local spec = self.spec_manualAttachConnectionHoses
+
+    if self.isClient then
+        if jointDesc ~= nil and jointDesc.sampleAttachHoses ~= nil then
+            g_soundManager:playSample(jointDesc.sampleAttachHoses)
+        else
+            g_soundManager:playSample(spec.samples.attach)
+        end
+    end
+
+    return true
 end
 
 ---Called on post attache event.

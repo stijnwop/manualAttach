@@ -48,7 +48,7 @@ end
 function load(mission)
     assert(g_manualAttach == nil)
 
-    manualAttach = ManualAttach:new(mission, g_inputBinding, g_i18n, g_inputDisplayManager, directory, modName)
+    manualAttach = ManualAttach:new(mission, g_inputBinding, g_i18n, g_inputDisplayManager, g_soundManager, directory, modName)
 
     getfenv(0)["g_manualAttach"] = manualAttach
 

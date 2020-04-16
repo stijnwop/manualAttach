@@ -51,7 +51,7 @@ local ManualAttach_mt = Class(ManualAttach)
 ---@param modDirectory string
 ---@param modName string
 ---@return ManualAttach
-function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirectory, modName)
+function ManualAttach:new(mission, input, i18n, inputDisplayManager, soundManager, modDirectory, modName)
     local self = setmetatable({}, ManualAttach_mt)
 
     self.isServer = mission:getIsServer()
@@ -59,6 +59,7 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirector
     self.mission = mission
     self.input = input
     self.i18n = i18n
+    self.soundManager = soundManager
     self.modDirectory = modDirectory
     self.modName = modName
 
@@ -75,8 +76,19 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, modDirector
 
     self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, self.mission, modDirectory)
 
+    self.samples = {}
     if self.isClient then
         self.detectionHandler:addDetectionListener(self)
+
+        local xmlFile = loadXMLFile("ManualAttachSamples", Utils.getFilename("resources/sounds.xml", self.modDirectory))
+        if xmlFile ~= nil then
+            local soundsNode = getRootNode()
+
+            self.samples.hosesAttach = self.soundManager:loadSampleFromXML(xmlFile, "vehicle.sounds", "hosesAttach", self.modDirectory, soundsNode, 1, AudioGroup.VEHICLE, nil, nil)
+            self.samples.ptoAttach = self.soundManager:loadSampleFromXML(xmlFile, "vehicle.sounds", "ptoAttach", self.modDirectory, soundsNode, 1, AudioGroup.VEHICLE, nil, nil)
+
+            delete(xmlFile)
+        end
     end
 
     return self
@@ -94,6 +106,7 @@ end
 function ManualAttach:delete()
     self.detectionHandler:delete()
     self.context:delete()
+    self.soundManager:deleteSamples(self.samples)
 end
 
 ---Main update function called every frame.
@@ -431,6 +444,9 @@ function ManualAttach:attachPowerTakeOff(vehicle, object, noEventSend)
 
     vehicle:attachPowerTakeOff(object, inputJointDescIndex, jointDescIndex)
     vehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+
+    local jointDesc = vehicle:getAttacherJointByJointDescIndex(jointDescIndex)
+    vehicle:playPtoAttachSound(jointDesc)
 end
 
 ---Detaches the pto from the given object from the vehicle.
@@ -442,6 +458,9 @@ function ManualAttach:detachPowerTakeOff(vehicle, object, noEventSend)
 
     local implement = vehicle:getImplementByObject(object)
     vehicle:detachPowerTakeOff(vehicle, implement)
+
+    local jointDesc = vehicle:getAttacherJointByJointDescIndex(implement.jointDescIndex)
+    vehicle:playPtoAttachSound(jointDesc)
 end
 
 ---Attaches the connection hoses from the given object to the vehicle.
@@ -457,6 +476,9 @@ function ManualAttach:attachConnectionHoses(vehicle, object, noEventSend)
 
     object:connectHosesToAttacherVehicle(vehicle, inputJointDescIndex, jointDescIndex)
     object:updateAttachedConnectionHoses(vehicle) -- update once
+
+    local jointDesc = vehicle:getAttacherJointByJointDescIndex(jointDescIndex)
+    object:playHoseAttachSound(jointDesc)
 end
 
 ---Detaches the connection hoses from the given object from the vehicle.
@@ -467,6 +489,10 @@ function ManualAttach:detachConnectionHoses(vehicle, object, noEventSend)
     ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, false, noEventSend)
 
     object:disconnectHoses(vehicle)
+
+    local implement = vehicle:getImplementByObject(object)
+    local jointDesc = vehicle:getAttacherJointByJointDescIndex(implement.jointDescIndex)
+    object:playHoseAttachSound(jointDesc)
 end
 
 ---Handles attach event.
