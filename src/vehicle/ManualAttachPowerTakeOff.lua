@@ -132,8 +132,10 @@ function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIn
     local spec = self.spec_manualAttachPowerTakeOff
     if not spec.isBlockingInitialPtoDetach then
         if attacherVehicle.detachPowerTakeOff ~= nil then
-            local implement = attacherVehicle:getImplementByObject(self)
-            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+            if ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
+                local implement = attacherVehicle:getImplementByObject(self)
+                attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+            end
         end
     else
         spec.isBlockingInitialPtoDetach = false
