@@ -388,7 +388,14 @@ function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, join
 
                 local spec = object.spec_sprayer
                 if spec ~= nil and spec.activateOnLowering then
-                    object:setIsTurnedOn(false)
+                    if object.setIsTurnedOn ~= nil then
+                        object:setIsTurnedOn(false)
+                    else
+                        local attacherVehicle = object:getAttacherVehicle()
+                        if attacherVehicle.setIsTurnedOn ~= nil then
+                            attacherVehicle:setIsTurnedOn(false)
+                        end
+                    end
                 end
             end
         end
