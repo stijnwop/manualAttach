@@ -382,6 +382,24 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
     return detachAllowed, warning, showWarning
 end
 
+---Handles tool that activates on lowering for attach events.
+---@param object table
+---@param jointDesc table
+---@return boolean, string, boolean
+function ManualAttach:handleActivatedOnLoweredObject(object)
+    local spec = object.spec_sprayer
+    if spec ~= nil and spec.activateOnLowering then
+        if object.setIsTurnedOn ~= nil then
+            object:setIsTurnedOn(false)
+        else
+            local attacherVehicle = object:getAttacherVehicle()
+            if attacherVehicle.setIsTurnedOn ~= nil then
+                attacherVehicle:setIsTurnedOn(false)
+            end
+        end
+    end
+end
+
 ---Attaches the object to the vehicle.
 ---@param vehicle table
 ---@param object table
@@ -398,18 +416,7 @@ function ManualAttach:attachImplement(vehicle, object, inputJointDescIndex, join
             local allowsLowering = object:getAllowsLowering()
             if allowsLowering and jointDesc.allowsLowering and not object:getIsFoldMiddleAllowed() then
                 vehicle:handleLowerImplementByAttacherJointIndex(jointDescIndex)
-
-                local spec = object.spec_sprayer
-                if spec ~= nil and spec.activateOnLowering then
-                    if object.setIsTurnedOn ~= nil then
-                        object:setIsTurnedOn(false)
-                    else
-                        local attacherVehicle = object:getAttacherVehicle()
-                        if attacherVehicle.setIsTurnedOn ~= nil then
-                            attacherVehicle:setIsTurnedOn(false)
-                        end
-                    end
-                end
+                self:handleActivatedOnLoweredObject(object)
             end
         end
     end
@@ -421,8 +428,12 @@ function ManualAttach:detachImplement(object)
     local vehicle = object:getAttacherVehicle()
     if vehicle ~= nil and self:canHandle(vehicle, object) then
         local jointDesc = vehicle:getAttacherJointDescFromObject(object)
-        local detachAllowed, warning, showWarning = self:isDetachAllowed(object, vehicle, jointDesc)
+        local allowsLowering = object:getAllowsLowering()
+        if allowsLowering and jointDesc.allowsLowering and not object:getIsFoldMiddleAllowed() then
+            self:handleActivatedOnLoweredObject(object)
+        end
 
+        local detachAllowed, warning, showWarning = self:isDetachAllowed(object, vehicle, jointDesc)
         if detachAllowed then
             vehicle:detachImplementByObject(object)
         elseif showWarning == nil or showWarning then
@@ -458,8 +469,8 @@ function ManualAttach:detachPowerTakeOff(vehicle, object, noEventSend)
 
     local implement = vehicle:getImplementByObject(object)
     vehicle:detachPowerTakeOff(vehicle, implement)
-
     local jointDesc = vehicle:getAttacherJointByJointDescIndex(implement.jointDescIndex)
+
     vehicle:playPtoAttachSound(jointDesc)
 end
 
@@ -523,6 +534,10 @@ function ManualAttach:onPowerTakeOffEvent()
         local attacherVehicle = object:getAttacherVehicle()
 
         if ManualAttachUtil.hasPowerTakeOffs(object, attacherVehicle) then
+            if object:getAllowsLowering() then
+                self:handleActivatedOnLoweredObject(object)
+            end
+
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
                 self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), ManualAttach.WARNING_TIMER_THRESHOLD)
                 return
@@ -545,6 +560,10 @@ function ManualAttach:onConnectionHoseEvent()
         local attacherVehicle = object:getAttacherVehicle()
 
         if ManualAttachUtil.hasConnectionHoses(object, attacherVehicle) then
+            if object:getAllowsLowering() then
+                self:handleActivatedOnLoweredObject(object)
+            end
+
             if object.getIsTurnedOn ~= nil and object:getIsTurnedOn() then
                 self.mission:showBlinkingWarning(self.i18n:getText("info_turn_off_warning"):format(object:getFullName()), ManualAttach.WARNING_TIMER_THRESHOLD)
                 return
