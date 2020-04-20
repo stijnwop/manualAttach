@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="44">
+<modDesc descVersion="47">
     <author>Wopster</author>
-    <version>1.0.1.1</version>
+    <version>1.1.0.0</version>
 
     <title>
         <en>Manual Attach</en>
