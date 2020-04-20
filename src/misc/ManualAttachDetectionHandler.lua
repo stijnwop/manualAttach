@@ -88,6 +88,18 @@ function ManualAttachDetectionHandler:removeDetectionListener(listener)
     end
 end
 
+---Handles detection of a vehicle.
+---@param vehicle table
+function ManualAttachDetectionHandler:detectVehicle(vehicle)
+    if vehicle ~= nil then
+        if not ListUtil.hasListElement(self.detectedVehiclesInTrigger, vehicle) then
+            ListUtil.addElementToList(self.detectedVehiclesInTrigger, vehicle)
+        end
+
+        self.detectedVehiclesOnLeaveTimes[vehicle] = self.lastDetectedTime
+    end
+end
+
 ---Notifies listeners that the vehicle list has changed.
 ---@param vehicles table
 function ManualAttachDetectionHandler:notifyVehicleListChanged(vehicles)
@@ -174,6 +186,11 @@ function ManualAttachDetectionHandler:removeTrigger(player)
             delete(trigger)
             player.manualAttachDetectionTrigger = nil
             self:notifyVehicleTriggerChange(true)
+
+            self.lastDetectedTime = 0
+            self.lastDetectedVehicle = nil
+            self.detectedVehiclesInTrigger = {}
+            self.detectedVehiclesOnLeaveTimes = {}
         end
     end
 end
@@ -217,29 +234,20 @@ function ManualAttachDetectionHandler:vehicleDetectionCallback(triggerId, otherI
             end
 
             if onEnter then
-                if not ListUtil.hasListElement(self.detectedVehiclesInTrigger, nodeVehicle) then
-                    ListUtil.addElementToList(self.detectedVehiclesInTrigger, nodeVehicle)
-                end
+                self:detectVehicle(nodeVehicle)
 
                 if nodeVehicle.getAttacherVehicle ~= nil then
-                    local attacherVehicle = nodeVehicle:getAttacherVehicle()
-                    if attacherVehicle ~= nil and not ListUtil.hasListElement(self.detectedVehiclesInTrigger, attacherVehicle) then
-                        ListUtil.addElementToList(self.detectedVehiclesInTrigger, attacherVehicle)
-                    end
+                    self:detectVehicle(nodeVehicle:getAttacherVehicle())
                 end
 
                 if nodeVehicle.getAttachedImplements ~= nil then
                     for _, implement in pairs(nodeVehicle:getAttachedImplements()) do
                         local object = implement.object
                         if object ~= nil then
-                            if not ListUtil.hasListElement(self.detectedVehiclesInTrigger, object) then
-                                ListUtil.addElementToList(self.detectedVehiclesInTrigger, object)
-                            end
+                            self:detectVehicle(object)
                         end
                     end
                 end
-            else
-                self.detectedVehiclesOnLeaveTimes[nodeVehicle] = self.lastDetectedTime
             end
         end
 
