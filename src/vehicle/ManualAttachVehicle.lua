@@ -16,6 +16,21 @@ function ManualAttachVehicle.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadAttacherJointFromXML", ManualAttachVehicle.loadAttacherJointFromXML)
 end
 
+function ManualAttachVehicle.registerEventListeners(vehicleType)
+    SpecializationUtil.registerEventListener(vehicleType, "onDelete", ManualAttachVehicle)
+end
+
+function ManualAttachVehicle:onDelete()
+    local spec = self.spec_attacherJoints
+    if self.isClient then
+        for _, jointDesc in pairs(spec.attacherJoints) do
+            g_soundManager:deleteSample(jointDesc.sampleAttachHoses)
+            g_soundManager:deleteSample(jointDesc.sampleAttachPto)
+        end
+    end
+end
+
+
 ---
 --- Injections.
 ---
