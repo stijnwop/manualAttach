@@ -48,9 +48,22 @@ function ManualAttachUtil.hasPowerTakeOffs(object, vehicle)
     end
 
     local outputs = vehicle:getOutputPowerTakeOffs()
-    local inputs = object:getInputPowerTakeOffs()
+    if not (#outputs ~= 0) then
+        return false
+    end
 
-    return #outputs ~= 0 and #inputs ~= 0
+    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
+    for _, output in ipairs(outputs) do
+        if object.getInputPowerTakeOffsByJointDescIndexAndName ~= nil then
+            local inputs = object:getInputPowerTakeOffsByJointDescIndexAndName(inputJointDescIndex, output.ptoName)
+
+            if #inputs ~= 0 then
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 ---Returns true when object has attached power take offs, false otherwise.
