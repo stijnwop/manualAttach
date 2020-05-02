@@ -72,7 +72,9 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, soundManage
     self.allowPtoEvent = true
     self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
 
+    self.uiScale = g_gameSettings:getValue("uiScale")
     self.context = ContextActionDisplay.new(self.hudAtlasPath, inputDisplayManager)
+    self.context:setScale(self.uiScale)
 
     self.detectionHandler = ManualAttachDetectionHandler:new(self.isServer, self.isClient, self.mission, modDirectory)
 
