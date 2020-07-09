@@ -38,7 +38,10 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
     [mapJointTypeNameToInt("hookLift")] = true,
     [mapJointTypeNameToInt("semitrailer")] = true,
     [mapJointTypeNameToInt("semitrailerHook")] = true,
-    [mapJointTypeNameToInt("fastCoupler")] = true
+    -- Mods
+    [mapJointTypeNameToInt("fastCoupler")] = true,
+    [mapJointTypeNameToInt("bigbaghook")] = true,
+
 }
 
 local ManualAttach_mt = Class(ManualAttach)
