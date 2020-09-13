@@ -684,8 +684,12 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
 
         if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations)
             and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
+
+            --Todo: needs some better thought for enterable attachments in the future.
             if SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) and
-                (SpecializationUtil.hasSpecialization(LogGrab, typeEntry.specializations) or SpecializationUtil.hasSpecialization(BaleLoader, typeEntry.specializations)) then
+                (SpecializationUtil.hasSpecialization(LogGrab, typeEntry.specializations)
+                    or SpecializationUtil.hasSpecialization(BaleLoader, typeEntry.specializations)
+                    or SpecializationUtil.hasSpecialization(Roller, typeEntry.specializations)) then
                 vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
             elseif not SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) then
                 vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
