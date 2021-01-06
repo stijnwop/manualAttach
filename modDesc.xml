@@ -6,7 +6,7 @@
     <title>
         <en>Manual Attach</en>
         <de>Manuelles Ankuppeln</de>
-        <fr>Attacher manuellement</fr>
+        <fr>Attelage manuel</fr>
         <nl>Handmatig aankoppelen</nl>
         <pl>Ręczne zaczepianie</pl>
         <ru>Ручная сцепка</ru>
@@ -90,25 +90,28 @@ Changelog v1.1.0.0:
 ]]>
         </de>
         <fr>
-            <![CDATA[Ce mod vous oblige à attacher/détacher manuellement les outils et les remorques.
+            <![CDATA[Ce mod vous oblige à atteler/dételer manuellement les outils portés et trainés.
 
-Attacher/détacher les outils :
-Lors de la fixation d'un outil, le script force l'outil à rester à l'état abaissé. Il y a quelques exceptions faites pour les chargeurs frontaux, les débardeurs, les pelles, les télescopiques, les moissonneuses-batteuses et les appareils de levage à crochet. Vous pouvez toujours attacher et détacher ces outils de l'intérieur de votre véhicule. Remarque : Les flexibles de raccordement et la prise de force doivent encore être fixés manuellement pour ces outils. Pour pouvoir détacher l'outil, il faut d'abord l'abaisser ! Avant de dételer l'outil, vérifiez également que la prise de force et les flexibles de raccordement sont débranchés.
+Atteler/dételer les outils :
+Lors de l'attelage d'un outil, le script force le relevage à rester baissé.
+Il y a quelques exceptions : les chargeurs frontaux, les débardeurs, les pelles, les télescopiques, les moissonneuses-batteuses et les matériels de levage à crochet. Vous pouvez toujours atteler et dételer ces outils de l'intérieur de votre véhicule.
+Remarque : Les flexibles hydrauliques et la prise de force doivent quand même être branchés manuellement pour ces outils.
+Pour pouvoir dételer les outils portés, il faut d'abord baisser le relevage ! Avant de dételer l'outil, vérifiez également que la prise de force et les flexibles hydrauliques sont débranchés.
 
-Le mod désactive l'attachement et le détachement depuis l'intérieur du véhicule (les attentes sont mentionnées ci-dessus). Comme le suggère déjà l'intitulé du mod il n'est plus possible de passer rapidement d'un outil à l'autre.... sortez ce véhicule pour de bon cette fois-ci !
+Ce mod désactive la fonction attelage/dételage depuis la cabine du véhicule (sauf exceptions mentionnées ci-dessus). Comme le suggère le nom de ce mod, il n'est plus possible de passer rapidement d'un outil à l'autre.... il va falloir sortir du véhicule !
 
-Branchez/débranchez la prise de force :
-Appuyez sur la touche W pour accoupler/détacher la prise de force.
+Mettre/retirer la prise de force :
+Appuyez sur la touche W pour mettre/retirer la prise de force.
 
 Gardez à l'esprit qu'un outil a besoin d'une prise de force, sinon il ne peut pas être mis en marche !
 
-Branchez/débranchez les tuyaux de raccordement :
-Maintenez la touche W (pendant un court instant) pour fixer/détacher les flexibles de raccordement.
+Branchez/débranchez les flexibles hydrauliques :
+Maintenez la touche W (pendant un court instant) pour brancher/débrancher les flexibles hydrauliques.
 
-En l'absence de tuyaux de raccordement raccordés, les situations suivantes peuvent se produire :
-- Vous ne serez pas en mesure de contrôler l'hydraulique (par exemple, les pièces mobiles, le repliage, l'utilisation de marqueurs de faîtage, etc.)
-- Vous ne pourrez pas utiliser les lumières.
-- Votre remorque sera freinée par l'air comprimé.
+Si les flexibles hydrauliques ne sont pas branchés, les situations suivantes peuvent se produire :
+- Vous ne pourrez pas utiliser les fonctions hydrauliques (dépliage/repliage, traceurs, etc.)
+- Vous ne pourrez pas allumer les éclairages.
+- Vos outils trainés seront frainés (frainage pneumatique).
 
 Changelog v1.1.0.0:
 - Performance improvements.
