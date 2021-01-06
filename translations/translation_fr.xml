@@ -5,8 +5,8 @@
         <text name="input_MA_ATTACH_VEHICLE" text="Attelage manuel : Atteler/Dételer"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="Attelage manuel : Mettre la prise de force et brancher les flexibles hydrauliques"/>
 
-        <text name="action_attach_pto" text="Atteler la prise de force"/>
-        <text name="action_detach_pto" text="Dételer la prise de force"/>
+        <text name="action_attach_pto" text="Mettre la prise de force"/>
+        <text name="action_detach_pto" text="Retirer la prise de force"/>
 
         <text name="action_attach_hose" text="Maintenir pour brancher les flexibles"/>
         <text name="action_detach_hose" text="Maintenir pour débrancher les flexibles"/>
