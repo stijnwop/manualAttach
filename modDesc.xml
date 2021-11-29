@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="47">
+<modDesc descVersion="61">
     <author>Wopster</author>
-    <version>1.1.0.0</version>
+    <version>2.0.0.0</version>
 
     <title>
         <en>Manual Attach</en>
@@ -38,27 +38,18 @@ Without attached connection hoses the following can occur:
 - You won't be able to use the lights.
 - Brakes will be blocked.
 
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
 ]]>
         </en>
         <de>
-            <![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
+<![CDATA[Dieser Mod zwingt dich Geräte und Anhänger manuell anzukoppeln.
 
 Anhängen/Abhängen von Anbaugeräten:
 
-Wenn ein Anbaugerät angehangen wird, zwingt das Skript das Anbaugerät im abgesenkten Zustand zu bleiben. Es gibt ein paar Ausnahmen, Frontlader, Skidsteers, Schaufeln, Telelader, Mähdrescher und Hakenlift Anbaugeräte.
+Wenn ein Anbaugerät angehangen wird, zwingt das Skript das Anbaugerät im abgesenkten Zustand zu bleiben. Es gibt ein paar Ausnahmen, Frontlader, Kompaktlader, Schaufeln, Telelader, Mähdrescher und Hakenlift Anbaugeräte.
 Es ist weiterhin möglich diese Anbaugeräte vom Fahrzeug aus an und abzubauen.
 Anmerkung: Die Schläuche und die Zapfwelle müssen trotzdem noch manuell angebaut werden.
 Man muss das Anbaugerät erst absenken um es abzuhängen! Bevor du das Anbaugerät abhängst,
-sei dir sicher,dass die Schläuche und die Zapfwelle nicht angeschlossen sind.
+sei dir sicher, dass die Schläuche und die Zapfwelle nicht angeschlossen sind.
 
 Der Mod deaktiviert das An-/Abkuppeln vom Fahrzeug aus (Ausnahmen wurden oben erwähnt).
 Wie der Modname schon sagt, ist es nun nicht mehr möglich mal eben schnell zwischen den Anbaugeräten zu wechseln...
@@ -76,19 +67,10 @@ Halte y (für eine kurze Zeit) gedrückt um die Schläuche an bzw. abzukuppeln.
 Ohne angeschlossene Schläuche kann folgendes passieren:
 - Du wirst nicht in der Lage sein die Hydraulik zu kontrollieren (z.B. sich bewegende Teile, ein-/ausklappen, Spuranreißer benutzen etc.)
 - Du kannst keine Lichter benutzen.
-- Blockierte Bremsen.
+- Blockierte Bremse.
 
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
 ]]>
-        </de>
+</de>
         <fr>
             <![CDATA[Ce mod vous oblige à attacher/détacher manuellement les outils et les remorques.
 
@@ -110,86 +92,22 @@ En l'absence de tuyaux de raccordement raccordés, les situations suivantes peuv
 - Vous ne pourrez pas utiliser les lumières.
 - Votre remorque sera freinée par l'air comprimé.
 
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
 ]]>
         </fr>
         <pl>
-            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!
-
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
-]]>
+            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!]]>
         </pl>
         <ru>
-            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.
-
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
-]]>
+            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.]]>
         </ru>
         <cz>
-            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.
-
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
-]]>
+            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.]]>
         </cz>
         <hu>
-            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.
-
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
-]]>
+            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]>
         </hu>
         <it>
-            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.
-
-Changelog v1.1.0.0:
-- Performance improvements.
-- Added more blockage of functions when hoses are not connected.
-- Fixed double attach possibility.
-- Allow detaching of vehicles that are turned on by lowering.
-- Fixed issue with the hoses on the Anderson M160.
-- Fixed PTO attach state on savegame load.
-- Fixed issue with tools sometimes not being detected (frontloader tools specially).
-- Added attach/detach sounds for PTO and hoses.
-]]>
+            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.]]>
         </it>
     </description>
 
@@ -197,10 +115,10 @@ Changelog v1.1.0.0:
 
     <multiplayer supported="true"/>
 
-    <l10n filenamePrefix="translations/translation"/>
+    <l10n filenamePrefix="i18n/locale"/>
 
     <extraSourceFiles>
-        <sourceFile filename="src/loader.lua"/>
+        <sourceFile filename="src/main.lua"/>
     </extraSourceFiles>
 
     <actions>
