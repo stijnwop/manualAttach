@@ -1,9 +1,12 @@
----
+--
 -- ManualAttachDetectionHandler
 --
--- Main class for handling the vehicle detection.
+-- Author: Wopster
+-- Description: Main class for handling the vehicle detection.
+-- Name: ManualAttachDetectionHandler
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
 ---@class ManualAttachDetectionHandler @parent class
 ManualAttachDetectionHandler = {}
@@ -27,6 +30,7 @@ function ManualAttachDetectionHandler:new(isServer, isClient, mission, modDirect
     self.mission = mission
     self.modDirectory = modDirectory
 
+    self.lastTrigger = nil
     self.lastDetectedTime = 0
     self.lastDetectedVehicle = nil
     self.triggerCloneNode = nil
@@ -47,6 +51,12 @@ end
 
 ---Called on delete.
 function ManualAttachDetectionHandler:delete()
+    if self.lastTrigger ~= nil then
+        removeTrigger(self.lastTrigger)
+        if entityExists(self.lastTrigger) then
+            delete(self.lastTrigger)
+        end
+    end
     delete(self.triggerCloneNode)
 end
 
@@ -60,7 +70,7 @@ function ManualAttachDetectionHandler:update(dt)
         for vehicle, lastDetectedTime in pairs(self.detectedVehiclesOnLeaveTimes) do
             if (currentTime - lastDetectedTime) > ManualAttachDetectionHandler.CLEAR_TIME_THRESHOLD then
                 if vehicle ~= self.lastDetectedVehicle then
-                    ListUtil.removeElementFromList(self.detectedVehiclesInTrigger, vehicle)
+                    table.removeElement(self.detectedVehiclesInTrigger, vehicle)
                     self.detectedVehiclesOnLeaveTimes[vehicle] = nil -- GC
                 end
             end
@@ -72,11 +82,20 @@ function ManualAttachDetectionHandler:update(dt)
     end
 end
 
+---Clears all detection values.
+function ManualAttachDetectionHandler:clear()
+    self.lastDetectedTime = 0
+    self.lastDetectedVehicle = nil
+    self.detectedVehiclesInTrigger = {}
+    self.detectedVehiclesOnLeaveTimes = {}
+    self:notifyVehicleListChanged(self.detectedVehiclesInTrigger)
+end
+
 ---Adds listener from the list.
 ---@param listener table
 function ManualAttachDetectionHandler:addDetectionListener(listener)
     if listener ~= nil then
-        ListUtil.addElementToList(self.listeners, listener)
+        table.addElement(self.listeners, listener)
     end
 end
 
@@ -84,7 +103,7 @@ end
 ---@param listener table
 function ManualAttachDetectionHandler:removeDetectionListener(listener)
     if listener ~= nil then
-        ListUtil.removeElementFromList(self.listeners, listener)
+        table.removeElement(self.listeners, listener)
     end
 end
 
@@ -92,8 +111,8 @@ end
 ---@param vehicle table
 function ManualAttachDetectionHandler:detectVehicle(vehicle)
     if vehicle ~= nil then
-        if not ListUtil.hasListElement(self.detectedVehiclesInTrigger, vehicle) then
-            ListUtil.addElementToList(self.detectedVehiclesInTrigger, vehicle)
+        if not table.hasElement(self.detectedVehiclesInTrigger, vehicle) then
+            table.addElement(self.detectedVehiclesInTrigger, vehicle)
         end
 
         self.detectedVehiclesOnLeaveTimes[vehicle] = self.lastDetectedTime
@@ -130,7 +149,7 @@ end
 
 ---Loads the trigger from the i3d file.
 function ManualAttachDetectionHandler:loadCloneableTrigger()
-    local filename = Utils.getFilename("resources/detectionTrigger.i3d", self.modDirectory)
+    local filename = Utils.getFilename("data/shared/detectionTrigger.i3d", self.modDirectory)
     local rootNode = loadI3DFile(filename, false, false, false)
     local trigger = I3DUtil.indexToObject(rootNode, "0")
 
@@ -145,7 +164,14 @@ end
 ---@param player table the current player
 function ManualAttachDetectionHandler:addTrigger(player)
     if self.isClient and self.triggerCloneNode ~= nil and player == self.mission.player then
-        player.manualAttachDetectionTrigger = clone(self.triggerCloneNode, false, false, false)
+        if self.lastTrigger ~= nil then
+            removeTrigger(self.lastTrigger)
+            delete(self.lastTrigger)
+        end
+
+        self.lastTrigger = clone(self.triggerCloneNode, false, false, false)
+        player.manualAttachDetectionTrigger = self.lastTrigger
+
         local trigger = player.manualAttachDetectionTrigger
 
         -- Link trigger to player
@@ -178,19 +204,25 @@ end
 
 ---Removes the trigger from the player.
 ---@param player table the current player
-function ManualAttachDetectionHandler:removeTrigger(player)
-    if self.isClient and player == self.mission.player then
+function ManualAttachDetectionHandler:removeTrigger(player, force)
+    force = force or false
+
+    if self.isClient and player == self.mission.player or force then
         local trigger = player.manualAttachDetectionTrigger
         if trigger ~= nil then
+            unlink(trigger)
             removeTrigger(trigger)
-            delete(trigger)
+
             player.manualAttachDetectionTrigger = nil
             self:notifyVehicleTriggerChange(true)
 
+            self.lastTrigger = nil
             self.lastDetectedTime = 0
             self.lastDetectedVehicle = nil
             self.detectedVehiclesInTrigger = {}
             self.detectedVehiclesOnLeaveTimes = {}
+
+            delete(trigger)
         end
     end
 end
