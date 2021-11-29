@@ -1,14 +1,23 @@
----
+--
 -- ManualAttachConnectionHoses
 --
--- ConnectionHoses extension for Manual Attach.
+-- Author: Wopster
+-- Description: ConnectionHoses extension for Manual Attach.
+-- Name: ManualAttachConnectionHoses
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
+---@class ManualAttachConnectionHoses
 ManualAttachConnectionHoses = {}
 
 function ManualAttachConnectionHoses.prerequisitesPresent(specializations)
     return SpecializationUtil.hasSpecialization(ConnectionHoses, specializations)
+end
+
+function ManualAttachConnectionHoses.initSpecialization()
+    local schemaSavegame = Vehicle.xmlSchemaSavegame
+    schemaSavegame:register(XMLValueType.BOOL, ("vehicles.vehicle(?).%s.manualAttachConnectionHoses#hasAttachedConnectionHoses"):format(g_manualAttachModName), "State of initial connection hoses")
 end
 
 function ManualAttachConnectionHoses.registerFunctions(vehicleType)
@@ -30,7 +39,8 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldAllowed", ManualAttachConnectionHoses.inj_getIsFoldAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsMovingToolActive", ManualAttachConnectionHoses.inj_getIsMovingToolActive)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachConnectionHoses.inj_getCanBeTurnedOn)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
+    -- Todo: bugs on planters..
+    --SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "canFoldRidgeMarker", ManualAttachConnectionHoses.inj_canFoldRidgeMarker)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToObject", ManualAttachConnectionHoses.inj_getCanDischargeToObject)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToGround", ManualAttachConnectionHoses.inj_getCanDischargeToGround)
@@ -71,7 +81,7 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
 
     if savegame ~= nil then
         local key = savegame.key .. "." .. g_manualAttach.modName
-        spec.isBlockingInitialHoseDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses"), false)
+        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getValue(key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses") or false
     end
 end
 
@@ -119,7 +129,7 @@ function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
         local attacherVehicle = self:getAttacherVehicle()
 
         if attacherVehicle ~= nil and ManualAttachUtil.hasConnectionHoses(self, attacherVehicle) then
-            setXMLBool(xmlFile, key .. "#hasAttachedConnectionHoses", ManualAttachUtil.hasAttachedConnectionHoses(self))
+            xmlFile:setValue(key .. "#hasAttachedConnectionHoses", ManualAttachUtil.hasAttachedConnectionHoses(self))
         end
     end
 end
@@ -157,7 +167,7 @@ function ManualAttachConnectionHoses:isHoseAttached()
         end
     end
 
-    return ManualAttachUtil.hasEdgeCaseHose(self) or ManualAttachUtil.hasAttachedConnectionHoses(self)
+    return ManualAttachUtil.hasAttachedConnectionHoses(self)
 end
 
 ---Returns true if hoses are attached, false otherwise.
@@ -252,7 +262,7 @@ end
 ---@param jointDescIndex number
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachConnectionHoses
-    if not spec.isBlockingInitialHoseDetach then
+    if not spec.isBlockingInitialHoseDetach and g_manualAttach.isEnabled then
         self:disconnectHoses(attacherVehicle)
     else
         spec.isBlockingInitialHoseDetach = false

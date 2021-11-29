@@ -1,10 +1,14 @@
----
+--
 -- ManualAttachPowerTakeOff
 --
--- PowerTakeOffs extension for Manual Attach.
+-- Author: Wopster
+-- Description: PowerTakeOffs extension for Manual Attach.
+-- Name: ManualAttachPowerTakeOff
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
+---@class ManualAttachPowerTakeOff
 ManualAttachPowerTakeOff = {}
 
 function ManualAttachPowerTakeOff.prerequisitesPresent(specializations)
@@ -15,6 +19,11 @@ function ManualAttachPowerTakeOff.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "handlePowerTakeOffPostAttach", ManualAttachPowerTakeOff.handlePowerTakeOffPostAttach)
     SpecializationUtil.registerFunction(vehicleType, "isPtoAttached", ManualAttachPowerTakeOff.isPtoAttached)
     SpecializationUtil.registerFunction(vehicleType, "playPtoAttachSound", ManualAttachPowerTakeOff.playPtoAttachSound)
+end
+
+function ManualAttachPowerTakeOff.initSpecialization()
+    local schemaSavegame = Vehicle.xmlSchemaSavegame
+    schemaSavegame:register(XMLValueType.BOOL, ("vehicles.vehicle(?).%s.manualAttachPowerTakeOff#hasAttachedPowerTakeOffs"):format(g_manualAttachModName), "State of initial blocking PTO detach")
 end
 
 function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
@@ -54,7 +63,7 @@ function ManualAttachPowerTakeOff:onPostLoad(savegame)
 
     if savegame ~= nil then
         local key = savegame.key .. "." .. g_manualAttach.modName
-        spec.isBlockingInitialPtoDetach = Utils.getNoNil(getXMLBool(savegame.xmlFile, key .. ".manualAttachPowerTakeOff#hasAttachedPowerTakeOffs"), false)
+        spec.isBlockingInitialPtoDetach = savegame.xmlFile:getValue(key .. ".manualAttachPowerTakeOff#hasAttachedPowerTakeOffs")
     end
 end
 
@@ -101,7 +110,7 @@ function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
         local attacherVehicle = self:getAttacherVehicle()
 
         if attacherVehicle ~= nil and ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
-            setXMLBool(xmlFile, key .. "#hasAttachedPowerTakeOffs", ManualAttachUtil.hasAttachedPowerTakeOffs(self, attacherVehicle))
+            xmlFile:setValue(key .. "#hasAttachedPowerTakeOffs", ManualAttachUtil.hasAttachedPowerTakeOffs(self, attacherVehicle))
         end
     end
 end
@@ -167,7 +176,7 @@ end
 ---@param jointDescIndex number
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachPowerTakeOff
-    if not spec.isBlockingInitialPtoDetach then
+    if not spec.isBlockingInitialPtoDetach and g_manualAttach.isEnabled then
         if attacherVehicle.detachPowerTakeOff ~= nil then
             if ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
                 local implement = attacherVehicle:getImplementByObject(self)
