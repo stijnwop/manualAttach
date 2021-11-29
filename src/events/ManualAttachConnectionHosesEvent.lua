@@ -1,9 +1,12 @@
----
+--
 -- ManualAttachConnectionHosesEvent
 --
--- Event for handling the attach/detach for connection hoses.
+-- Author: Wopster
+-- Description: Event for handling the attach/detach for connection hoses.
+-- Name: ManualAttachConnectionHosesEvent
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
 ---@class ManualAttachConnectionHosesEvent
 ---@field public manualAttach ManualAttach
@@ -14,16 +17,16 @@ local ManualAttachConnectionHosesEvent_mt = Class(ManualAttachConnectionHosesEve
 InitEventClass(ManualAttachConnectionHosesEvent, 'ManualAttachConnectionHosesEvent')
 
 ---@return ManualAttachConnectionHosesEvent
-function ManualAttachConnectionHosesEvent:emptyNew()
-    local self = Event:new(ManualAttachConnectionHosesEvent_mt)
+function ManualAttachConnectionHosesEvent.emptyNew()
+    local self = Event.new(ManualAttachConnectionHosesEvent_mt)
 
     self.manualAttach = g_manualAttach
 
     return self
 end
 
-function ManualAttachConnectionHosesEvent:new(vehicle, object, doAttach)
-    local self = ManualAttachConnectionHosesEvent:emptyNew()
+function ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach)
+    local self = ManualAttachConnectionHosesEvent.emptyNew()
 
     self.vehicle = vehicle
     self.object = object
@@ -61,9 +64,9 @@ end
 function ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, doAttach, noEventSend)
     if noEventSend == nil or not noEventSend then
         if g_server ~= nil then
-            g_server:broadcastEvent(ManualAttachConnectionHosesEvent:new(vehicle, object, doAttach), nil, nil, vehicle)
+            g_server:broadcastEvent(ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach), nil, nil, vehicle)
         else
-            g_client:getServerConnection():sendEvent(ManualAttachConnectionHosesEvent:new(vehicle, object, doAttach))
+            g_client:getServerConnection():sendEvent(ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach))
         end
     end
 end

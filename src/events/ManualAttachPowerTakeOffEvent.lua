@@ -1,9 +1,12 @@
----
+--
 -- ManualAttachPowerTakeOffEvent
 --
--- Event for handling the attach/detach for power take offs.
+-- Author: Wopster
+-- Description: Event for handling the attach/detach for power take offs.
+-- Name: ManualAttachPowerTakeOffEvent
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
 ---@class ManualAttachPowerTakeOffEvent
 ---@field public manualAttach ManualAttach
@@ -14,16 +17,16 @@ local ManualAttachPowerTakeOffEvent_mt = Class(ManualAttachPowerTakeOffEvent, Ev
 InitEventClass(ManualAttachPowerTakeOffEvent, 'ManualAttachPowerTakeOffEvent')
 
 ---@return ManualAttachPowerTakeOffEvent
-function ManualAttachPowerTakeOffEvent:emptyNew()
-    local self = Event:new(ManualAttachPowerTakeOffEvent_mt)
+function ManualAttachPowerTakeOffEvent.emptyNew()
+    local self = Event.new(ManualAttachPowerTakeOffEvent_mt)
 
     self.manualAttach = g_manualAttach
 
     return self
 end
 
-function ManualAttachPowerTakeOffEvent:new(vehicle, object, doAttach)
-    local self = ManualAttachPowerTakeOffEvent:emptyNew()
+function ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach)
+    local self = ManualAttachPowerTakeOffEvent.emptyNew()
 
     self.vehicle = vehicle
     self.object = object
@@ -61,9 +64,9 @@ end
 function ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, doAttach, noEventSend)
     if noEventSend == nil or not noEventSend then
         if g_server ~= nil then
-            g_server:broadcastEvent(ManualAttachPowerTakeOffEvent:new(vehicle, object, doAttach), nil, nil, vehicle)
+            g_server:broadcastEvent(ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach), nil, nil, vehicle)
         else
-            g_client:getServerConnection():sendEvent(ManualAttachPowerTakeOffEvent:new(vehicle, object, doAttach))
+            g_client:getServerConnection():sendEvent(ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach))
         end
     end
 end
