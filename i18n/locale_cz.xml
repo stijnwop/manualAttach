@@ -19,5 +19,10 @@
 
         <text name="info_detach_hoses_warning" text="Nejdříve odpojte hadice"/>
         <text name="info_attach_hoses_warning" text="Nejdříve připojte hadice"/>
+
+        <!-- Todo: gui translations -->
+        <text name="title_manualAttach" text="Manuální připojování"/>
+        <text name="setting_manualAttach" text="Manual attaching"/>
+        <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
     </texts>
 </l10n>

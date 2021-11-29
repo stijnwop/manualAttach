@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <translationContributors>Gonimy_Vetrom</translationContributors>
+    <texts>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Присоединить/Отсоединить"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Присоединить/Отсоединить ВОМ и шланги"/>
+
+        <text name="action_attach_pto" text="Присоединить вал отбора мощности"/>
+        <text name="action_detach_pto" text="Отсоединить вал отбора мощности"/>
+
+        <text name="action_attach_hose" text="Удерживайте, чтобы присоединить шланги"/>
+        <text name="action_detach_hose" text="Удерживайте, чтобы отсоединить шланги"/>
+
+        <text name="info_lower_warning" text="Сначала опустите %s"/>
+        <text name="info_turn_off_warning" text="Сначала выключите %s"/>
+
+        <text name="info_detach_pto_warning" text="Сначала отсоедините ВОМ от %s"/>
+        <text name="info_attach_pto_warning" text="Сначала присоедините ВОМ к %s"/>
+
+        <text name="info_detach_hoses_warning" text="Сначала отсоедините шланги от %s"/>
+        <text name="info_attach_hoses_warning" text="Сначала присоедините шланги к %s"/>
+
+        <!-- Todo: gui translations -->
+        <text name="title_manualAttach" text="Ручная сцепка"/>
+        <text name="setting_manualAttach" text="Manual attaching"/>
+        <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
+    </texts>
+</l10n>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <translationContributors>*TurboStar*</translationContributors>
+    <texts>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Collega/Scollega"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Collega/Scollega PTO e tubi"/>
+
+        <text name="action_attach_pto" text="Collega presa di potenza"/>
+        <text name="action_detach_pto" text="Scollega presa di potenza"/>
+
+        <text name="action_attach_hose" text="Tieni premuto per collegare i tubi"/>
+        <text name="action_detach_hose" text="Tieni premuto per scollegare i tubi"/>
+
+        <text name="info_lower_warning" text="Abbassa prima %s"/>
+        <text name="info_turn_off_warning" text="Spegni prima %s"/>
+
+        <text name="info_detach_pto_warning" text="Scollega prima la PTO di %s"/>
+        <text name="info_attach_pto_warning" text="Collega prima la PTO di %"/>
+
+        <text name="info_detach_hoses_warning" text="Scollega prima i tubi di %s"/>
+        <text name="info_attach_hoses_warning" text="Collega prima i tubi di %s"/>
+
+        <!-- Todo: gui translations -->
+        <text name="title_manualAttach" text="Manual Attach"/>
+        <text name="setting_manualAttach" text="Manual attaching"/>
+        <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
+    </texts>
+</l10n>

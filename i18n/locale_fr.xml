@@ -19,5 +19,9 @@
 
         <text name="info_detach_hoses_warning" text="Débrancher les flexibles de %s d'abord"/>
         <text name="info_attach_hoses_warning" text="Brancher les flexibles de %s d'abord"/>
+
+        <text name="title_manualAttach" text="Attelage manuel"/>
+        <text name="setting_manualAttach" text="Attelage manuel"/>
+        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour attacher/détacher l'outil."/>
     </texts>
 </l10n>
