@@ -1,9 +1,12 @@
----
+--
 -- ManualAttach
 --
--- Main class for Manual Attach.
+-- Author: Wopster
+-- Description:  Main class for Manual Attach.
+-- Name: ManualAttach
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
 ---@class ManualAttach
 ---@field public detectionHandler ManualAttachDetectionHandler
@@ -38,9 +41,10 @@ ManualAttach.AUTO_ATTACH_JOINTYPES = {
     [mapJointTypeNameToInt("hookLift")] = true,
     [mapJointTypeNameToInt("semitrailer")] = true,
     [mapJointTypeNameToInt("semitrailerHook")] = true,
+    [mapJointTypeNameToInt("semitrailerCar")] = true,
+    [mapJointTypeNameToInt("bigBag")] = true,
     -- Mods
     [mapJointTypeNameToInt("fastCoupler")] = true,
-    [mapJointTypeNameToInt("bigbaghook")] = true,
 
 }
 
@@ -71,6 +75,7 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, soundManage
     self.vehicles = {}
     self.controlledVehicle = nil
 
+    self.isEnabled = true
     self.hasHoseEventInput = 0
     self.allowPtoEvent = true
     self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
@@ -85,7 +90,7 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, soundManage
     if self.isClient then
         self.detectionHandler:addDetectionListener(self)
 
-        local xmlFile = loadXMLFile("ManualAttachSamples", Utils.getFilename("resources/sounds.xml", self.modDirectory))
+        local xmlFile = loadXMLFile("ManualAttachSamples", Utils.getFilename("data/sounds/sounds.xml", self.modDirectory))
         if xmlFile ~= nil then
             local soundsNode = getRootNode()
 
@@ -96,7 +101,29 @@ function ManualAttach:new(mission, input, i18n, inputDisplayManager, soundManage
         end
     end
 
+    self:setState(self.isEnabled)
+
     return self
+end
+
+---Sets the state if manual attach is enabled on the client.
+---@param state boolean
+function ManualAttach:setState(state)
+    if self.isEnabled ~= state then
+        self.isEnabled = state
+
+        if self.isEnabled then
+            self:addControllingVehicle(true)
+        else
+            self.detectionHandler:clear()
+            self:resetAttachValues()
+        end
+    end
+end
+
+---Returns true when manual attach is enabled and we are controlling a vehicle.
+function ManualAttach:canOperate()
+    return self.isEnabled and self.mission.controlledVehicle ~= nil
 end
 
 ---Called when player clicks start.
@@ -109,9 +136,9 @@ end
 
 ---Called on delete.
 function ManualAttach:delete()
-    self.detectionHandler:delete()
     self.context:delete()
     self.soundManager:deleteSamples(self.samples)
+    self.detectionHandler:delete()
 end
 
 ---Main update function called every frame.
@@ -121,36 +148,38 @@ function ManualAttach:update(dt)
         return
     end
 
-    local lastHasHoseEventInput = self.hasHoseEventInput
-    self.hasHoseEventInput = 0
+    if self.isEnabled then
+        local lastHasHoseEventInput = self.hasHoseEventInput
+        self.hasHoseEventInput = 0
 
-    if lastHasHoseEventInput ~= 0 then
-        self.handleEventCurrentDelay = self.handleEventCurrentDelay - dt
+        if lastHasHoseEventInput ~= 0 then
+            self.handleEventCurrentDelay = self.handleEventCurrentDelay - dt
 
-        if self.allowPtoEvent and self.handleEventCurrentDelay < 0 then
-            self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
-            self.allowPtoEvent = false
+            if self.allowPtoEvent and self.handleEventCurrentDelay < 0 then
+                self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
+                self.allowPtoEvent = false
 
-            self:onConnectionHoseEvent()
-        end
-    else
-        if self.allowPtoEvent then
-            if self.handleEventCurrentDelay ~= ManualAttach.TIMER_THRESHOLD and self.handleEventCurrentDelay ~= 0 then
-                self:onPowerTakeOffEvent()
+                self:onConnectionHoseEvent()
             end
+        else
+            if self.allowPtoEvent then
+                if self.handleEventCurrentDelay ~= ManualAttach.TIMER_THRESHOLD and self.handleEventCurrentDelay ~= 0 then
+                    self:onPowerTakeOffEvent()
+                end
+            end
+
+            self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
+            self.allowPtoEvent = true
         end
 
-        self.handleEventCurrentDelay = ManualAttach.TIMER_THRESHOLD
-        self.allowPtoEvent = true
-    end
+        local isValidPlayer = self:isValidPlayer()
+        if self:hasVehicles() then
+            self.attacherVehicle, self.attacherVehicleJointDescIndex, self.attachable, self.attachableJointDescIndex, self.attachedImplement = ManualAttachUtil.findVehicleInAttachRange(self.vehicles, AttacherJoints.MAX_ATTACH_DISTANCE_SQ, AttacherJoints.MAX_ATTACH_ANGLE, isValidPlayer)
+        end
 
-    local isValidPlayer = self:isValidPlayer()
-    if self:hasVehicles() then
-        self.attacherVehicle, self.attacherVehicleJointDescIndex, self.attachable, self.attachableJointDescIndex, self.attachedImplement = ManualAttachUtil.findVehicleInAttachRange(self.vehicles, AttacherJoints.MAX_ATTACH_DISTANCE_SQ, AttacherJoints.MAX_ATTACH_ANGLE, isValidPlayer)
-    end
-
-    if not isValidPlayer then
-        self:addControllingVehicle()
+        if not isValidPlayer then
+            self:addControllingVehicle()
+        end
     end
 
     self.context:update(dt)
@@ -209,6 +238,15 @@ function ManualAttach:canHandle(vehicle, object, jointIndex)
     return (isValidPlayer and not isAutoDetachable) or (not isValidPlayer and isAutoDetachable)
 end
 
+---Checks whether or not the current vehicle and object in range can be handled.
+function ManualAttach:canHandleCurrentVehicle()
+    if self.attachable ~= nil then
+        return self:canHandle(self.attacherVehicle, self.attachable, self.attacherVehicleJointDescIndex)
+    end
+
+    return false
+end
+
 ---Draw called on every frame.
 function ManualAttach:draw()
     if not self.isClient
@@ -219,67 +257,70 @@ function ManualAttach:draw()
     local attachEvent = getInitialDrawEventValues()
     local handleEvent = getInitialDrawEventValues()
 
-    local isValidPlayer = self:isValidPlayer()
+    if self.isEnabled then
+        local isValidPlayer = self:isValidPlayer()
 
-    local object = self.attachedImplement
-    if not isValidPlayer and self.controlledVehicle ~= nil then
-        object = self.controlledVehicle:getSelectedVehicle()
-    end
-
-    if self:isValidObject(object) then
-        local attacherVehicle = object:getAttacherVehicle()
-
-        if self:canHandle(attacherVehicle, object) then
-            if object.isDetachAllowed ~= nil and object:isDetachAllowed() then
-                setDrawEventValues(attachEvent, self.i18n:getText("action_detach"))
-            end
+        local object = self.attachedImplement
+        if not isValidPlayer and self.controlledVehicle ~= nil then
+            object = self.controlledVehicle:getSelectedVehicle()
         end
 
-        if isValidPlayer then
-            local hasPowerTakeOffs = ManualAttachUtil.hasPowerTakeOffs(object, attacherVehicle)
-            local handleText = ManualAttach.EMPTY_TEXT
+        if self:isValidObject(object) then
+            local attacherVehicle = object:getAttacherVehicle()
 
-            if hasPowerTakeOffs then
-                local isAttached = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
-                handleText = self.i18n:getText(("action_%s_pto"):format(getAttachKey(isAttached)))
-            end
-
-            if ManualAttachUtil.hasConnectionHoses(object, attacherVehicle) then
-                local isAttached = ManualAttachUtil.hasAttachedConnectionHoses(object)
-                local hoseText = self.i18n:getText(("action_%s_hose"):format(getAttachKey(isAttached)))
-
-                if not hasPowerTakeOffs then
-                    handleText = hoseText
-                else
-                    self.mission:addExtraPrintText(hoseText)
+            if self:canHandle(attacherVehicle, object) then
+                if object.isDetachAllowed ~= nil and object:isDetachAllowed() then
+                    setDrawEventValues(attachEvent, self.i18n:getText("action_detach"))
                 end
             end
 
-            setDrawEventValues(handleEvent, handleText)
-        end
-    end
+            if isValidPlayer then
+                local hasPowerTakeOffs = ManualAttachUtil.hasPowerTakeOffs(object, attacherVehicle)
+                local handleText = ManualAttach.EMPTY_TEXT
 
-    if self.attachable ~= nil then
-        if self:canHandle(self.attacherVehicle, self.attachable, self.attacherVehicleJointDescIndex) then
-            if self.mission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
-                setDrawEventValues(attachEvent, self.i18n:getText("action_attach"), GS_PRIO_VERY_HIGH)
-                self.context:setContext(InputAction.MA_ATTACH_VEHICLE, ContextActionDisplay.CONTEXT_ICON.ATTACH, self.attachable:getFullName())
+                if hasPowerTakeOffs then
+                    local isAttached = ManualAttachUtil.hasAttachedPowerTakeOffs(object, attacherVehicle)
+                    handleText = self.i18n:getText(("action_%s_pto"):format(getAttachKey(isAttached)))
+                end
+
+                if ManualAttachUtil.hasConnectionHoses(object, attacherVehicle) then
+                    local isAttached = ManualAttachUtil.hasAttachedConnectionHoses(object)
+                    local hoseText = self.i18n:getText(("action_%s_hose"):format(getAttachKey(isAttached)))
+
+                    if not hasPowerTakeOffs then
+                        handleText = hoseText
+                    else
+                        self.mission:addExtraPrintText(hoseText)
+                    end
+                end
+
+                setDrawEventValues(handleEvent, handleText)
+            end
+        end
+
+        if self.attachable ~= nil then
+            if self:canHandle(self.attacherVehicle, self.attachable, self.attacherVehicleJointDescIndex) then
+                if self.mission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
+                    setDrawEventValues(attachEvent, self.i18n:getText("action_attach"), GS_PRIO_VERY_HIGH)
+                    self.context:setContext(InputAction.MA_ATTACH_VEHICLE, ContextActionDisplay.CONTEXT_ICON.ATTACH, self.attachable:getFullName())
+                end
             end
         end
     end
 
-    self:setActionEventText(self.attachEvent, attachEvent.text, attachEvent.priority, attachEvent.visibility)
+    self:setActionEventText(self.attachEventId, attachEvent.text, attachEvent.priority, attachEvent.visibility)
     self:setActionEventText(self.handleEventId, handleEvent.text, handleEvent.priority, handleEvent.visibility)
     self.context:draw()
 end
 
 ---Adds the current controlled vehicle to the list if valid.
-function ManualAttach:addControllingVehicle()
-    if self.controlledVehicle ~= self.mission.controlledVehicle then
+function ManualAttach:addControllingVehicle(force)
+    force = force or false
+    if self.controlledVehicle ~= self.mission.controlledVehicle or force then
         local vehicles = {}
         if self.detectionHandler.getIsValidVehicle(self.mission.controlledVehicle) then
             self.controlledVehicle = self.mission.controlledVehicle
-            ListUtil.addElementToList(vehicles, self.controlledVehicle)
+            table.addElement(vehicles, self.controlledVehicle)
         else
             self.controlledVehicle = nil
         end
@@ -302,8 +343,9 @@ function ManualAttach:resetAttachValues()
     self.attachable = nil
     self.attachableJointDescIndex = nil
     self.attachedImplement = nil
+    self.controlledVehicle = nil
 
-    self.input:setActionEventTextVisibility(self.attachEvent, false)
+    self.input:setActionEventTextVisibility(self.attachEventId, false)
     self.input:setActionEventTextVisibility(self.handleEventId, false)
 end
 
@@ -356,6 +398,15 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
         return detachAllowed, warning, showWarning
     end
 
+    detachAllowed, warning = self:isDetachAllowedByManualAttach(object, vehicle, jointDesc)
+
+    return detachAllowed, warning, showWarning
+end
+
+---Check whether or not ManualAttach can detach the object.
+function ManualAttach:isDetachAllowedByManualAttach(object, vehicle, jointDesc)
+    local detachAllowed, warning = true, nil
+
     if ManualAttachUtil.isManualJointType(jointDesc) then
         local allowsLowering = object:getAllowsLowering()
 
@@ -384,7 +435,7 @@ function ManualAttach:isDetachAllowed(object, vehicle, jointDesc)
         end
     end
 
-    return detachAllowed, warning, showWarning
+    return detachAllowed, warning
 end
 
 ---Handles tool that activates on lowering for attach events.
@@ -593,8 +644,11 @@ function ManualAttach:registerActionEvents()
     if self.isClient then
         local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
         self.input:setActionEventTextVisibility(attachEventId, false)
+        self.attachEventId = attachEventId
 
-        self.attachEvent = attachEventId
+        local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
+        self.input:setActionEventTextVisibility(handleEventId, false)
+        self.handleEventId = handleEventId
     end
 end
 
@@ -602,10 +656,7 @@ end
 ---@param player table
 function ManualAttach:registerPlayerActionEvents(player)
     if self.isClient and player == self.mission.player then
-        local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
-        self.input:setActionEventTextVisibility(handleEventId, false)
-
-        self.handleEventId = handleEventId
+        self:registerActionEvents()
     end
 end
 
@@ -613,30 +664,19 @@ end
 ---@param player table
 function ManualAttach:unregisterPlayerActionEvents(player)
     if player == self.mission.player then
-        self.input:removeActionEvent(self.handleEventId)
+        self:unregisterActionEvents()
     end
 end
 
 ---Unregister input actions.
 function ManualAttach:unregisterActionEvents()
-    self.input:removeActionEventsByTarget(self)
+    self.input:removeActionEvent(self.attachEventId)
+    self.input:removeActionEvent(self.handleEventId)
 end
 
 ---
 --- Injections.
 ---
-
----Injects in the mission register action events.
----@param mission table
-function ManualAttach.inj_registerActionEvents(mission)
-    g_manualAttach:registerActionEvents()
-end
-
----Injects in the mission unregister action events.
----@param mission table
-function ManualAttach.inj_unregisterActionEvents(mission)
-    g_manualAttach:unregisterActionEvents()
-end
 
 ---Injects in the player onEnter function to load the trigger when controlling the player.
 ---@param player table
@@ -664,7 +704,7 @@ end
 ---Injects in the player delete function
 ---@param player table
 function ManualAttach.inj_delete(player)
-    g_manualAttach.detectionHandler:removeTrigger(player)
+    g_manualAttach.detectionHandler:removeTrigger(player, true)
 end
 
 ---Early hook into adding vehicle specializations.
@@ -676,8 +716,17 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
     specializationManager:addSpecialization("manualAttachPowerTakeOff", "ManualAttachPowerTakeOff", Utils.getFilename("src/vehicle/ManualAttachPowerTakeOff.lua", modDirectory), nil)
     specializationManager:addSpecialization("manualAttachConnectionHoses", "ManualAttachConnectionHoses", Utils.getFilename("src/vehicle/ManualAttachConnectionHoses.lua", modDirectory), nil)
     specializationManager:addSpecialization("manualAttachVehicle", "ManualAttachVehicle", Utils.getFilename("src/vehicle/ManualAttachVehicle.lua", modDirectory), nil)
+    specializationManager:addSpecialization("manualAttachAttachable", "ManualAttachAttachable", Utils.getFilename("src/vehicle/ManualAttachAttachable.lua", modDirectory), nil)
 
-    for typeName, typeEntry in pairs(vehicleTypeManager:getVehicleTypes()) do
+    for typeName, typeEntry in pairs(vehicleTypeManager:getTypes()) do
+        if SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachVehicle")
+        end
+
+        if SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
+            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachAttachable")
+        end
+
         if SpecializationUtil.hasSpecialization(PowerTakeOffs, typeEntry.specializations) then
             vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachPowerTakeOff")
         end
@@ -685,7 +734,6 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
         if SpecializationUtil.hasSpecialization(ConnectionHoses, typeEntry.specializations)
             and SpecializationUtil.hasSpecialization(Attachable, typeEntry.specializations) then
 
-            --Todo: needs some better thought for enterable attachments in the future.
             if SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) and
                 (SpecializationUtil.hasSpecialization(LogGrab, typeEntry.specializations)
                     or SpecializationUtil.hasSpecialization(BaleLoader, typeEntry.specializations)
@@ -695,9 +743,45 @@ function ManualAttach.installSpecializations(vehicleTypeManager, specializationM
                 vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachConnectionHoses")
             end
         end
-
-        if SpecializationUtil.hasSpecialization(AttacherJoints, typeEntry.specializations) then
-            vehicleTypeManager:addSpecialization(typeName, modName .. ".manualAttachVehicle")
-        end
     end
+end
+
+---Injects a checkbox in the InGameMenuGameSettingsFrame
+function ManualAttach.initGui(self)
+    if not self.createdGuiForMA then
+        local target = g_manualAttach
+        self.manualAttach = self.checkAutoMotorStart:clone()
+        self.manualAttach.target = target
+        self.manualAttach.id = "manualAttach"
+        self.manualAttach:setCallback("onClickCallback", "onManualAttachModeChanged")
+
+        local settingTitle = self.manualAttach.elements[4]
+        local toolTip = self.manualAttach.elements[6]
+
+        settingTitle:setText(g_i18n:getText("setting_manualAttach"))
+        toolTip:setText(g_i18n:getText("toolTip_manualAttach"))
+
+        self.manualAttach:setIsChecked(target.isEnabled)
+
+        local title = TextElement.new()
+        title:applyProfile("settingsMenuSubtitle", true)
+        title:setText(g_i18n:getText("title_manualAttach"))
+
+        self.boxLayout:addElement(title)
+        self.boxLayout:addElement(self.manualAttach)
+
+        self.createdGuiForMA = true
+    end
+end
+
+---Updates the checkbox once the InGameMenuGameSettingsFrame is opened.
+function ManualAttach.updateGui(self)
+    if self.createdGuiForMA and self.manualAttach ~= nil then
+        self.manualAttach:setIsChecked(g_manualAttach.isEnabled)
+    end
+end
+
+---Called on checkbox change.
+function ManualAttach:onManualAttachModeChanged(state)
+    self:setState(state == CheckedOptionElement.STATE_CHECKED)
 end
