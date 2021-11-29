@@ -1,10 +1,14 @@
----
+--
 -- ManualAttachVehicle
 --
--- AttacherJoints extension for Manual Attach.
+-- Author: Wopster
+-- Description: AttacherJoints extension for Manual Attach.
+-- Name: ManualAttachVehicle
+-- Hide: yes
 --
--- Copyright (c) Wopster, 2019
+-- Copyright (c) Wopster, 2021
 
+---@class ManualAttachVehicle
 ManualAttachVehicle = {}
 
 function ManualAttachVehicle.prerequisitesPresent(specializations)
@@ -12,7 +16,7 @@ function ManualAttachVehicle.prerequisitesPresent(specializations)
 end
 
 function ManualAttachVehicle.registerOverwrittenFunctions(vehicleType)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachVehicle.inj_getCanToggleAttach)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachVehicle.getCanToggleAttach)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadAttacherJointFromXML", ManualAttachVehicle.loadAttacherJointFromXML)
 end
 
@@ -35,8 +39,14 @@ end
 --- Injections.
 ---
 
-function ManualAttachVehicle.inj_getCanToggleAttach()
-    return false
+---Checks whether or not the vehicle can perform an attach.
+function ManualAttachVehicle:getCanToggleAttach(superFunc)
+    local canOperateManually = g_manualAttach:canOperate()
+    if canOperateManually then
+        return g_manualAttach:canHandleCurrentVehicle()
+    end
+
+    return not canOperateManually and superFunc(self)
 end
 
 ---Load hose and pto samples on the attacherJoint.
