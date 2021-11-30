@@ -2,8 +2,8 @@
 <l10n>
     <translationContributors>kiki</translationContributors>
     <texts>
-        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Připojit/Odpojit"/>
-        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Připojit/Odpojit náhon/hadice"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="Připojit/Odpojit"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="Připojit/Odpojit náhon/hadice"/>
 
         <text name="action_attach_pto" text="Připojit náhon"/>
         <text name="action_detach_pto" text="Odpojit náhon"/>
@@ -20,9 +20,8 @@
         <text name="info_detach_hoses_warning" text="Nejdříve odpojte hadice"/>
         <text name="info_attach_hoses_warning" text="Nejdříve připojte hadice"/>
 
-        <!-- Todo: gui translations -->
         <text name="title_manualAttach" text="Manuální připojování"/>
-        <text name="setting_manualAttach" text="Manual attaching"/>
-        <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
+        <text name="setting_manualAttach" text="Manuální připojování"/>
+        <text name="toolTip_manualAttach" text="Vyber si, zda chceš nebo nechceš používat manuální připojování nástrojů a vleček."/>
     </texts>
 </l10n>
