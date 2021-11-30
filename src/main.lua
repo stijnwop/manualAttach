@@ -65,8 +65,8 @@ local function init()
     Player.load = Utils.appendedFunction(Player.load, ManualAttach.inj_load)
     Player.delete = Utils.prependedFunction(Player.delete, ManualAttach.inj_delete)
 
-    InGameMenuGameSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuGameSettingsFrame.onFrameOpen, ManualAttach.initGui)
-    InGameMenuGameSettingsFrame.updateGameSettings = Utils.appendedFunction(InGameMenuGameSettingsFrame.updateGameSettings, ManualAttach.updateGui)
+    InGameMenuGeneralSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.onFrameOpen, ManualAttach.initGui)
+    InGameMenuGeneralSettingsFrame.updateGameSettings = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.updateGameSettings, ManualAttach.updateGui)
 end
 
 init()

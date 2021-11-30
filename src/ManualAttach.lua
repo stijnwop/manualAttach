@@ -750,7 +750,7 @@ end
 function ManualAttach.initGui(self)
     if not self.createdGuiForMA then
         local target = g_manualAttach
-        self.manualAttach = self.checkAutoMotorStart:clone()
+        self.manualAttach = self.checkIsTrainTabbable:clone()
         self.manualAttach.target = target
         self.manualAttach.id = "manualAttach"
         self.manualAttach:setCallback("onClickCallback", "onManualAttachModeChanged")
