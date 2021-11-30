@@ -2,8 +2,8 @@
 <l10n>
     <translationContributors>kiki</translationContributors>
     <texts>
-        <text name="input_MA_ATTACH_VEHICLE" text="Připojit/Odpojit"/>
-        <text name="input_MA_ATTACH_PTO_HOSE" text="Připojit/Odpojit náhon/hadice"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Připojit/Odpojit"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Připojit/Odpojit náhon/hadice"/>
 
         <text name="action_attach_pto" text="Připojit náhon"/>
         <text name="action_detach_pto" text="Odpojit náhon"/>
