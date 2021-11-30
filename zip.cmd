@@ -1,3 +1,4 @@
+SET PATH=%PATH%;"C:\Program Files\7-Zip"
 SET filename="FS22_manualAttach.zip"
 
 IF EXIST %filename% (
