@@ -2,8 +2,8 @@
 <l10n>
     <translationContributors>Gonimy_Vetrom</translationContributors>
     <texts>
-        <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Присоединить/Отсоединить"/>
-        <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Присоединить/Отсоединить ВОМ и шланги"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="Присоединить/Отсоединить"/>
+        <text name="input_MA_ATTACH_PTO_HOSE" text="Присоединить/Отсоединить ВОМ и шланги"/>
 
         <text name="action_attach_pto" text="Присоединить вал отбора мощности"/>
         <text name="action_detach_pto" text="Отсоединить вал отбора мощности"/>
