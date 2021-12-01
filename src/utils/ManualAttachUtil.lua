@@ -195,32 +195,35 @@ function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxD
     local minDist = math.huge
     local minDistY = math.huge
 
-    for _, attachable in pairs(g_currentMission.vehicles) do
-        if attachable ~= vehicle and attachable.getInputAttacherJoints ~= nil then
-            if attachable:getActiveInputAttacherJointDescIndex() == nil then
-                local inputAttacherJoints = attachable:getInputAttacherJoints()
-                if inputAttacherJoints ~= nil then
-                    for inputAttacherJointIndex, inputAttacherJoint in pairs(inputAttacherJoints) do
-                        if attacherJoint.jointType == inputAttacherJoint.jointType then
-                            local allowPlayerHandling = ManualAttachUtil.isManualJointType(inputAttacherJoint)
-                            local isValid = (not isPlayerBased and not allowPlayerHandling) or (isPlayerBased and allowPlayerHandling)
+    local x, y, z = getWorldTranslation(attacherJoint.jointTransform)
 
-                            if isValid then
-                                local x, y, z = localToLocal(inputAttacherJoint.node, attacherJoint.jointTransform, 0, 0, 0)
-                                local distSq = MathUtil.vector2LengthSq(x, z)
-                                local distSqY = y * y
+    for _, jointInfo in pairs(g_currentMission.inputAttacherJoints) do
+        if attacherJoint.jointType == jointInfo.jointType then
+            local allowPlayerHandling = ManualAttachUtil.isManualJointType(jointInfo.inputAttacherJoint)
+            local isValid = (not isPlayerBased and not allowPlayerHandling) or (isPlayerBased and allowPlayerHandling)
 
-                                -- we check x-z-distance plus an extra check in y (doubled distance) to better handle height differences
-                                if distSq < maxDistanceSq and distSq < minDist and distSqY < maxDistanceSq * 2 and distSqY < minDistY then
-                                    local dx, _, _ = localDirectionToLocal(inputAttacherJoint.node, attacherJoint.jointTransform, 1, 0, 0)
-                                    if dx > maxAngle then
-                                        minDist = distSq
-                                        minDistY = distSqY
-                                        attachableInRange = attachable
-                                        attachableJointDescIndex = inputAttacherJointIndex
-                                    end
-                                end
-                            end
+            if isValid then
+                local distSq = MathUtil.vector2LengthSq(x - jointInfo.translation[1], z - jointInfo.translation[3])
+
+                if distSq < maxDistanceSq and distSq < minDist then
+                    local distY = y - jointInfo.translation[2]
+                    local distSqY = distY * distY
+
+                    -- we check x-z-distance plus an extra check in y (doubled distance) to better handle height differences
+                    if distSqY < maxDistanceSq * 4
+                        and distSqY < minDistY
+                        and (jointInfo.vehicle:getActiveInputAttacherJointDescIndex() == nil or jointInfo.vehicle:getAllowMultipleAttachments())
+                    then
+                        local attachAngleLimitAxis = jointInfo.inputAttacherJoint.attachAngleLimitAxis
+                        local axis = { 0, 0, 0 }
+                        axis[attachAngleLimitAxis] = 1
+
+                        local d = { localDirectionToLocal(jointInfo.node, attacherJoint.jointTransform, axis[1], axis[2], axis[3]) }
+                        if d[attachAngleLimitAxis] > maxAngle then
+                            minDist = distSq
+                            minDistY = distSqY
+                            attachableInRange = jointInfo.vehicle
+                            attachableJointDescIndex = jointInfo.jointIndex
                         end
                     end
                 end
