@@ -198,7 +198,7 @@ function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxD
     local x, y, z = getWorldTranslation(attacherJoint.jointTransform)
 
     for _, jointInfo in pairs(g_currentMission.inputAttacherJoints) do
-        if attacherJoint.jointType == jointInfo.jointType then
+        if jointInfo.vehicle ~= vehicle and attacherJoint.jointType == jointInfo.jointType then
             local allowPlayerHandling = ManualAttachUtil.isManualJointType(jointInfo.inputAttacherJoint)
             local isValid = (not isPlayerBased and not allowPlayerHandling) or (isPlayerBased and allowPlayerHandling)
 
