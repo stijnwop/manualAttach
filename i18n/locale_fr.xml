@@ -22,6 +22,6 @@
 
         <text name="title_manualAttach" text="Attelage manuel"/>
         <text name="setting_manualAttach" text="Attelage manuel"/>
-        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour attaler/dételer l'outil."/>
+        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour atteler/dételer l'outil."/>
     </texts>
 </l10n>
