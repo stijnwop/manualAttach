@@ -12,6 +12,7 @@
         <ru>Ручная сцепка</ru>
         <cz>Manuální připojování</cz>
         <hu>Kézi Csatlakozás</hu>
+        <tr>Manuel Bağlantı</en>
     </title>
 
     <description>
@@ -120,6 +121,32 @@ Changelog 2.0.0.0:
         <it>
             <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.]]>
         </it>
+        <en>
+            <![CDATA[Bu mod, sizi romörk ve alet bağlantılarını el ile yapmak zorunda bırakacaktır.
+
+    Aletleri el ile tak/sök:
+    Bir aleti bağladığınızda, kod aleti alçaltılmış durumda başlatır. Ön yükleyiciler, paletli forkliftler, küreyiciler, teleskopik yükleyiciler, biçerler ve sırtlanılabilen romörkler bu moddan etkilenmez. Bu aletleri aracın içinden çıkmadan takmaya devam edebilirsiniz.
+    Not: Yukarıdaki aletlerin bağlantı borularını yine de takmanız gerekiyor.*
+    Bağlantıyı sökmeden önce aleti alçaltmanız gerekiyor! Aynı zamanda aleti sökmeden önce bağlantı borularını sökmeyi unutmayın.
+
+    Bu mod, aracın içinden yapılan tak/sök işlemlerini devre dışı bırakacaktır (İstisnalar yukarıda belirtildi). Artık aracın dışına çıkmak zorundasınız!
+    
+    Güç çıkışlarını takmak veya sökmek için 'Z' tuşuna basın
+
+    Aletlerin çalışmak için güç bağlantısına ihtiyaç duyduğunu unutmayın!
+
+    Bağlantı borularını takmak veya sökmek için kısa bir süre 'Z' tuşuna basılı tutun
+
+    Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsiniz:
+    - Aletteki hidrolikleri kullanamazsınız (Örnek olarak, katlanan parçalar)
+    - Aletin ışıklarını çalıştıramazsınız
+    - Alet frenleri kitlenecektir
+    
+    Güncelleme notları: 2.0.0.0:
+    - FS22 Çıkış
+    ]]>
+        </en>
+
     </description>
 
     <iconFilename>icon.png</iconFilename>
