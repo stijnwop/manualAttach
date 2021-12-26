@@ -12,6 +12,7 @@
         <ru>Ручная сцепка</ru>
         <cz>Manuální připojování</cz>
         <hu>Kézi Csatlakozás</hu>
+        <it>Collegamento Manuale</it>
     </title>
 
     <description>
@@ -118,7 +119,32 @@ Changelog 2.0.0.0:
             <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]>
         </hu>
         <it>
-            <![CDATA[Questa mod ti impone di agganciare / sganciare manualmente strumenti e rimorchi.]]>
+            <![CDATA[Questa mod ti impone di collegare/scollegare attrezzi e rimorchi manualmente.
+
+Attacca/stacca attrezzi:
+Quando si collega un attrezzo, lo script forza l'attrezzo a rimanere nello stato abbassato. Ci sono alcune eccezioni fatte per caricatori frontali, minipale, pale, sollevatori telescopici, mietitrebbie e attrezzi per scarrabili. Puoi ancora attaccare e staccare quegli attrezzi senza dover lasciare il tuo veicolo.
+Nota: i tubi di collegamento e la presa di forza devono ancora essere collegati manualmente per quegli attrezzi.*
+Per staccare l'attrezzo deve essere prima abbassato! Assicurarsi inoltre che la presa di forza ei tubi di collegamento siano staccati prima di staccare l'attrezzo.
+
+La mod disabilita il collegamento e il distacco dall'interno del veicolo (le eccezioni sono menzionate sopra).
+Come suggerisce già il titolo della mod, non è più possibile fare i rapidi cambi tra gli attrezzi ... questa volta tira fuori quel veicolo per davvero!
+
+Collegare/scollegare la presa di forza:
+Premi Z per collegare/scollegare la presa di forza.
+
+Tieni presente che uno strumento ha bisogno di una presa di forza, altrimenti non può essere acceso!
+
+Collegare/scollegare i tubi dei servizi idraulici, luci e/o similari:
+Tenere premuto Z (per un breve periodo di tempo) per collegare/scollegare i tubi dei servizi idraulici, luci e/o similari.
+
+Senza aver collegato i tubi dei servizi idraulici, luci e/o similari, si verificano i seguenti problemi:
+- Non sarai in grado di controllare l'idraulica (ad esempio parti mobili, piegatura, utilizzo di marcatori di colmo, ecc.)
+- Non potrai usare le luci.
+- I freni saranno bloccati.
+
+Changelog 2.0.0.0:
+- Versione FS22
+]]>
         </it>
     </description>
 
