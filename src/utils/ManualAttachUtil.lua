@@ -165,8 +165,14 @@ function ManualAttachUtil.hasAttachedConnectionHoses(object)
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
-    local hose = hoses[1]
-    return hose ~= nil and object:getIsConnectionHoseUsed(hose)
+    -- Iterate over all hoses.. perhaps make exclusive for hydraulics, air and lights
+    for _, hose in ipairs(hoses) do
+        if hose ~= nil and object:getIsConnectionHoseUsed(hose) then
+            return true
+        end
+    end
+
+    return false
 end
 
 ---Returns true when the jointDesc is not manually handled, false otherwise.¶
