@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="61">
+<modDesc descVersion="63">
     <author>Wopster</author>
-    <version>2.0.0.0</version>
+    <version>2.1.0.0</version>
 
     <title>
         <en>Manual Attach</en>
@@ -13,7 +13,7 @@
         <cz>Manuální připojování</cz>
         <hu>Kézi Csatlakozás</hu>
         <it>Collegamento Manuale</it>
-        <tr>Manuel Bağlantı</en>
+        <tr>Manuel Bağlantı</tr>
     </title>
 
     <description>
@@ -156,7 +156,7 @@ Changelog 2.0.0.0:
     Bağlantıyı sökmeden önce aleti alçaltmanız gerekiyor! Aynı zamanda aleti sökmeden önce bağlantı borularını sökmeyi unutmayın.
 
     Bu mod, aracın içinden yapılan tak/sök işlemlerini devre dışı bırakacaktır (İstisnalar yukarıda belirtildi). Artık aracın dışına çıkmak zorundasınız!
-    
+
     Güç çıkışlarını takmak veya sökmek için 'Z' tuşuna basın
 
     Aletlerin çalışmak için güç bağlantısına ihtiyaç duyduğunu unutmayın!
@@ -167,12 +167,11 @@ Changelog 2.0.0.0:
     - Aletteki hidrolikleri kullanamazsınız (Örnek olarak, katlanan parçalar)
     - Aletin ışıklarını çalıştıramazsınız
     - Alet frenleri kitlenecektir
-    
+
     Güncelleme notları: 2.0.0.0:
     - FS22 Çıkış
     ]]>
         </tr>
-
     </description>
 
     <iconFilename>icon.png</iconFilename>
