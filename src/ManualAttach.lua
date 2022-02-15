@@ -542,6 +542,8 @@ function ManualAttach:attachConnectionHoses(vehicle, object, noEventSend)
     local jointDescIndex = implement.jointDescIndex
 
     object:connectHosesToAttacherVehicle(vehicle, inputJointDescIndex, jointDescIndex)
+    object:connectCustomHosesToAttacherVehicle(vehicle, inputJointDescIndex, jointDescIndex)
+
     object:updateAttachedConnectionHoses(vehicle) -- update once
 
     local jointDesc = vehicle:getAttacherJointByJointDescIndex(jointDescIndex)

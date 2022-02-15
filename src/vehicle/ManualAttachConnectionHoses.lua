@@ -208,30 +208,54 @@ end
 ---@param attacherVehicle table
 function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
     local spec = self.spec_connectionHoses
+
     if spec ~= nil then
         -- before the actual hoses are detached.
         self:toggleLightStates(false, true)
 
-        local hoses = self:getConnectionHosesByInputAttacherJoint(self:getActiveInputAttacherJointDescIndex())
+        local inputJointDescIndex = self:getActiveInputAttacherJointDescIndex()
+        local hoses = self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
         for _, hose in ipairs(hoses) do
             self:disconnectHose(hose)
         end
 
-        for _, hose in ipairs(spec.updateableHoses) do
+        for i = #spec.updateableHoses, 1, -1 do
+            local hose = spec.updateableHoses[i]
+
             if hose.connectedObject == attacherVehicle then
                 self:disconnectHose(hose)
             end
         end
 
-        -- remove delayed mounting if we detach the implement
         local attacherVehicleSpec = attacherVehicle.spec_connectionHoses
+
         if attacherVehicleSpec ~= nil then
             for _, toolConnector in pairs(attacherVehicleSpec.toolConnectorHoses) do
-                if toolConnector.delayedMounting ~= nil then
-                    if toolConnector.delayedMounting.sourceObject == self then
-                        toolConnector.delayedMounting = nil
-                    end
+                if toolConnector.delayedMounting ~= nil and toolConnector.delayedMounting.sourceObject == self then
+                    toolConnector.delayedMounting = nil
+                end
+            end
+        end
+
+        local customHoses = spec.customHosesByInputAttacher[inputJointDescIndex]
+        if customHoses ~= nil then
+            for i = 1, #customHoses do
+                local customHose = customHoses[i]
+
+                if customHose.isActive then
+                    self:disconnectCustomHoseNode(customHose, customHose.connectedTarget)
+                end
+            end
+        end
+
+        local customTargets = spec.customHoseTargetsByInputAttacher[inputJointDescIndex]
+        if customTargets ~= nil then
+            for i = 1, #customTargets do
+                local customTarget = customTargets[i]
+
+                if customTarget.isActive then
+                    self:disconnectCustomHoseNode(customTarget.connectedHose, customTarget)
                 end
             end
         end
@@ -262,6 +286,7 @@ end
 ---@param jointDescIndex number
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachConnectionHoses
+
     if not spec.isBlockingInitialHoseDetach and g_manualAttach.isEnabled then
         self:disconnectHoses(attacherVehicle)
     else
