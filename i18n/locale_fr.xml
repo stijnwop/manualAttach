@@ -2,7 +2,7 @@
 <l10n>
     <translationContributors>Farmer1602</translationContributors>
     <texts>
-        <text name="input_MA_ATTACH_VEHICLE" text="Attelage manuel : Atteler/Dételer"/>
+        <text name="input_MA_ATTACH_VEHICLE" text="Attelage manuel : Atteler / Dételer"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="Attelage manuel : Mettre la prise de force et brancher les flexibles hydrauliques"/>
 
         <text name="action_attach_pto" text="Mettre la prise de force"/>
@@ -22,6 +22,6 @@
 
         <text name="title_manualAttach" text="Attelage manuel"/>
         <text name="setting_manualAttach" text="Attelage manuel"/>
-        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour attaler/dételer l'outil."/>
+        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour atteler / dételer l'outil."/>
     </texts>
 </l10n>
