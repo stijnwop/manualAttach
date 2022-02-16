@@ -20,7 +20,7 @@ InitEventClass(ManualAttachPowerTakeOffEvent, 'ManualAttachPowerTakeOffEvent')
 function ManualAttachPowerTakeOffEvent.emptyNew()
     local self = Event.new(ManualAttachPowerTakeOffEvent_mt)
 
-    self.manualAttach = g_manualAttach
+    self.manualAttach = g_currentMission.manualAttach
 
     return self
 end

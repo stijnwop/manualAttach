@@ -41,9 +41,9 @@ end
 
 ---Checks whether or not the vehicle can perform an attach.
 function ManualAttachVehicle:getCanToggleAttach(superFunc)
-    local canOperateManually = g_manualAttach:canOperate()
+    local canOperateManually = g_currentMission.manualAttach:canOperate()
     if canOperateManually then
-        return g_manualAttach:canHandleCurrentVehicle()
+        return g_currentMission.manualAttach:canHandleCurrentVehicle()
     end
 
     return not canOperateManually and superFunc(self)
@@ -58,14 +58,14 @@ function ManualAttachVehicle:loadAttacherJointFromXML(superFunc, attacherJoint, 
     if self.isClient then
         local sampleAttachHoses = g_soundManager:loadSampleFromXML(xmlFile, baseName, "attachHoses", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttachHoses == nil then
-            sampleAttachHoses = g_soundManager:cloneSample(g_manualAttach.samples.hosesAttach, attacherJoint.jointTransform, self)
+            sampleAttachHoses = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.hosesAttach, attacherJoint.jointTransform, self)
         end
 
         attacherJoint.sampleAttachHoses = sampleAttachHoses
 
         local sampleAttachPto = g_soundManager:loadSampleFromXML(xmlFile, baseName, "attachPto", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttachPto == nil then
-            sampleAttachPto = g_soundManager:cloneSample(g_manualAttach.samples.ptoAttach, attacherJoint.jointTransform, self)
+            sampleAttachPto = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.ptoAttach, attacherJoint.jointTransform, self)
         end
 
         attacherJoint.sampleAttachPto = sampleAttachPto

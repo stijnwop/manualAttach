@@ -685,28 +685,28 @@ end
 ---@param isControlling boolean
 function ManualAttach.inj_onEnter(player, isControlling)
     if isControlling then
-        g_manualAttach:registerPlayerActionEvents(player)
-        g_manualAttach.detectionHandler:addTrigger(player)
+        g_currentMission.manualAttach:registerPlayerActionEvents(player)
+        g_currentMission.manualAttach.detectionHandler:addTrigger(player)
     end
 end
 
 ---Injects in the player onLeave function
 ---@param player table
 function ManualAttach.inj_onLeave(player)
-    g_manualAttach:unregisterPlayerActionEvents(player)
-    g_manualAttach.detectionHandler:removeTrigger(player)
+    g_currentMission.manualAttach:unregisterPlayerActionEvents(player)
+    g_currentMission.manualAttach.detectionHandler:removeTrigger(player)
 end
 
 ---Injects in the player load function
 ---@param player table
 function ManualAttach.inj_load(player)
-    g_manualAttach.detectionHandler:load(player)
+    g_currentMission.manualAttach.detectionHandler:load(player)
 end
 
 ---Injects in the player delete function
 ---@param player table
 function ManualAttach.inj_delete(player)
-    g_manualAttach.detectionHandler:removeTrigger(player, true)
+    g_currentMission.manualAttach.detectionHandler:removeTrigger(player, true)
 end
 
 ---Early hook into adding vehicle specializations.
@@ -751,7 +751,7 @@ end
 ---Injects a checkbox in the InGameMenuGameSettingsFrame
 function ManualAttach.initGui(self)
     if not self.createdGuiForMA then
-        local target = g_manualAttach
+        local target = g_currentMission.manualAttach
         self.manualAttach = self.checkUseEasyArmControl:clone()
         self.manualAttach.target = target
         self.manualAttach.id = "manualAttach"
@@ -779,7 +779,7 @@ end
 ---Updates the checkbox once the InGameMenuGameSettingsFrame is opened.
 function ManualAttach.updateGui(self)
     if self.createdGuiForMA and self.manualAttach ~= nil then
-        self.manualAttach:setIsChecked(g_manualAttach.isEnabled)
+        self.manualAttach:setIsChecked(g_currentMission.manualAttach.isEnabled)
     end
 end
 

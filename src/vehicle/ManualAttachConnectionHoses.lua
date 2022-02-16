@@ -65,7 +65,7 @@ function ManualAttachConnectionHoses:onLoad(savegame)
 
         local sampleAttach = g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachHoses", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttach == nil then
-            sampleAttach = g_soundManager:cloneSample(g_manualAttach.samples.hosesAttach, self.components[1].node, self)
+            sampleAttach = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.hosesAttach, self.components[1].node, self)
         end
 
         spec.samples.attach = sampleAttach
@@ -80,7 +80,7 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
     spec.hasAttachedHoses = false
 
     if savegame ~= nil then
-        local key = savegame.key .. "." .. g_manualAttach.modName
+        local key = savegame.key .. "." .. g_currentMission.manualAttach.modName
         spec.isBlockingInitialHoseDetach = savegame.xmlFile:getValue(key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses") or false
     end
 end
@@ -287,7 +287,7 @@ end
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachConnectionHoses
 
-    if not spec.isBlockingInitialHoseDetach and g_manualAttach.isEnabled then
+    if not spec.isBlockingInitialHoseDetach and g_currentMission.manualAttach.isEnabled then
         self:disconnectHoses(attacherVehicle)
     else
         spec.isBlockingInitialHoseDetach = false

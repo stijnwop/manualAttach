@@ -16,7 +16,7 @@ ManualAttachUtil = {}
 ---@param name string
 ---@return table
 function ManualAttachUtil.getSpecTable(vehicle, name)
-    local modName = g_manualAttach.modName
+    local modName = g_currentMission.manualAttach.modName
     local spec = vehicle["spec_" .. modName .. "." .. name]
     if spec ~= nil then
         return spec

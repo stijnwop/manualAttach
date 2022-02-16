@@ -24,10 +24,10 @@ end
 ---
 
 function ManualAttachAttachable:isDetachAllowed(superFunc)
-    if g_manualAttach:canOperate() then
+    if g_currentMission.manualAttach:canOperate() then
         if self.getAttacherVehicle ~= nil then
             local vehicle = self:getAttacherVehicle()
-            if vehicle ~= nil and g_manualAttach:canHandle(vehicle, self) then
+            if vehicle ~= nil and g_currentMission.manualAttach:canHandle(vehicle, self) then
                 local jointDesc = vehicle:getAttacherJointDescFromObject(self)
                 local detachAllowed, warning, showWarning = superFunc(self)
 
@@ -35,7 +35,7 @@ function ManualAttachAttachable:isDetachAllowed(superFunc)
                     return detachAllowed, warning, showWarning
                 end
 
-                detachAllowed, warning = g_manualAttach:isDetachAllowedByManualAttach(self, vehicle, jointDesc)
+                detachAllowed, warning = g_currentMission.manualAttach:isDetachAllowedByManualAttach(self, vehicle, jointDesc)
 
                 return detachAllowed, warning, showWarning
             end

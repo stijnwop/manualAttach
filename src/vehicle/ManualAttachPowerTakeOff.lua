@@ -50,7 +50,7 @@ function ManualAttachPowerTakeOff:onLoad(savegame)
 
         local sampleAttach = g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachPto", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttach == nil then
-            sampleAttach = g_soundManager:cloneSample(g_manualAttach.samples.ptoAttach, self.components[1].node, self)
+            sampleAttach = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.ptoAttach, self.components[1].node, self)
         end
 
         spec.samples.attach = sampleAttach
@@ -62,7 +62,7 @@ function ManualAttachPowerTakeOff:onPostLoad(savegame)
     spec.isBlockingInitialPtoDetach = false -- always block detach because we don't have an attached PTO at first load.
 
     if savegame ~= nil then
-        local key = savegame.key .. "." .. g_manualAttach.modName
+        local key = savegame.key .. "." .. g_currentMission.manualAttach.modName
         spec.isBlockingInitialPtoDetach = savegame.xmlFile:getValue(key .. ".manualAttachPowerTakeOff#hasAttachedPowerTakeOffs")
     end
 end
@@ -176,7 +176,8 @@ end
 ---@param jointDescIndex number
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachPowerTakeOff
-    if not spec.isBlockingInitialPtoDetach and g_manualAttach.isEnabled then
+
+    if not spec.isBlockingInitialPtoDetach and g_currentMission.manualAttach.isEnabled then
         if attacherVehicle.detachPowerTakeOff ~= nil then
             if ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
                 local implement = attacherVehicle:getImplementByObject(self)

@@ -26,20 +26,22 @@ source(modDirectory .. "src/misc/ManualAttachDetectionHandler.lua")
 g_manualAttachModName = modName
 
 local function load(mission)
-    assert(g_manualAttach == nil)
-
+    assert(mission.manualAttach == nil)
     modEnvironment = ManualAttach:new(mission, g_inputBinding, g_i18n, g_inputDisplayManager, g_soundManager, modDirectory, modName)
-
-    getfenv(0)["g_manualAttach"] = modEnvironment
-
+    mission.manualAttach = modEnvironment
     addModEventListener(modEnvironment)
 end
 
 local function unload()
-    removeModEventListener(modEnvironment)
-    modEnvironment:delete()
-    modEnvironment = nil -- Allows garbage collecting
-    getfenv(0)["g_manualAttach"] = nil
+    if modEnvironment ~= nil then
+        removeModEventListener(modEnvironment)
+        modEnvironment:delete()
+        modEnvironment = nil -- Allows garbage collecting
+
+        if g_currentMission ~= nil then
+            g_currentMission.manualAttach = nil
+        end
+    end
 end
 
 local function startMission(mission)

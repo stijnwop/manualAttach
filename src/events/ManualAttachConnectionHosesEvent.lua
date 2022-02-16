@@ -20,7 +20,7 @@ InitEventClass(ManualAttachConnectionHosesEvent, 'ManualAttachConnectionHosesEve
 function ManualAttachConnectionHosesEvent.emptyNew()
     local self = Event.new(ManualAttachConnectionHosesEvent_mt)
 
-    self.manualAttach = g_manualAttach
+    self.manualAttach = g_currentMission.manualAttach
 
     return self
 end
