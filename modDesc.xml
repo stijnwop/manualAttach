@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="63">
+<modDesc descVersion="72">
     <author>Wopster</author>
-    <version>2.1.0.0</version>
+    <version>2.2.0.0</version>
 
     <title>
         <en>Manual Attach</en>
@@ -40,8 +40,10 @@ Without attached connection hoses the following can occur:
 - You won't be able to use the lights.
 - Brakes will be blocked.
 
-Changelog 2.0.0.0:
-- FS22 Release
+Changelog 2.2.0.0:
+- Added separate hose type check to only disable the functions per type
+- Added support for custom hoses
+- Multiple bug fixes
 ]]>
         </en>
         <de>
@@ -73,8 +75,10 @@ Ohne angeschlossene Schläuche kann folgendes passieren:
 - Du kannst keine Lichter benutzen.
 - Blockierte Bremse.
 
-Changelog 2.0.0.0:
-- FS22 Release
+Changelog 2.2.0.0:
+- Added separate hose type check to only disable the functions per type
+- Added support for custom hoses
+- Multiple bug fixes
 ]]>
         </de>
         <fr>
@@ -103,8 +107,10 @@ Si les flexibles hydrauliques ne sont pas branchés, les situations suivantes pe
 - Vous ne pourrez pas allumer les feux de l'outil.
 - Vos outils trainés seront freinés (freinage pneumatique).
 
-Changelog 2.0.0.0:
-- FS22 Release
+Changelog 2.2.0.0:
+- Added separate hose type check to only disable the functions per type
+- Added support for custom hoses
+- Multiple bug fixes
 ]]>
         </fr>
         <pl>
@@ -143,33 +149,37 @@ Senza aver collegato i tubi dei servizi idraulici, luci e/o similari, si verific
 - Non potrai usare le luci.
 - I freni saranno bloccati.
 
-Changelog 2.0.0.0:
-- Versione FS22
+Changelog 2.2.0.0:
+- Added separate hose type check to only disable the functions per type
+- Added support for custom hoses
+- Multiple bug fixes
 ]]>
         </it>
         <tr>
             <![CDATA[Bu mod, sizi romörk ve alet bağlantılarını el ile yapmak zorunda bırakacaktır.
 
-    Aletleri el ile tak/sök:
-    Bir aleti bağladığınızda, kod aleti alçaltılmış durumda başlatır. Ön yükleyiciler, paletli forkliftler, küreyiciler, teleskopik yükleyiciler, biçerler ve sırtlanılabilen romörkler bu moddan etkilenmez. Bu aletleri aracın içinden çıkmadan takmaya devam edebilirsiniz.
-    Not: Yukarıdaki aletlerin bağlantı borularını yine de takmanız gerekiyor.*
-    Bağlantıyı sökmeden önce aleti alçaltmanız gerekiyor! Aynı zamanda aleti sökmeden önce bağlantı borularını sökmeyi unutmayın.
+Aletleri el ile tak/sök:
+Bir aleti bağladığınızda, kod aleti alçaltılmış durumda başlatır. Ön yükleyiciler, paletli forkliftler, küreyiciler, teleskopik yükleyiciler, biçerler ve sırtlanılabilen romörkler bu moddan etkilenmez. Bu aletleri aracın içinden çıkmadan takmaya devam edebilirsiniz.
+Not: Yukarıdaki aletlerin bağlantı borularını yine de takmanız gerekiyor.*
+Bağlantıyı sökmeden önce aleti alçaltmanız gerekiyor! Aynı zamanda aleti sökmeden önce bağlantı borularını sökmeyi unutmayın.
 
-    Bu mod, aracın içinden yapılan tak/sök işlemlerini devre dışı bırakacaktır (İstisnalar yukarıda belirtildi). Artık aracın dışına çıkmak zorundasınız!
+Bu mod, aracın içinden yapılan tak/sök işlemlerini devre dışı bırakacaktır (İstisnalar yukarıda belirtildi). Artık aracın dışına çıkmak zorundasınız!
 
-    Güç çıkışlarını takmak veya sökmek için 'Z' tuşuna basın
+Güç çıkışlarını takmak veya sökmek için 'Z' tuşuna basın
 
-    Aletlerin çalışmak için güç bağlantısına ihtiyaç duyduğunu unutmayın!
+Aletlerin çalışmak için güç bağlantısına ihtiyaç duyduğunu unutmayın!
 
-    Bağlantı borularını takmak veya sökmek için kısa bir süre 'Z' tuşuna basılı tutun
+Bağlantı borularını takmak veya sökmek için kısa bir süre 'Z' tuşuna basılı tutun
 
-    Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsiniz:
-    - Aletteki hidrolikleri kullanamazsınız (Örnek olarak, katlanan parçalar)
-    - Aletin ışıklarını çalıştıramazsınız
-    - Alet frenleri kitlenecektir
+Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsiniz:
+- Aletteki hidrolikleri kullanamazsınız (Örnek olarak, katlanan parçalar)
+- Aletin ışıklarını çalıştıramazsınız
+- Alet frenleri kitlenecektir
 
-    Güncelleme notları: 2.0.0.0:
-    - FS22 Çıkış
+Changelog 2.2.0.0:
+- Added separate hose type check to only disable the functions per type
+- Added support for custom hoses
+- Multiple bug fixes
     ]]>
         </tr>
     </description>
