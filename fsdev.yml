@@ -1,0 +1,15 @@
+version: v1
+
+mod:
+    name: ManualAttach
+    author: Wopster
+
+build:
+    ignore:
+        - .git
+        - .idea
+    outputName: FS22_manualAttach
+    cleanOutput: true
+    code: src/
+    outputTextures:
+        type: dds
