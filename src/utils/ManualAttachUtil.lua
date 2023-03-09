@@ -109,6 +109,10 @@ end
 ---@param vehicle table
 ---@return boolean
 function ManualAttachUtil.hasConnectionHoses(object, vehicle)
+    if not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
+        return false
+    end
+
     local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
     local hasTarget = ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
 
