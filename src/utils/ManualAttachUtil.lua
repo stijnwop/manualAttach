@@ -136,12 +136,27 @@ function ManualAttachUtil.hasAttachedConnectionHoses(object, type)
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
+    local hasTypeMatch = false
     for _, hose in ipairs(hoses) do
-        if hose ~= nil and object:getIsConnectionHoseUsed(hose) then
-            if type == nil or ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][hose.type:upper()] then
+        if hose ~= nil then
+            local isConnected = object:getIsConnectionHoseUsed(hose)
+            if type == nil and isConnected then
                 return true
             end
+
+            if type ~= nil then
+                hasTypeMatch = ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][(hose.type):upper()]
+
+                if hasTypeMatch and isConnected then
+                    return true
+                end
+            end
         end
+    end
+
+    --We don't have a hose with the type in question
+    if type ~= nil and not hasTypeMatch then
+        return true
     end
 
     return false
