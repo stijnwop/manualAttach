@@ -145,7 +145,9 @@ function ManualAttachUtil.hasAttachedConnectionHoses(object, type)
             end
 
             if type ~= nil then
-                hasTypeMatch = ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][(hose.type):upper()]
+                if not hasTypeMatch then
+                    hasTypeMatch = ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][(hose.type):upper()]
+                end
 
                 if hasTypeMatch and isConnected then
                     return true

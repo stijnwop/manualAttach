@@ -89,6 +89,7 @@ function ManualAttachConnectionHoses:onLoad(savegame)
     self.spec_manualAttachConnectionHoses = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
     local spec = self.spec_manualAttachConnectionHoses
 
+    spec.hoseStateChanged = false
     spec.attachedHosesByType = {
         [ManualAttachConnectionHoses.TYPE_ELECTRIC] = false,
         [ManualAttachConnectionHoses.TYPE_AIR] = false,
@@ -183,6 +184,14 @@ function ManualAttachConnectionHoses:onPostUpdateTick(dt)
             end
         end
     end
+
+    if self.finishedFirstUpdate and spec.hoseStateChanged then
+        for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
+            spec.attachedHosesByType[type] = self:isHoseAttached(type)
+        end
+
+        spec.hoseStateChanged = false
+    end
 end
 
 ---Set if mod needs to force update the state.
@@ -235,6 +244,10 @@ end
 ---Returns true if hoses of type are attached, false otherwise.
 function ManualAttachConnectionHoses:hasAttachedHosesOfType(type)
     type = type or ManualAttachConnectionHoses.TYPE_HYDRAULIC
+
+    if not self.finishedFirstUpdate then
+        return true
+    end
 
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
@@ -330,10 +343,8 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
         end
     end
 
-    local spec_manualAttach = self.spec_manualAttachConnectionHoses
-    for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
-        spec_manualAttach.attachedHosesByType[type] = self:isHoseAttached(type)
-    end
+    self.spec_manualAttachConnectionHoses.hoseStateChanged = true
+    self:raiseActive()
 end
 
 ---Play attach sound for the given jointDesc.
@@ -374,11 +385,10 @@ function ManualAttachConnectionHoses.inj_connectHosesToAttacherVehicle(vehicle, 
     vehicle:toggleLightStates(true, true)
 
     if attacherVehicle.getConnectionTarget ~= nil then
-        local spec_manualAttach = vehicle.spec_manualAttachConnectionHoses
-        for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
-            spec_manualAttach.attachedHosesByType[type] = vehicle:isHoseAttached(type)
-        end
+        vehicle.spec_manualAttachConnectionHoses.hoseStateChanged = true
+        vehicle:raiseActive()
     end
+
 end
 
 function ManualAttachConnectionHoses.inj_setLightsTypesMask(vehicle, superFunc, lightsTypesMask, force, noEventSend)
