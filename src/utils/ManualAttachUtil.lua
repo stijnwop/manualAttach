@@ -92,13 +92,36 @@ end
 ---@param attacherJointIndex number
 ---@return boolean
 function ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
-    local hoses = vehicle.spec_connectionHoses
-    if hoses ~= nil then
-        for _, node in ipairs(hoses.targetNodes) do
+    local spec = vehicle.spec_connectionHoses
+
+    local function hasConnectedNode(nodes)
+        for _, node in ipairs(nodes) do
             if node.attacherJointIndices[attacherJointIndex] ~= nil then
                 return true
             end
         end
+
+        return false
+    end
+
+    local function hasInternals(nodes)
+        for _, node in ipairs(nodes) do
+            for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
+                if ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][(node.type):upper()] ~= nil then
+                    return true
+                end
+            end
+        end
+
+        return false
+    end
+
+    if spec ~= nil then
+        if not hasInternals(spec.targetNodes) then
+            return false
+        end
+
+        return hasConnectedNode(spec.targetNodes)
     end
 
     return false
@@ -122,6 +145,7 @@ function ManualAttachUtil.hasConnectionHoses(object, vehicle)
 
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
+
     return #hoses ~= 0
 end
 
