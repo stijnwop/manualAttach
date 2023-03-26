@@ -1,6 +1,6 @@
 # ManualAttach for Farming Simulator 22
 
-![For Farming Simulator 19](https://img.shields.io/badge/Farming%20Simulator-19-FF7C00.svg) [![Releases](https://img.shields.io/github/release/stijnwop/guidanceSteering.svg)](https://github.com/stijnwop/manualAttach/releases)
+![For Farming Simulator 22](https://img.shields.io/badge/Farming%20Simulator-22-10BEFF.svg) [![Releases](https://img.shields.io/github/release/stijnwop/manualAttach.svg)](https://github.com/stijnwop/manualAttach/releases) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Warning!
 Please be aware that this is a ***DEVELOPMENT VERSION***!
