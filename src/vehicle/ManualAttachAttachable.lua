@@ -17,6 +17,7 @@ end
 
 function ManualAttachAttachable.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "isDetachAllowed", ManualAttachAttachable.isDetachAllowed)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadInputAttacherJoint", ManualAttachAttachable.loadInputAttacherJoint)
 end
 
 ---
@@ -46,4 +47,17 @@ function ManualAttachAttachable:isDetachAllowed(superFunc)
     end
 
     return superFunc(self)
+end
+
+function ManualAttachAttachable:loadInputAttacherJoint(superFunc, xmlFile, key, inputAttacherJoint, index)
+    if not superFunc(self, xmlFile, key, inputAttacherJoint, index) then
+        return false
+    end
+
+    local isManualJointDesc = xmlFile:getBool(key .. "#isManual")
+    if isManualJointDesc ~= nil then
+        inputAttacherJoint.isManual = isManualJointDesc
+    end
+
+    return true
 end

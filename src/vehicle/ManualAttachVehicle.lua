@@ -71,5 +71,10 @@ function ManualAttachVehicle:loadAttacherJointFromXML(superFunc, attacherJoint, 
         attacherJoint.sampleAttachPto = sampleAttachPto
     end
 
+    local isManualJointDesc = xmlFile:getBool(baseName .. "#isManual")
+    if isManualJointDesc ~= nil then
+        attacherJoint.isManual = isManualJointDesc
+    end
+
     return true
 end
