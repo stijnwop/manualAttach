@@ -24,7 +24,8 @@ end
 ---
 
 function ManualAttachAttachable:isDetachAllowed(superFunc)
-    if g_currentMission.manualAttach:canOperate() then
+    if g_currentMission.manualAttach:canOperate()
+        and not self:getIsAIActive() then
         if self.getAttacherVehicle ~= nil then
             local vehicle = self:getAttacherVehicle()
             if vehicle ~= nil and g_currentMission.manualAttach:canHandle(vehicle, self) then

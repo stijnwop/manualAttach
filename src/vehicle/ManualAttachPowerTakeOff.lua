@@ -177,7 +177,9 @@ end
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachPowerTakeOff
 
-    if not spec.isBlockingInitialPtoDetach and g_currentMission.manualAttach.isEnabled then
+    if not spec.isBlockingInitialPtoDetach
+        and g_currentMission.manualAttach.isEnabled
+        and not self:getIsAIActive() then
         if attacherVehicle.detachPowerTakeOff ~= nil then
             if ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
                 local implement = attacherVehicle:getImplementByObject(self)

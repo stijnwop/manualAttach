@@ -369,7 +369,9 @@ end
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachConnectionHoses
 
-    if not spec.isBlockingInitialHoseDetach and g_currentMission.manualAttach.isEnabled then
+    if not spec.isBlockingInitialHoseDetach
+        and g_currentMission.manualAttach.isEnabled
+        and not self:getIsAIActive() then
         self:disconnectHoses(attacherVehicle)
     else
         spec.isBlockingInitialHoseDetach = false
