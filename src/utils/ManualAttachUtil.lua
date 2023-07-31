@@ -29,11 +29,11 @@ end
 ---@param jointDesc number
 ---@return boolean
 function ManualAttachUtil.isManualJointType(jointDesc)
-    if not ManualAttach.AUTO_ATTACH_JOINTYPES[jointDesc.jointType] then
-        if jointDesc.isManual ~= nil and not jointDesc.isManual then
-            return false
-        end
+    if jointDesc.isManual ~= nil then
+        return jointDesc.isManual
+    end
 
+    if not ManualAttach.AUTO_ATTACH_JOINTYPES[jointDesc.jointType] then
         return true
     end
 
