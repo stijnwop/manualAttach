@@ -207,7 +207,7 @@ function ManualAttachConnectionHoses:isHoseAttached(type)
 
     local attacherVehicle = self:getAttacherVehicle()
     if attacherVehicle ~= nil then
-        if not ManualAttachUtil.hasConnectionHoses(self, attacherVehicle) then
+        if not ManualAttachUtil.hasConnectionHoses(self, attacherVehicle, type) then
             return true
         end
     end
