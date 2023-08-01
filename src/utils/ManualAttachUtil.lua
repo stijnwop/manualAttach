@@ -91,7 +91,7 @@ end
 ---@param vehicle table
 ---@param attacherJointIndex number
 ---@return boolean
-function ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
+function ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex, type)
     local spec = vehicle.spec_connectionHoses
 
     local function hasConnectedNode(nodes)
@@ -105,8 +105,8 @@ function ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
     end
 
     local function hasInternals(nodes)
-        for _, node in ipairs(nodes) do
-            for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
+        if type ~= nil then
+            for _, node in ipairs(nodes) do
                 if ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][(node.type):upper()] ~= nil then
                     return true
                 end
@@ -131,22 +131,45 @@ end
 ---@param object table
 ---@param vehicle table
 ---@return boolean
-function ManualAttachUtil.hasConnectionHoses(object, vehicle)
-    if not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
+function ManualAttachUtil.hasConnectionHoses(object, vehicle, type)
+    if type == nil then
+        for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
+            if ManualAttachUtil.hasTypedConnectionHoses(object, vehicle, type) then
+                return true
+            end
+        end
+
+        return false
+    end
+
+    return ManualAttachUtil.hasTypedConnectionHoses(object, vehicle, type)
+end
+
+---Returns true when object has connection hoses for given type, false otherwise.
+---@param object table
+---@param vehicle table
+---@return boolean
+function ManualAttachUtil.hasTypedConnectionHoses(object, vehicle, type)
+    if object.spec_attachable == nil or object.getConnectionHosesByInputAttacherJoint == nil or not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
         return false
     end
 
     local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
-    local hasTarget = ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex)
 
-    if not hasTarget or object.getConnectionHosesByInputAttacherJoint == nil then
+    if type == nil or not ManualAttachUtil.hasConnectionTarget(vehicle, attacherJointIndex, type) then
         return false
     end
 
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local hoses = object:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
 
-    return #hoses ~= 0
+    for _, hose in ipairs(hoses) do
+        if ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type][(hose.type):upper()] ~= nil then
+            return true
+        end
+    end
+
+    return false
 end
 
 ---Returns true when object has attached connection hoses, false otherwise.
