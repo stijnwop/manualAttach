@@ -23,6 +23,6 @@
         <!-- Todo: gui translations -->
         <text name="title_manualAttach" text="Manual Attach"/>
         <text name="setting_manualAttach" text="Manual attaching"/>
-        <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
+        <text name="toolTip_manualAttach" text="Si necesita o no realizar acciones manuales para enganchar/desenganchar el implemento."/>
     </texts>
 </l10n>
