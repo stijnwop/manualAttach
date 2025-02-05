@@ -1,28 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <l10n>
     <translationContributors>Vanquish081</translationContributors>
+    <locale>es</locale>
     <texts>
         <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Enganchar/Desengachar"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Enganchar/Desengachar TDF y conectar mangueras"/>
-
         <text name="action_attach_pto" text="Enganchar toma de fuerza"/>
         <text name="action_detach_pto" text="Desengachar toma de fuerza"/>
-
         <text name="action_attach_hose" text="Mantener enganchadas las mangueras"/>
         <text name="action_detach_hose" text="Mantener desenganchadas las mangueras"/>
-
         <text name="info_lower_warning" text="Bajar %s primero"/>
         <text name="info_turn_off_warning" text="Parar %s primero"/>
-
         <text name="info_detach_pto_warning" text="Desengachar TDF de %s primero"/>
         <text name="info_attach_pto_warning" text="Enganchar TDF de %s primero"/>
-
         <text name="info_detach_hoses_warning" text="Desengachar mangueras de %s primero"/>
         <text name="info_attach_hoses_warning" text="Enganchar mangueras de %s primero"/>
-
-        <!-- Todo: gui translations -->
         <text name="title_manualAttach" text="Manual Attach"/>
         <text name="setting_manualAttach" text="Manual attaching"/>
         <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
     </texts>
+
 </l10n>

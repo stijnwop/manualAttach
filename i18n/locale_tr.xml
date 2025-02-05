@@ -1,27 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <l10n>
     <translationContributors>PhénixNoir</translationContributors>
+    <locale>tr</locale>
     <texts>
         <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: tak veya sök"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Bağlantı ve PTO borularını tak veya sök"/>
-
         <text name="action_attach_pto" text="Güç çıkışını tak"/>
         <text name="action_detach_pto" text="Güç çıkışını sök"/>
-
         <text name="action_attach_hose" text="Boruları takmak için basılı tut"/>
         <text name="action_detach_hose" text="Boruları sökmek için basılı tut"/>
-
         <text name="info_lower_warning" text="Önce %s alçaltmanız gerekiyor"/>
         <text name="info_turn_off_warning" text="Önce %s çalışmasını durdurmanız gerekiyor "/>
-
         <text name="info_detach_pto_warning" text="Önce %s bağlantısını sökün"/>
         <text name="info_attach_pto_warning" text="Önce %s PTO bağlantısını yapın"/>
-
         <text name="info_detach_hoses_warning" text="Önce %s borularını sökün"/>
         <text name="info_attach_hoses_warning" text="Önce %s borularını takın"/>
-
         <text name="title_manualAttach" text="Manual Attach"/>
         <text name="setting_manualAttach" text="Manuel bağlantı"/>
         <text name="toolTip_manualAttach" text="Aletin bağlantılarının el ile yapılıp yapılmayacağı."/>
     </texts>
+
 </l10n>

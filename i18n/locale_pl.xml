@@ -1,27 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <l10n>
     <translationContributors>Ziuta</translationContributors>
+    <locale>pl</locale>
     <texts>
         <text name="input_MA_ATTACH_VEHICLE" text="Zaczep/Odczep"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="Podłącz/Odłącz WPM i węże"/>
-
         <text name="action_attach_pto" text="Podłącz wał przekazu mocy"/>
         <text name="action_detach_pto" text="Odłącz wał przekazu mocy"/>
-
         <text name="action_attach_hose" text="Przytrzymaj, aby podłączyć węże"/>
         <text name="action_detach_hose" text="Przytrzymaj, aby odłączyć węże"/>
-
         <text name="info_lower_warning" text="Najpierw opuść %s"/>
         <text name="info_turn_off_warning" text="Najpierw wyłącz %s"/>
-
         <text name="info_detach_pto_warning" text="Najpierw odłącz WPM od %s"/>
         <text name="info_attach_pto_warning" text="Najpierw podłącz WPM od %s"/>
-
         <text name="info_detach_hoses_warning" text="Najpierw odłącz węże od %s"/>
         <text name="info_attach_hoses_warning" text="Najpierw podłącz węże od %s"/>
-
         <text name="title_manualAttach" text="Interakcje na podejście"/>
         <text name="setting_manualAttach" text="Ręczne zaczepianie"/>
         <text name="toolTip_manualAttach" text="Czy chcesz grać realistycznie i zaczepiać oraz odczepiać maszyny po podejściu do nich?."/>
     </texts>
+
 </l10n>

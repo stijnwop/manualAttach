@@ -163,7 +163,7 @@ end
 ---Adds the trigger to the player.
 ---@param player table the current player
 function ManualAttachDetectionHandler:addTrigger(player)
-    if self.isClient and self.triggerCloneNode ~= nil and player == self.mission.player then
+    if self.isClient and self.triggerCloneNode ~= nil and player == g_localPlayer then
         if self.lastTrigger ~= nil then
             removeTrigger(self.lastTrigger)
             delete(self.lastTrigger)
@@ -189,7 +189,7 @@ end
 ---Disables the trigger from the player.
 ---@param player table the current player
 function ManualAttachDetectionHandler:disableTrigger(player)
-    if self.isClient and player == self.mission.player then
+    if self.isClient and player == g_localPlayer then
         local trigger = player.manualAttachDetectionTrigger
 
         self:onGhostRemove(trigger)
@@ -207,7 +207,7 @@ end
 function ManualAttachDetectionHandler:removeTrigger(player, force)
     force = force or false
 
-    if self.isClient and player == self.mission.player or force then
+    if self.isClient and player == g_localPlayer or force then
         local trigger = player.manualAttachDetectionTrigger
         if trigger ~= nil then
             unlink(trigger)

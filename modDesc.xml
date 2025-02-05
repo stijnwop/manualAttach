@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="76">
+<modDesc descVersion="95">
     <author>Wopster</author>
-    <version>2.3.0.0</version>
+    <version>1.0.0.0</version>
 
     <title>
         <en>Manual Attach</en>
         <de>Manuelles Ankuppeln</de>
-        <fr>Attelage manuel</fr>
-        <nl>Handmatig aankoppelen</nl>
-        <pl>Ręczne zaczepianie</pl>
-        <ru>Ручная сцепка</ru>
-        <cz>Manuální připojování</cz>
+        <fr>Attelage Manuel</fr>
+        <nl>Handmatig Aankoppelen</nl>
+        <pl>Ręczne Zaczepianie</pl>
+        <ru>Ручная Cцепка</ru>
+        <cz>Manuální Připojování</cz>
         <hu>Kézi Csatlakozás</hu>
         <it>Collegamento Manuale</it>
         <tr>Manuel Bağlantı</tr>
@@ -39,21 +39,6 @@ Without attached connection hoses the following can occur:
 - You won't be able to control hydraulics (e.g. moving parts, folding, use ridge markers etc)
 - You won't be able to use the lights.
 - Brakes will be blocked.
-
-Changelog 2.3.0.0:
-- Added xml attribute to force auto or manual attach on attacher joints
-- Fixed attach/detach interaction when AI is active
-- Fixed issue with target vehicle not supporting all connection hose types
-
-Changelog 2.2.1.0:
-- Fixed blocking of lights, brakes etc when we don't have support for the hose type on the attacher vehicle
-- Fixed hose state on initial update
-- Added check if target vehicles supports any of the hose types, if not we allow all functions
-
-Changelog 2.2.0.0:
-- Added separate hose type check to only disable the functions per type
-- Added support for custom hoses
-- Multiple bug fixes
 ]]>
         </en>
         <de>
@@ -84,21 +69,6 @@ Ohne angeschlossene Schläuche kann folgendes passieren:
 - Du wirst nicht in der Lage sein die Hydraulik zu kontrollieren (z.B. sich bewegende Teile, ein-/ausklappen, Spuranreißer benutzen etc.)
 - Du kannst keine Lichter benutzen.
 - Blockierte Bremse.
-
-Changelog 2.3.0.0:
-- Added xml attribute to force auto or manual attach on attacher joints
-- Fixed attach/detach interaction when AI is active
-- Fixed issue with target vehicle not supporting all connection hose types
-
-Changelog 2.2.1.0:
-- Fixed blocking of lights, brakes etc when we don't have support for the hose type on the attacher vehicle
-- Fixed hose state on initial update
-- Added check if target vehicles supports any of the hose types, if not we allow all functions
-
-Changelog 2.2.0.0:
-- Added separate hose type check to only disable the functions per type
-- Added support for custom hoses
-- Multiple bug fixes
 ]]>
         </de>
         <fr>
@@ -126,21 +96,6 @@ Si les flexibles hydrauliques ne sont pas branchés, les situations suivantes pe
 - Vous ne pourrez pas utiliser les fonctions hydrauliques (dépliage/repliage, traceurs, etc.)
 - Vous ne pourrez pas allumer les feux de l'outil.
 - Vos outils trainés seront freinés (freinage pneumatique).
-
-Changelog 2.3.0.0:
-- Added xml attribute to force auto or manual attach on attacher joints
-- Fixed attach/detach interaction when AI is active
-- Fixed issue with target vehicle not supporting all connection hose types
-
-Changelog 2.2.1.0:
-- Fixed blocking of lights, brakes etc when we don't have support for the hose type on the attacher vehicle
-- Fixed hose state on initial update
-- Added check if target vehicles supports any of the hose types, if not we allow all functions
-
-Changelog 2.2.0.0:
-- Added separate hose type check to only disable the functions per type
-- Added support for custom hoses
-- Multiple bug fixes
 ]]>
         </fr>
         <pl>
@@ -178,21 +133,6 @@ Senza aver collegato i tubi dei servizi idraulici, luci e/o similari, si verific
 - Non sarai in grado di controllare l'idraulica (ad esempio parti mobili, piegatura, utilizzo di marcatori di colmo, ecc.)
 - Non potrai usare le luci.
 - I freni saranno bloccati.
-
-Changelog 2.3.0.0:
-- Added xml attribute to force auto or manual attach on attacher joints
-- Fixed attach/detach interaction when AI is active
-- Fixed issue with target vehicle not supporting all connection hose types
-
-Changelog 2.2.1.0:
-- Fixed blocking of lights, brakes etc when we don't have support for the hose type on the attacher vehicle
-- Fixed hose state on initial update
-- Added check if target vehicles supports any of the hose types, if not we allow all functions
-
-Changelog 2.2.0.0:
-- Added separate hose type check to only disable the functions per type
-- Added support for custom hoses
-- Multiple bug fixes
 ]]>
         </it>
         <tr>
@@ -215,26 +155,11 @@ Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsi
 - Aletteki hidrolikleri kullanamazsınız (Örnek olarak, katlanan parçalar)
 - Aletin ışıklarını çalıştıramazsınız
 - Alet frenleri kitlenecektir
-
-Changelog 2.3.0.0:
-- Added xml attribute to force auto or manual attach on attacher joints
-- Fixed attach/detach interaction when AI is active
-- Fixed issue with target vehicle not supporting all connection hose types
-
-Changelog 2.2.1.0:
-- Fixed blocking of lights, brakes etc when we don't have support for the hose type on the attacher vehicle
-- Fixed hose state on initial update
-- Added check if target vehicles supports any of the hose types, if not we allow all functions
-
-Changelog 2.2.0.0:
-- Added separate hose type check to only disable the functions per type
-- Added support for custom hoses
-- Multiple bug fixes
     ]]>
         </tr>
     </description>
 
-    <iconFilename>icon.png</iconFilename>
+    <iconFilename>icon_manualAttach.dds</iconFilename>
 
     <multiplayer supported="true"/>
 

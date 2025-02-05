@@ -62,13 +62,15 @@ local function init()
 
     TypeManager.validateTypes = Utils.prependedFunction(TypeManager.validateTypes, initSpecialization)
 
-    Player.onEnter = Utils.appendedFunction(Player.onEnter, ManualAttach.inj_onEnter)
-    Player.onLeave = Utils.appendedFunction(Player.onLeave, ManualAttach.inj_onLeave)
+    Player.onEnterVehicle = Utils.appendedFunction(Player.onEnterVehicle, ManualAttach.inj_onEnter)
+    Player.onLeaveVehicle = Utils.appendedFunction(Player.onLeaveVehicle, ManualAttach.inj_onLeave)
+    Player.onEnterVehicleAsPassenger = Utils.appendedFunction(Player.onEnterVehicleAsPassenger, ManualAttach.inj_onEnter)
+    Player.onLeaveVehicleAsPassenger = Utils.appendedFunction(Player.onLeaveVehicleAsPassenger, ManualAttach.inj_onLeave)
     Player.load = Utils.appendedFunction(Player.load, ManualAttach.inj_load)
     Player.delete = Utils.prependedFunction(Player.delete, ManualAttach.inj_delete)
 
-    InGameMenuGeneralSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.onFrameOpen, ManualAttach.initGui)
-    InGameMenuGeneralSettingsFrame.updateGameSettings = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.updateGameSettings, ManualAttach.updateGui)
+    -- InGameMenuGeneralSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.onFrameOpen, ManualAttach.initGui)
+    -- InGameMenuGeneralSettingsFrame.updateGameSettings = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.updateGameSettings, ManualAttach.updateGui)
 end
 
 init()

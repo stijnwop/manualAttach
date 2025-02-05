@@ -123,7 +123,7 @@ end
 
 ---Returns true when manual attach is enabled and we are controlling a vehicle.
 function ManualAttach:canOperate()
-    return self.isEnabled and self.mission.controlledVehicle ~= nil
+    return self.isEnabled and self.mission.hud.controlledVehicle ~= nil
 end
 
 ---Called when player clicks start.
@@ -302,7 +302,7 @@ function ManualAttach:draw()
             if self:canHandle(self.attacherVehicle, self.attachable, self.attacherVehicleJointDescIndex) then
                 if self.mission.accessHandler:canFarmAccess(self.attacherVehicle:getActiveFarm(), self.attachable) then
                     setDrawEventValues(attachEvent, self.i18n:getText("action_attach"), GS_PRIO_VERY_HIGH)
-                    self.context:setContext(InputAction.MA_ATTACH_VEHICLE, ContextActionDisplay.CONTEXT_ICON.ATTACH, self.attachable:getFullName())
+                    self.context:setContext(InputAction.MA_ATTACH_VEHICLE, ContextActionDisplay.CONTEXT_ICON.ATTACH, self.attachable:getFullName(), HUD.CONTEXT_PRIORITY.LOW, g_i18n:getText("input_MA_ATTACH_VEHICLE"))
                 end
             end
         end
@@ -316,10 +316,10 @@ end
 ---Adds the current controlled vehicle to the list if valid.
 function ManualAttach:addControllingVehicle(force)
     force = force or false
-    if self.controlledVehicle ~= self.mission.controlledVehicle or force then
+    if self.controlledVehicle ~= self.mission.hud.controlledVehicle or force then
         local vehicles = {}
-        if self.detectionHandler.getIsValidVehicle(self.mission.controlledVehicle) then
-            self.controlledVehicle = self.mission.controlledVehicle
+        if self.detectionHandler.getIsValidVehicle(self.mission.hud.controlledVehicle) then
+            self.controlledVehicle = self.mission.hud.controlledVehicle
             table.addElement(vehicles, self.controlledVehicle)
         else
             self.controlledVehicle = nil
@@ -370,11 +370,11 @@ end
 ---Returns true when the player is valid, false otherwise.
 ---@return boolean
 function ManualAttach:isValidPlayer()
-    local player = self.mission.player
+    local player = g_localPlayer
     return player ~= nil
-        and self.mission.controlPlayer
-        and not player.isCarryingObject
-        and not player:hasHandtoolEquipped()
+        and player.isControlled
+        and not player:getAreHandsHoldingObject()
+        and not player:getIsHoldingHandTool()
 end
 
 ---Returns true when the given object is valid, false otherwise.
@@ -590,7 +590,6 @@ function ManualAttach:onPowerTakeOffEvent()
     local object = self.attachedImplement
     if object ~= nil then
         local attacherVehicle = object:getAttacherVehicle()
-
         if ManualAttachUtil.hasPowerTakeOffs(object, attacherVehicle) then
             if object:getAllowsLowering() then
                 self:handleActivatedOnLoweredObject(object)
@@ -644,11 +643,11 @@ end
 ---Register input actions.
 function ManualAttach:registerActionEvents()
     if self.isClient then
-        local _, attachEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_VEHICLE, self, self.onAttachEvent, false, true, false, true)
+        local _, attachEventId = self.input:registerActionEvent("MA_ATTACH_VEHICLE", self, self.onAttachEvent, false, true, false, true)
         self.input:setActionEventTextVisibility(attachEventId, false)
         self.attachEventId = attachEventId
 
-        local _, handleEventId = self.input:registerActionEvent(InputAction.MA_ATTACH_PTO_HOSE, self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
+        local _, handleEventId = self.input:registerActionEvent("MA_ATTACH_PTO_HOSE", self, self.onPowerTakeOffAndConnectionHoseEvent, false, true, true, true)
         self.input:setActionEventTextVisibility(handleEventId, false)
         self.handleEventId = handleEventId
     end
@@ -657,7 +656,7 @@ end
 ---Register player input actions.
 ---@param player table
 function ManualAttach:registerPlayerActionEvents(player)
-    if self.isClient and player == self.mission.player then
+    if self.isClient and player == g_localPlayer then
         self:registerActionEvents()
     end
 end
@@ -665,7 +664,7 @@ end
 ---Remove player input actions.
 ---@param player table
 function ManualAttach:unregisterPlayerActionEvents(player)
-    if player == self.mission.player then
+    if player == g_localPlayer then
         self:unregisterActionEvents()
     end
 end

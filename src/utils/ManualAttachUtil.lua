@@ -239,7 +239,7 @@ function ManualAttachUtil.getAttachableInJointRange(vehicle, attacherJoint, maxD
 
     local x, y, z = getWorldTranslation(attacherJoint.jointTransform)
 
-    for _, jointInfo in pairs(g_currentMission.inputAttacherJoints) do
+    for _, jointInfo in pairs(g_currentMission.vehicleSystem.inputAttacherJoints) do
         if jointInfo.vehicle ~= vehicle and attacherJoint.jointType == jointInfo.jointType then
             local allowPlayerHandling = ManualAttachUtil.isManualJointType(jointInfo.inputAttacherJoint)
             local isValid = (not isPlayerBased and not allowPlayerHandling) or (isPlayerBased and allowPlayerHandling)
@@ -283,6 +283,7 @@ end
 ---@param isPlayerBased boolean when player controlled.
 ---@return table, number, table, number, table
 function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxAngle, isPlayerBased)
+
     local attacherVehicle
     local attacherVehicleJointDescIndex
     local attachable
@@ -302,7 +303,7 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
                     if object ~= nil then
                         if isPlayerBased then
                             local attacherJoint = spec.attacherJoints[implement.jointDescIndex]
-                            local x, y, z = localToLocal(attacherJoint.jointTransform, g_currentMission.player.rootNode, 0, 0, 0)
+                            local x, y, z = localToLocal(attacherJoint.jointTransform, g_localPlayer.rootNode, 0, 0, 0)
                             local distSq = MathUtil.vector3LengthSq(x, y, z)
 
                             if attachedImplement ~= object
@@ -328,7 +329,7 @@ function ManualAttachUtil.findVehicleInAttachRange(vehicles, maxDistanceSq, maxA
                     local distSq = math.huge
 
                     if isPlayerBased then
-                        local x, y, z = localToLocal(attacherJoint.jointTransform, g_currentMission.player.rootNode, 0, 0, 0)
+                        local x, y, z = localToLocal(attacherJoint.jointTransform, g_localPlayer.rootNode, 0, 0, 0)
                         distSq = MathUtil.vector3LengthSq(x, y, z)
                         isInRange = distSq < ManualAttach.PLAYER_MIN_DISTANCE and distSq < minPlayerDist
                     end

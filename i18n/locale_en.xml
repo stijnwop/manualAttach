@@ -1,27 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <l10n>
     <translationContributors>Wopster</translationContributors>
+    <locale>en</locale>
     <texts>
         <text name="input_MA_ATTACH_VEHICLE" text="ManualAttach: Attach/Detach"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="ManualAttach: Attach/Detach PTO and connection hoses"/>
-
         <text name="action_attach_pto" text="Attach power take off"/>
         <text name="action_detach_pto" text="Detach power take off"/>
-
         <text name="action_attach_hose" text="Hold to attach hoses"/>
         <text name="action_detach_hose" text="Hold to detach hoses"/>
-
         <text name="info_lower_warning" text="Lower %s first"/>
         <text name="info_turn_off_warning" text="Turn off %s first"/>
-
         <text name="info_detach_pto_warning" text="Detach PTO of %s first"/>
         <text name="info_attach_pto_warning" text="Attach PTO of %s first"/>
-
         <text name="info_detach_hoses_warning" text="Detach hoses of %s first"/>
         <text name="info_attach_hoses_warning" text="Attach hoses of %s first"/>
-
         <text name="title_manualAttach" text="Manual Attach"/>
         <text name="setting_manualAttach" text="Manual attaching"/>
         <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
     </texts>
+
 </l10n>

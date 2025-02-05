@@ -1,27 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <l10n>
     <translationContributors>Farmer1602</translationContributors>
+    <locale>fr</locale>
     <texts>
         <text name="input_MA_ATTACH_VEHICLE" text="Attelage manuel : Atteler / Dételer"/>
         <text name="input_MA_ATTACH_PTO_HOSE" text="Attelage manuel : Mettre la prise de force et brancher les flexibles hydrauliques"/>
-
         <text name="action_attach_pto" text="Mettre la prise de force"/>
         <text name="action_detach_pto" text="Retirer la prise de force"/>
-
         <text name="action_attach_hose" text="Maintenir pour brancher les flexibles"/>
         <text name="action_detach_hose" text="Maintenir pour débrancher les flexibles"/>
-
-        <text name="info_lower_warning" text="Baisser %s d'abord"/>
-        <text name="info_turn_off_warning" text="Arrêter %s d'abord"/>
-
-        <text name="info_detach_pto_warning" text="Retirer la prise de force de %s d'abord"/>
-        <text name="info_attach_pto_warning" text="Mettre la prise de force de %s d'abord"/>
-
-        <text name="info_detach_hoses_warning" text="Débrancher les flexibles de %s d'abord"/>
-        <text name="info_attach_hoses_warning" text="Brancher les flexibles de %s d'abord"/>
-
+        <text name="info_lower_warning" text="Baisser %s d&#39;abord"/>
+        <text name="info_turn_off_warning" text="Arrêter %s d&#39;abord"/>
+        <text name="info_detach_pto_warning" text="Retirer la prise de force de %s d&#39;abord"/>
+        <text name="info_attach_pto_warning" text="Mettre la prise de force de %s d&#39;abord"/>
+        <text name="info_detach_hoses_warning" text="Débrancher les flexibles de %s d&#39;abord"/>
+        <text name="info_attach_hoses_warning" text="Brancher les flexibles de %s d&#39;abord"/>
         <text name="title_manualAttach" text="Attelage manuel"/>
         <text name="setting_manualAttach" text="Attelage manuel"/>
-        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour atteler / dételer l'outil."/>
+        <text name="toolTip_manualAttach" text="Si vous devez ou non effectuer des actions manuelles pour atteler / dételer l&#39;outil."/>
     </texts>
+
 </l10n>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<l10n>
+    <locale>kr</locale>
+
+    <elements>
+        <e k="action_attach_hose" v="Hold to attach hoses" tag="todo">
+            <!--Todo: add missing translation for action_attach_hose--></e>
+        <e k="action_attach_pto" v="Attach power take off" tag="todo">
+            <!--Todo: add missing translation for action_attach_pto--></e>
+        <e k="action_detach_hose" v="Hold to detach hoses" tag="todo">
+            <!--Todo: add missing translation for action_detach_hose--></e>
+        <e k="action_detach_pto" v="Detach power take off" tag="todo">
+            <!--Todo: add missing translation for action_detach_pto--></e>
+        <e k="info_attach_hoses_warning" v="Attach hoses of %s first" tag="todo">
+            <!--Todo: add missing translation for info_attach_hoses_warning--></e>
+        <e k="info_attach_pto_warning" v="Attach PTO of %s first" tag="todo">
+            <!--Todo: add missing translation for info_attach_pto_warning--></e>
+        <e k="info_detach_hoses_warning" v="Detach hoses of %s first" tag="todo">
+            <!--Todo: add missing translation for info_detach_hoses_warning--></e>
+        <e k="info_detach_pto_warning" v="Detach PTO of %s first" tag="todo">
+            <!--Todo: add missing translation for info_detach_pto_warning--></e>
+        <e k="info_lower_warning" v="Lower %s first" tag="todo">
+            <!--Todo: add missing translation for info_lower_warning--></e>
+        <e k="info_turn_off_warning" v="Turn off %s first" tag="todo">
+            <!--Todo: add missing translation for info_turn_off_warning--></e>
+        <e k="input_MA_ATTACH_PTO_HOSE" v="ManualAttach: Attach/Detach PTO and connection hoses" tag="todo">
+            <!--Todo: add missing translation for input_MA_ATTACH_PTO_HOSE--></e>
+        <e k="input_MA_ATTACH_VEHICLE" v="ManualAttach: Attach/Detach" tag="todo">
+            <!--Todo: add missing translation for input_MA_ATTACH_VEHICLE--></e>
+        <e k="setting_manualAttach" v="Manual attaching" tag="todo">
+            <!--Todo: add missing translation for setting_manualAttach--></e>
+        <e k="title_manualAttach" v="Manual Attach" tag="todo">
+            <!--Todo: add missing translation for title_manualAttach--></e>
+        <e k="toolTip_manualAttach" v="Whether or not you need to perform manual actions to attach/detach the implement." tag="todo">
+            <!--Todo: add missing translation for toolTip_manualAttach--></e>
+    </elements>
+</l10n>
