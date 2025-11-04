@@ -19,9 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Najpierw odłącz węże od %s"/>
         <text name="info_attach_hoses_warning" text="Najpierw podłącz węże od %s"/>
-
-        <text name="title_manualAttach" text="Interakcje na podejście"/>
-        <text name="setting_manualAttach" text="Ręczne zaczepianie"/>
-        <text name="toolTip_manualAttach" text="Czy chcesz grać realistycznie i zaczepiać oraz odczepiać maszyny po podejściu do nich?."/>
     </texts>
 </l10n>

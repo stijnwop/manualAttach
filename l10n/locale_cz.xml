@@ -19,9 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Nejdříve odpojte hadice"/>
         <text name="info_attach_hoses_warning" text="Nejdříve připojte hadice"/>
-
-        <text name="title_manualAttach" text="Manuální připojování"/>
-        <text name="setting_manualAttach" text="Manuální připojování"/>
-        <text name="toolTip_manualAttach" text="Vyber si, zda chceš nebo nechceš používat manuální připojování nástrojů a vleček."/>
     </texts>
 </l10n>

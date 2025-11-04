@@ -19,9 +19,5 @@
 
         <text name="info_attach_hoses_warning" text="Schläuche von %s anbauen"/>
         <text name="info_detach_hoses_warning" text="Schläuche von %s zuerst abbauen"/>
-
-        <text name="title_manualAttach" text="Manuelles Ankuppeln"/>
-        <text name="setting_manualAttach" text="Manuelles Ankuppeln"/>
-        <text name="toolTip_manualAttach" text="Legt fest, ob du Geräte manuell ankuppeln möchtest."/>
     </texts>
 </l10n>

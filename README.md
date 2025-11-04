@@ -1,6 +1,7 @@
-# ManualAttach for Farming Simulator 22
+# ManualAttach for Farming Simulator 25
 
-![For Farming Simulator 22](https://img.shields.io/badge/Farming%20Simulator-22-10BEFF.svg) [![Releases](https://img.shields.io/github/release/stijnwop/manualAttach.svg)](https://github.com/stijnwop/manualAttach/releases) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![For Farming Simulator 25](https://img.shields.io/badge/Farming%20Simulator-25-F.svg) [![Releases](https://img.shields.io/github/release/stijnwop/manualAttach.svg)](https://github.com/stijnwop/manualAttach/releases) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 
 ## Warning!
 Please be aware that this is a ***DEVELOPMENT VERSION***!
@@ -31,7 +32,7 @@ Without attached connection hoses the following can occur:
 
 
 ## Copyright
-Copyright (c) 2019 [Wopster](https://github.com/stijnwop).
+Copyright (c) 2019-2025 [Wopster](https://github.com/stijnwop).
 All rights reserved.
 
 Special thanks to workflowsen for creating the icon!

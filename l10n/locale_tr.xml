@@ -19,9 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Önce %s borularını sökün"/>
         <text name="info_attach_hoses_warning" text="Önce %s borularını takın"/>
-
-        <text name="title_manualAttach" text="Manual Attach"/>
-        <text name="setting_manualAttach" text="Manuel bağlantı"/>
-        <text name="toolTip_manualAttach" text="Aletin bağlantılarının el ile yapılıp yapılmayacağı."/>
     </texts>
 </l10n>

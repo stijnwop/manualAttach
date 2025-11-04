@@ -8,7 +8,7 @@ build:
     ignore:
         - .git
         - .idea
-    outputName: FS22_manualAttach
+    outputName: FS25_manualAttach
     cleanOutput: true
     code: src/
     outputTextures:

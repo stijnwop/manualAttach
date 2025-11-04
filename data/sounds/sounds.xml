@@ -1,9 +1,9 @@
 <vehicle>
     <sounds>
-        <hosesAttach template="ATTACH_01" file="data/sounds/hoses_attach.wav">
+        <hosesAttach template="hydraulicHosesAttach" file="data/sounds/hoses_attach.wav">
             <volume indoor="0.40" outdoor="1" />
         </hosesAttach>
-        <ptoAttach template="ATTACH_01" file="data/sounds/pto_attach.wav">
+        <ptoAttach template="generalConnection" file="data/sounds/pto_attach.wav">
             <volume indoor="0.40" outdoor="1" />
         </ptoAttach>
     </sounds>

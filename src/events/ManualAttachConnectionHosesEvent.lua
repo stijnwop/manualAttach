@@ -6,7 +6,7 @@
 -- Name: ManualAttachConnectionHosesEvent
 -- Hide: yes
 --
--- Copyright (c) Wopster, 2021
+-- Copyright (c) Wopster, 2025
 
 ---@class ManualAttachConnectionHosesEvent
 ---@field public manualAttach ManualAttach
@@ -14,18 +14,27 @@ ManualAttachConnectionHosesEvent = {}
 
 local ManualAttachConnectionHosesEvent_mt = Class(ManualAttachConnectionHosesEvent, Event)
 
-InitEventClass(ManualAttachConnectionHosesEvent, 'ManualAttachConnectionHosesEvent')
+type ManualAttachConnectionHosesEventData = {
+    manualAttach: ManualAttach,
 
----@return ManualAttachConnectionHosesEvent
-function ManualAttachConnectionHosesEvent.emptyNew()
+    vehicle: Vehicle,
+    object: Vehicle,
+    doAttach: boolean,
+}
+
+export type ManualAttachConnectionHosesEvent = typeof(setmetatable({} :: ManualAttachConnectionHosesEventData, ManualAttachConnectionHosesEvent_mt))
+
+InitEventClass(ManualAttachConnectionHosesEvent, "ManualAttachConnectionHosesEvent")
+
+function ManualAttachConnectionHosesEvent.emptyNew(): ManualAttachConnectionHosesEvent
     local self = Event.new(ManualAttachConnectionHosesEvent_mt)
 
-    self.manualAttach = g_currentMission.manualAttach
+    self.manualAttach = g_manualAttach
 
     return self
 end
 
-function ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach)
+function ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach): ManualAttachConnectionHosesEvent
     local self = ManualAttachConnectionHosesEvent.emptyNew()
 
     self.vehicle = vehicle
@@ -35,13 +44,13 @@ function ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach)
     return self
 end
 
-function ManualAttachConnectionHosesEvent:writeStream(streamId, connection)
+function ManualAttachConnectionHosesEvent:writeStream(streamId, connection): ()
     NetworkUtil.writeNodeObject(streamId, self.vehicle)
     NetworkUtil.writeNodeObject(streamId, self.object)
     streamWriteBool(streamId, self.doAttach)
 end
 
-function ManualAttachConnectionHosesEvent:readStream(streamId, connection)
+function ManualAttachConnectionHosesEvent:readStream(streamId, connection): ()
     self.vehicle = NetworkUtil.readNodeObject(streamId)
     self.object = NetworkUtil.readNodeObject(streamId)
     self.doAttach = streamReadBool(streamId)
@@ -49,7 +58,9 @@ function ManualAttachConnectionHosesEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
-function ManualAttachConnectionHosesEvent:run(connection)
+function ManualAttachConnectionHosesEvent:run(connection): ()
+    local self = self :: ManualAttachConnectionHosesEvent
+
     if self.doAttach then
         self.manualAttach:attachConnectionHoses(self.vehicle, self.object, true)
     else
@@ -61,7 +72,7 @@ function ManualAttachConnectionHosesEvent:run(connection)
     end
 end
 
-function ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, doAttach, noEventSend)
+function ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, doAttach, noEventSend): ()
     if noEventSend == nil or not noEventSend then
         if g_server ~= nil then
             g_server:broadcastEvent(ManualAttachConnectionHosesEvent.new(vehicle, object, doAttach), nil, nil, vehicle)

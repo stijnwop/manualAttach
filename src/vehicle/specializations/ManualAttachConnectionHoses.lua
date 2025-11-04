@@ -6,38 +6,41 @@
 -- Name: ManualAttachConnectionHoses
 -- Hide: yes
 --
--- Copyright (c) Wopster, 2021
+-- Copyright (c) Wopster
 
 ---@class ManualAttachConnectionHoses
 ManualAttachConnectionHoses = {}
+
 ManualAttachConnectionHoses.TYPE_ELECTRIC = "electric"
 ManualAttachConnectionHoses.TYPE_HYDRAULIC = "hydraulic"
 ManualAttachConnectionHoses.TYPE_AIR = "air"
 ManualAttachConnectionHoses.TYPE_ISOBUS = "isobus"
 
-ManualAttachConnectionHoses.TYPES = {
+ManualAttachConnectionHoses.ALL_TYPES = table.freeze({
+    ManualAttachConnectionHoses.TYPE_ELECTRIC,
+    ManualAttachConnectionHoses.TYPE_HYDRAULIC,
+    ManualAttachConnectionHoses.TYPE_AIR,
+    ManualAttachConnectionHoses.TYPE_ISOBUS,
+})
+
+ManualAttachConnectionHoses.TYPES = table.freeze({
     [ManualAttachConnectionHoses.TYPE_ELECTRIC] = 1,
     [ManualAttachConnectionHoses.TYPE_HYDRAULIC] = 2,
-    [ManualAttachConnectionHoses.TYPE_AIR] = 2,
-    [ManualAttachConnectionHoses.TYPE_ISOBUS] = 3,
-}
+    [ManualAttachConnectionHoses.TYPE_AIR] = 3,
+    [ManualAttachConnectionHoses.TYPE_ISOBUS] = 4,
+})
 
-ManualAttachConnectionHoses.TYPES_TO_INTERNAL = {
-    [ManualAttachConnectionHoses.TYPE_HYDRAULIC] = {
-        ["HYDRAULICIN"] = true,
-        ["HYDRAULICOUT"] = true
-    },
-    [ManualAttachConnectionHoses.TYPE_AIR] = {
-        ["AIRDOUBLERED"] = true,
-        ["AIRDOUBLEYELLOW"] = true
-    },
-    [ManualAttachConnectionHoses.TYPE_ELECTRIC] = {
-        ["ELECTRIC"] = true
-    },
-    [ManualAttachConnectionHoses.TYPE_ISOBUS] = {
-        ["ISOBUS"] = true
-    }
-}
+local TYPES_TO_INTERNAL_HYDRAULIC = { HYDRAULICIN = true, HYDRAULICOUT = true }
+local TYPES_TO_INTERNAL_AIR = { AIRDOUBLERED = true, AIRDOUBLEYELLOW = true }
+local TYPES_TO_INTERNAL_ELECTRIC = { ELECTRIC = true }
+local TYPES_TO_INTERNAL_ISOBUS = { ISOBUS = true }
+
+ManualAttachConnectionHoses.TYPES_TO_INTERNAL = table.freeze({
+    [ManualAttachConnectionHoses.TYPE_HYDRAULIC] = table.freeze(TYPES_TO_INTERNAL_HYDRAULIC),
+    [ManualAttachConnectionHoses.TYPE_AIR] = table.freeze(TYPES_TO_INTERNAL_AIR),
+    [ManualAttachConnectionHoses.TYPE_ELECTRIC] = table.freeze(TYPES_TO_INTERNAL_ELECTRIC),
+    [ManualAttachConnectionHoses.TYPE_ISOBUS] = table.freeze(TYPES_TO_INTERNAL_ISOBUS),
+})
 
 function ManualAttachConnectionHoses.prerequisitesPresent(specializations)
     return SpecializationUtil.hasSpecialization(ConnectionHoses, specializations)
@@ -45,7 +48,11 @@ end
 
 function ManualAttachConnectionHoses.initSpecialization()
     local schemaSavegame = Vehicle.xmlSchemaSavegame
-    schemaSavegame:register(XMLValueType.BOOL, ("vehicles.vehicle(?).%s.manualAttachConnectionHoses#hasAttachedConnectionHoses"):format(g_manualAttachModName), "State of initial connection hoses")
+    schemaSavegame:register(
+        XMLValueType.BOOL,
+        ("vehicles.vehicle(?).%s.manualAttachConnectionHoses#hasAttachedConnectionHoses"):format(g_manualAttachModName),
+        "State of initial connection hoses"
+    )
 end
 
 function ManualAttachConnectionHoses.registerFunctions(vehicleType)
@@ -68,11 +75,12 @@ function ManualAttachConnectionHoses.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldAllowed", ManualAttachConnectionHoses.inj_getIsFoldAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsMovingToolActive", ManualAttachConnectionHoses.inj_getIsMovingToolActive)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachConnectionHoses.inj_getCanBeTurnedOn)
-    -- Todo: bugs on planters..
-    --SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getAllowsLowering", ManualAttachConnectionHoses.inj_getAllowsLowering)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsFoldMiddleAllowed", ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "canFoldRidgeMarker", ManualAttachConnectionHoses.inj_canFoldRidgeMarker)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToObject", ManualAttachConnectionHoses.inj_getCanDischargeToObject)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToGround", ManualAttachConnectionHoses.inj_getCanDischargeToGround)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanChangePickupState", ManualAttachConnectionHoses.inj_getCanChangePickupState)
 end
 
 function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
@@ -86,22 +94,25 @@ function ManualAttachConnectionHoses.registerEventListeners(vehicleType)
 end
 
 function ManualAttachConnectionHoses:onLoad(savegame)
-    self.spec_manualAttachConnectionHoses = ManualAttachUtil.getSpecTable(self, "manualAttachConnectionHoses")
+    self.spec_manualAttachConnectionHoses = self[`spec_{g_manualAttachModName}.manualAttachConnectionHoses`]
+
     local spec = self.spec_manualAttachConnectionHoses
 
     spec.hoseStateChanged = false
     spec.attachedHosesByType = {
-        [ManualAttachConnectionHoses.TYPE_ELECTRIC] = false,
-        [ManualAttachConnectionHoses.TYPE_AIR] = false,
-        [ManualAttachConnectionHoses.TYPE_HYDRAULIC] = false
+        [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_ELECTRIC]] = false,
+        [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_AIR]] = false,
+        [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_HYDRAULIC]] = false,
+        [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_ISOBUS]] = false,
     }
 
     if self.isClient then
         spec.samples = {}
 
-        local sampleAttach = g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachHoses", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        local sampleAttach =
+            g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachHoses", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttach == nil then
-            sampleAttach = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.hosesAttach, self.components[1].node, self)
+            sampleAttach = g_soundManager:cloneSample(g_manualAttach.samples.hosesAttach, self.components[1].node, self)
         end
 
         spec.samples.attach = sampleAttach
@@ -115,8 +126,8 @@ function ManualAttachConnectionHoses:onPostLoad(savegame)
     spec.isBlockingInitialHoseDetach = false -- always block detach because we don't have attached hoses at first load.
 
     if savegame ~= nil then
-        local key = savegame.key .. "." .. g_currentMission.manualAttach.modName
-        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getValue(key .. ".manualAttachConnectionHoses#hasAttachedConnectionHoses") or false
+        local key = `{savegame.key}.{g_manualAttachModName}.manualAttachConnectionHoses`
+        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getValue(key .. "#hasAttachedConnectionHoses") or false
     end
 end
 
@@ -163,8 +174,8 @@ function ManualAttachConnectionHoses:saveToXMLFile(xmlFile, key, usedModNames)
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
 
-        if attacherVehicle ~= nil and ManualAttachUtil.hasConnectionHoses(self, attacherVehicle) then
-            xmlFile:setValue(key .. "#hasAttachedConnectionHoses", ManualAttachUtil.hasAttachedConnectionHoses(self))
+        if attacherVehicle ~= nil and ConnectionHosesExtension.hasConnectionHoses(self, attacherVehicle) then
+            xmlFile:setValue(key .. "#hasAttachedConnectionHoses", ConnectionHosesExtension.hasAttachedConnectionHoses(self))
         end
     end
 end
@@ -177,7 +188,6 @@ function ManualAttachConnectionHoses:onPostUpdateTick(dt)
 
     if self.isServer then
         if self:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_ELECTRIC) then
-
             if spec.doLightsUpdate then
                 self:toggleLightStates(true, false)
                 spec.doLightsUpdate = false
@@ -186,8 +196,10 @@ function ManualAttachConnectionHoses:onPostUpdateTick(dt)
     end
 
     if self.finishedFirstUpdate and spec.hoseStateChanged then
-        for type, _ in pairs(ManualAttachConnectionHoses.TYPES) do
-            spec.attachedHosesByType[type] = self:isHoseAttached(type)
+        for i = 1, #ManualAttachConnectionHoses.ALL_TYPES do
+            local type = ManualAttachConnectionHoses.ALL_TYPES[i]
+            local typeIndex = ManualAttachConnectionHoses.TYPES[type]
+            spec.attachedHosesByType[typeIndex] = self:isHoseAttached(type)
         end
 
         spec.hoseStateChanged = false
@@ -207,21 +219,19 @@ function ManualAttachConnectionHoses:isHoseAttached(type)
 
     local attacherVehicle = self:getAttacherVehicle()
     if attacherVehicle ~= nil then
-        if not ManualAttachUtil.hasConnectionHoses(self, attacherVehicle, type) then
+        if not ConnectionHosesExtension.hasConnectionHoses(self, attacherVehicle, type) then
             return true
         end
     end
 
-    return ManualAttachUtil.hasAttachedConnectionHoses(self, type)
+    return ConnectionHosesExtension.hasAttachedConnectionHoses(self, type)
 end
 
 ---Returns true if hoses are attached, false otherwise.
 function ManualAttachConnectionHoses:hasAttachedHoses()
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
-        if attacherVehicle ~= nil
-            and attacherVehicle.hasAttachedHoses ~= nil
-            and not attacherVehicle:hasAttachedHoses() then
+        if attacherVehicle ~= nil and attacherVehicle.hasAttachedHoses ~= nil and not attacherVehicle:hasAttachedHoses() then
             return false
         end
     end
@@ -232,8 +242,8 @@ function ManualAttachConnectionHoses:hasAttachedHoses()
         return true
     end
 
-    for _, isAttached in pairs(spec.attachedHosesByType) do
-        if isAttached then
+    for i = 1, #spec.attachedHosesByType do
+        if spec.attachedHosesByType[i] then
             return true
         end
     end
@@ -251,9 +261,7 @@ function ManualAttachConnectionHoses:hasAttachedHosesOfType(type)
 
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
-        if attacherVehicle ~= nil
-            and attacherVehicle.hasAttachedHosesOfType ~= nil
-            and not attacherVehicle:hasAttachedHosesOfType(type) then
+        if attacherVehicle ~= nil and attacherVehicle.hasAttachedHosesOfType ~= nil and not attacherVehicle:hasAttachedHosesOfType(type) then
             return false
         end
     end
@@ -264,7 +272,8 @@ function ManualAttachConnectionHoses:hasAttachedHosesOfType(type)
         return true
     end
 
-    return spec.attachedHosesByType[type]
+    local typeIndex = ManualAttachConnectionHoses.TYPES[type]
+    return spec.attachedHosesByType[typeIndex]
 end
 
 ---Toggles the lights states.
@@ -280,9 +289,10 @@ function ManualAttachConnectionHoses:toggleLightStates(isActive, noEventSend)
         self:deactivateLights()
     else
         local rootVehicle = self:getRootVehicle()
-        self:setLightsTypesMask(rootVehicle.spec_lights.lightsTypesMask, true, noEventSend)
-        self:setBeaconLightsVisibility(rootVehicle.spec_lights.beaconLightsActive, true, noEventSend)
-        self:setTurnLightState(rootVehicle.spec_lights.turnLightState, true, noEventSend)
+        local rootSpec = rootVehicle.spec_lights
+        self:setLightsTypesMask(rootSpec.lightsTypesMask, true, noEventSend)
+        self:setBeaconLightsVisibility(rootSpec.beaconLightsActive, true, noEventSend)
+        self:setTurnLightState(rootSpec.turnLightState, true, noEventSend)
     end
 end
 
@@ -296,22 +306,18 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
         self:toggleLightStates(false, true)
 
         local inputJointDescIndex = self:getActiveInputAttacherJointDescIndex()
-        local hoses = self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
-
-        for _, hose in ipairs(hoses) do
+        for _, hose in self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex) do
             self:disconnectHose(hose)
         end
 
         for i = #spec.updateableHoses, 1, -1 do
             local hose = spec.updateableHoses[i]
-
             if hose.connectedObject == attacherVehicle then
                 self:disconnectHose(hose)
             end
         end
 
         local attacherVehicleSpec = attacherVehicle.spec_connectionHoses
-
         if attacherVehicleSpec ~= nil then
             for _, toolConnector in pairs(attacherVehicleSpec.toolConnectorHoses) do
                 if toolConnector.delayedMounting ~= nil and toolConnector.delayedMounting.sourceObject == self then
@@ -320,27 +326,23 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle)
             end
         end
 
-        local customHoses = spec.customHosesByInputAttacher[inputJointDescIndex]
-        if customHoses ~= nil then
-            for i = 1, #customHoses do
-                local customHose = customHoses[i]
+        local function disconnectCustom(customTable, isByTarget)
+            if not customTable then
+                return
+            end
 
-                if customHose.isActive then
-                    self:disconnectCustomHoseNode(customHose, customHose.connectedTarget)
+            for i = 1, #customTable do
+                local custom = customTable[i]
+                if custom.isActive then
+                    local hose = isByTarget and custom.connectedHose or custom
+                    local target = isByTarget and custom or custom.connectedTarget
+                    self:disconnectCustomHoseNode(hose, target)
                 end
             end
         end
 
-        local customTargets = spec.customHoseTargetsByInputAttacher[inputJointDescIndex]
-        if customTargets ~= nil then
-            for i = 1, #customTargets do
-                local customTarget = customTargets[i]
-
-                if customTarget.isActive then
-                    self:disconnectCustomHoseNode(customTarget.connectedHose, customTarget)
-                end
-            end
-        end
+        disconnectCustom(spec.customHosesByInputAttacher[inputJointDescIndex], false)
+        disconnectCustom(spec.customHoseTargetsByInputAttacher[inputJointDescIndex], true)
     end
 
     self.spec_manualAttachConnectionHoses.hoseStateChanged = true
@@ -369,9 +371,7 @@ end
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachConnectionHoses
 
-    if not spec.isBlockingInitialHoseDetach
-        and g_currentMission.manualAttach.isEnabled
-        and not self:getIsAIActive() then
+    if not spec.isBlockingInitialHoseDetach and not self:getIsAIActive() then
         self:disconnectHoses(attacherVehicle)
     else
         spec.isBlockingInitialHoseDetach = false
@@ -390,7 +390,6 @@ function ManualAttachConnectionHoses.inj_connectHosesToAttacherVehicle(vehicle, 
         vehicle.spec_manualAttachConnectionHoses.hoseStateChanged = true
         vehicle:raiseActive()
     end
-
 end
 
 function ManualAttachConnectionHoses.inj_setLightsTypesMask(vehicle, superFunc, lightsTypesMask, force, noEventSend)
@@ -467,6 +466,14 @@ function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
     return superFunc(vehicle)
 end
 
+function ManualAttachConnectionHoses.inj_getAllowsLowering(vehicle, superFunc)
+    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+        return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
+    end
+
+    return superFunc(vehicle)
+end
+
 function ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed(vehicle, superFunc)
     if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
         return false
@@ -484,8 +491,10 @@ function ManualAttachConnectionHoses.inj_canFoldRidgeMarker(vehicle, superFunc, 
 end
 
 function ManualAttachConnectionHoses.inj_getCanDischargeToObject(vehicle, superFunc, dischargeNode)
-    if vehicle.spec_shovel == nil -- dismiss shovels
-        and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+    if
+        vehicle.spec_shovel == nil -- dismiss shovels
+        and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC)
+    then
         return false
     end
 
@@ -493,10 +502,20 @@ function ManualAttachConnectionHoses.inj_getCanDischargeToObject(vehicle, superF
 end
 
 function ManualAttachConnectionHoses.inj_getCanDischargeToGround(vehicle, superFunc, dischargeNode)
-    if vehicle.spec_shovel == nil -- dismiss shovels
-        and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+    if
+        vehicle.spec_shovel == nil -- dismiss shovels
+        and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC)
+    then
         return false
     end
 
     return superFunc(vehicle, dischargeNode)
+end
+
+function ManualAttachConnectionHoses.inj_getCanChangePickupState(vehicle, superFunc, spec, newState)
+    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+        return false
+    end
+
+    return superFunc(vehicle, spec, newState)
 end

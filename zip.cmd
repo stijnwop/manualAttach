@@ -1,4 +1,4 @@
-SET filename="FS22_manualAttach.zip"
+SET filename="FS25_manualAttach.zip"
 
 IF EXIST %filename% (
     DEL  %filename% > NUL

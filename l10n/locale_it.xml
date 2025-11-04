@@ -19,10 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Scollega prima i tubi di %s"/>
         <text name="info_attach_hoses_warning" text="Collega prima i tubi di %s"/>
-
-        <!-- Todo: gui translations -->
-        <text name="title_manualAttach" text="Collegamento manuale"/>
-        <text name="setting_manualAttach" text="Collegamento manuale"/>
-        <text name="toolTip_manualAttach" text="Se è necessario eseguire o meno azioni manuali per collegare/scollegare l'attrezzo."/>
     </texts>
 </l10n>

@@ -6,25 +6,25 @@
 -- Name: ManualAttachVehicle
 -- Hide: yes
 --
--- Copyright (c) Wopster, 2021
+-- Copyright (c) Wopster
 
 ---@class ManualAttachVehicle
 ManualAttachVehicle = {}
 
-function ManualAttachVehicle.prerequisitesPresent(specializations)
+function ManualAttachVehicle.prerequisitesPresent(specializations): boolean
     return SpecializationUtil.hasSpecialization(AttacherJoints, specializations)
 end
 
-function ManualAttachVehicle.registerOverwrittenFunctions(vehicleType)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachVehicle.getCanToggleAttach)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadAttacherJointFromXML", ManualAttachVehicle.loadAttacherJointFromXML)
+function ManualAttachVehicle.registerOverwrittenFunctions(vehicleType): ()
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachVehicle.inj_getCanToggleAttach)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadAttacherJointFromXML", ManualAttachVehicle.inj_loadAttacherJointFromXML)
 end
 
-function ManualAttachVehicle.registerEventListeners(vehicleType)
+function ManualAttachVehicle.registerEventListeners(vehicleType): ()
     SpecializationUtil.registerEventListener(vehicleType, "onDelete", ManualAttachVehicle)
 end
 
-function ManualAttachVehicle:onDelete()
+function ManualAttachVehicle:onDelete(): ()
     local spec = self.spec_attacherJoints
     if self.isClient then
         for _, jointDesc in pairs(spec.attacherJoints) do
@@ -34,23 +34,23 @@ function ManualAttachVehicle:onDelete()
     end
 end
 
-
 ---
---- Injections.
+--- Injections
 ---
 
 ---Checks whether or not the vehicle can perform an attach.
-function ManualAttachVehicle:getCanToggleAttach(superFunc)
-    local canOperateManually = g_currentMission.manualAttach:canOperate()
-    if canOperateManually then
-        return g_currentMission.manualAttach:canHandleCurrentVehicle()
+function ManualAttachVehicle:inj_getCanToggleAttach(superFunc): boolean
+    local manualAttach: ManualAttach = g_manualAttach
+    local isManualControl = manualAttach:isPlayerControllingVehicle()
+    if isManualControl then
+        return manualAttach:isCurrentVehicleManual()
     end
 
-    return not canOperateManually and superFunc(self)
+    return not isManualControl and superFunc(self)
 end
 
 ---Load hose and pto samples on the attacherJoint.
-function ManualAttachVehicle:loadAttacherJointFromXML(superFunc, attacherJoint, xmlFile, baseName, index)
+function ManualAttachVehicle:inj_loadAttacherJointFromXML(superFunc, attacherJoint, xmlFile, baseName, index): boolean
     if not superFunc(self, attacherJoint, xmlFile, baseName, index) then
         return false
     end
@@ -58,14 +58,14 @@ function ManualAttachVehicle:loadAttacherJointFromXML(superFunc, attacherJoint, 
     if self.isClient then
         local sampleAttachHoses = g_soundManager:loadSampleFromXML(xmlFile, baseName, "attachHoses", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttachHoses == nil then
-            sampleAttachHoses = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.hosesAttach, attacherJoint.jointTransform, self)
+            sampleAttachHoses = g_soundManager:cloneSample(g_manualAttach.samples.hosesAttach, attacherJoint.jointTransform, self)
         end
 
         attacherJoint.sampleAttachHoses = sampleAttachHoses
 
         local sampleAttachPto = g_soundManager:loadSampleFromXML(xmlFile, baseName, "attachPto", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttachPto == nil then
-            sampleAttachPto = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.ptoAttach, attacherJoint.jointTransform, self)
+            sampleAttachPto = g_soundManager:cloneSample(g_manualAttach.samples.ptoAttach, attacherJoint.jointTransform, self)
         end
 
         attacherJoint.sampleAttachPto = sampleAttachPto

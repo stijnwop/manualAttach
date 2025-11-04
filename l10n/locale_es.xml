@@ -19,10 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Desengachar mangueras de %s primero"/>
         <text name="info_attach_hoses_warning" text="Enganchar mangueras de %s primero"/>
-
-        <!-- Todo: gui translations -->
-        <text name="title_manualAttach" text="Manual Attach"/>
-        <text name="setting_manualAttach" text="Manual attaching"/>
-        <text name="toolTip_manualAttach" text="Whether or not you need to perform manual actions to attach/detach the implement."/>
     </texts>
 </l10n>

@@ -19,9 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Сначала отсоедините шланги от %s"/>
         <text name="info_attach_hoses_warning" text="Сначала присоедините шланги к %s"/>
-
-        <text name="title_manualAttach" text="Ручная сцепка"/>
-        <text name="setting_manualAttach" text="Ручное сцепление агрегатов"/>
-        <text name="toolTip_manualAttach" text="Нужно или нет вам выполнять ручные действия для сцепливания / расцепливания агрегатов."/>
     </texts>
 </l10n>

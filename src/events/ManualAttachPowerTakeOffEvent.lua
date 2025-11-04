@@ -6,26 +6,34 @@
 -- Name: ManualAttachPowerTakeOffEvent
 -- Hide: yes
 --
--- Copyright (c) Wopster, 2021
+-- Copyright (c) Wopster
 
 ---@class ManualAttachPowerTakeOffEvent
----@field public manualAttach ManualAttach
 ManualAttachPowerTakeOffEvent = {}
 
 local ManualAttachPowerTakeOffEvent_mt = Class(ManualAttachPowerTakeOffEvent, Event)
 
-InitEventClass(ManualAttachPowerTakeOffEvent, 'ManualAttachPowerTakeOffEvent')
+type ManualAttachPowerTakeOffEventData = {
+    manualAttach: ManualAttach,
 
----@return ManualAttachPowerTakeOffEvent
-function ManualAttachPowerTakeOffEvent.emptyNew()
+    vehicle: Vehicle,
+    object: Vehicle,
+    doAttach: boolean,
+}
+
+export type ManualAttachPowerTakeOffEvent = typeof(setmetatable({} :: ManualAttachPowerTakeOffEventData, ManualAttachPowerTakeOffEvent_mt))
+
+InitEventClass(ManualAttachPowerTakeOffEvent, "ManualAttachPowerTakeOffEvent")
+
+function ManualAttachPowerTakeOffEvent.emptyNew(): ManualAttachPowerTakeOffEvent
     local self = Event.new(ManualAttachPowerTakeOffEvent_mt)
 
-    self.manualAttach = g_currentMission.manualAttach
+    self.manualAttach = g_manualAttach
 
     return self
 end
 
-function ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach)
+function ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach): ManualAttachPowerTakeOffEvent
     local self = ManualAttachPowerTakeOffEvent.emptyNew()
 
     self.vehicle = vehicle
@@ -35,13 +43,13 @@ function ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach)
     return self
 end
 
-function ManualAttachPowerTakeOffEvent:writeStream(streamId, connection)
+function ManualAttachPowerTakeOffEvent:writeStream(streamId, connection): ()
     NetworkUtil.writeNodeObject(streamId, self.vehicle)
     NetworkUtil.writeNodeObject(streamId, self.object)
     streamWriteBool(streamId, self.doAttach)
 end
 
-function ManualAttachPowerTakeOffEvent:readStream(streamId, connection)
+function ManualAttachPowerTakeOffEvent:readStream(streamId, connection): ()
     self.vehicle = NetworkUtil.readNodeObject(streamId)
     self.object = NetworkUtil.readNodeObject(streamId)
     self.doAttach = streamReadBool(streamId)
@@ -49,7 +57,9 @@ function ManualAttachPowerTakeOffEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
-function ManualAttachPowerTakeOffEvent:run(connection)
+function ManualAttachPowerTakeOffEvent:run(connection): ()
+    local self = self :: ManualAttachPowerTakeOffEvent
+
     if self.doAttach then
         self.manualAttach:attachPowerTakeOff(self.vehicle, self.object, true)
     else
@@ -61,7 +71,7 @@ function ManualAttachPowerTakeOffEvent:run(connection)
     end
 end
 
-function ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, doAttach, noEventSend)
+function ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, doAttach, noEventSend): ()
     if noEventSend == nil or not noEventSend then
         if g_server ~= nil then
             g_server:broadcastEvent(ManualAttachPowerTakeOffEvent.new(vehicle, object, doAttach), nil, nil, vehicle)

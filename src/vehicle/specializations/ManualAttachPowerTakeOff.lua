@@ -6,7 +6,7 @@
 -- Name: ManualAttachPowerTakeOff
 -- Hide: yes
 --
--- Copyright (c) Wopster, 2021
+-- Copyright (c) Wopster
 
 ---@class ManualAttachPowerTakeOff
 ManualAttachPowerTakeOff = {}
@@ -23,7 +23,11 @@ end
 
 function ManualAttachPowerTakeOff.initSpecialization()
     local schemaSavegame = Vehicle.xmlSchemaSavegame
-    schemaSavegame:register(XMLValueType.BOOL, ("vehicles.vehicle(?).%s.manualAttachPowerTakeOff#hasAttachedPowerTakeOffs"):format(g_manualAttachModName), "State of initial blocking PTO detach")
+    schemaSavegame:register(
+        XMLValueType.BOOL,
+        ("vehicles.vehicle(?).%s.manualAttachPowerTakeOff#hasAttachedPowerTakeOffs"):format(g_manualAttachModName),
+        "State of initial blocking PTO detach"
+    )
 end
 
 function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
@@ -42,15 +46,17 @@ function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
 end
 
 function ManualAttachPowerTakeOff:onLoad(savegame)
-    self.spec_manualAttachPowerTakeOff = ManualAttachUtil.getSpecTable(self, "manualAttachPowerTakeOff")
+    self.spec_manualAttachPowerTakeOff = self[`spec_{g_manualAttachModName}.manualAttachPowerTakeOff`]
+
     local spec = self.spec_manualAttachPowerTakeOff
 
     if self.isClient then
         spec.samples = {}
 
-        local sampleAttach = g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachPto", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        local sampleAttach =
+            g_soundManager:loadSampleFromXML(self.xmlFile, "vehicle.attacherJoints.sounds", "attachPto", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         if sampleAttach == nil then
-            sampleAttach = g_soundManager:cloneSample(g_currentMission.manualAttach.samples.ptoAttach, self.components[1].node, self)
+            sampleAttach = g_soundManager:cloneSample(g_manualAttach.samples.ptoAttach, self.components[1].node, self)
         end
 
         spec.samples.attach = sampleAttach
@@ -62,8 +68,8 @@ function ManualAttachPowerTakeOff:onPostLoad(savegame)
     spec.isBlockingInitialPtoDetach = false -- always block detach because we don't have an attached PTO at first load.
 
     if savegame ~= nil then
-        local key = savegame.key .. "." .. g_currentMission.manualAttach.modName
-        spec.isBlockingInitialPtoDetach = savegame.xmlFile:getValue(key .. ".manualAttachPowerTakeOff#hasAttachedPowerTakeOffs")
+        local key = `{savegame.key}.{g_manualAttachModName}.manualAttachPowerTakeOff`
+        spec.isBlockingInitialPtoDetach = savegame.xmlFile:getValue(key .. "#hasAttachedPowerTakeOffs")
     end
 end
 
@@ -109,8 +115,8 @@ function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
 
-        if attacherVehicle ~= nil and ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
-            xmlFile:setValue(key .. "#hasAttachedPowerTakeOffs", ManualAttachUtil.hasAttachedPowerTakeOffs(self, attacherVehicle))
+        if attacherVehicle ~= nil and PowerTakeOffExtension.hasPowerTakeOffs(self, attacherVehicle) then
+            xmlFile:setValue(key .. "#hasAttachedPowerTakeOffs", PowerTakeOffExtension.hasAttachedPowerTakeOffs(self, attacherVehicle))
         end
     end
 end
@@ -121,11 +127,11 @@ function ManualAttachPowerTakeOff:isPtoAttached()
         local attacherVehicle = self:getAttacherVehicle()
 
         if attacherVehicle ~= nil then
-            if not ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
+            if not PowerTakeOffExtension.hasPowerTakeOffs(self, attacherVehicle) then
                 return true
             end
 
-            return ManualAttachUtil.hasAttachedPowerTakeOffs(self, attacherVehicle)
+            return PowerTakeOffExtension.hasAttachedPowerTakeOffs(self, attacherVehicle)
         end
     end
 
@@ -133,12 +139,10 @@ function ManualAttachPowerTakeOff:isPtoAttached()
 end
 
 ---Handles post attach in a function.
----@param jointDescIndex number
 function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
     local spec = self.spec_powerTakeOffs
     for i = #spec.delayedPowerTakeOffsMountings, 1, -1 do
         local delayedMounting = spec.delayedPowerTakeOffsMountings[i]
-
         if delayedMounting.jointDescIndex == jointDescIndex then
             local input = delayedMounting.input
             local output = delayedMounting.output
@@ -147,8 +151,8 @@ function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
                 input.attachFunc(self, input, output)
             end
 
-            ObjectChangeUtil.setObjectChanges(input.objectChanges, true)
-            ObjectChangeUtil.setObjectChanges(output.objectChanges, true)
+            ObjectChangeUtil.setObjectChanges(input.objectChanges, true, self, self.setMovingToolDirty)
+            ObjectChangeUtil.setObjectChanges(output.objectChanges, true, self, self.setMovingToolDirty)
 
             table.remove(spec.delayedPowerTakeOffsMountings, i)
         end
@@ -171,20 +175,13 @@ function ManualAttachPowerTakeOff:playPtoAttachSound(jointDesc)
 end
 
 ---Called on post attach event.
----@param attacherVehicle table
----@param inputJointDescIndex number
----@param jointDescIndex number
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
     local spec = self.spec_manualAttachPowerTakeOff
 
-    if not spec.isBlockingInitialPtoDetach
-        and g_currentMission.manualAttach.isEnabled
-        and not self:getIsAIActive() then
+    if not spec.isBlockingInitialPtoDetach and not self:getIsAIActive() then
         if attacherVehicle.detachPowerTakeOff ~= nil then
-            if ManualAttachUtil.hasPowerTakeOffs(self, attacherVehicle) then
-                local implement = attacherVehicle:getImplementByObject(self)
-                attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
-            end
+            local implement = attacherVehicle:getImplementByObject(self)
+            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
         end
     else
         spec.isBlockingInitialPtoDetach = false
@@ -192,7 +189,7 @@ function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIn
 end
 
 ---
---- Injections.
+--- Injections
 ---
 
 function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)

@@ -19,9 +19,5 @@
 
         <text name="info_detach_hoses_warning" text="Retire primeiro as mangueiras de %s"/>
         <text name="info_attach_hoses_warning" text="Acople primeiro as mangueiras de %s"/>
-
-        <text name="title_manualAttach" text="Modo Acopolamento"/>
-        <text name="setting_manualAttach" text="Acopolamento manual"/>
-        <text name="toolTip_manualAttach" text="Se precisa ou não de executar ações manuais para acoplar/desacoplar o implemento."/>
     </texts>
 </l10n>
