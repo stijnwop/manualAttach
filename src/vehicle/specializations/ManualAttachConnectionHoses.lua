@@ -134,7 +134,7 @@ end
 function ManualAttachConnectionHoses:onDelete()
     local spec = self.spec_manualAttachConnectionHoses
 
-    if self.isClient then
+    if self.isClient and spec.samples ~= nil then
         g_soundManager:deleteSample(spec.samples.attach)
     end
 end
