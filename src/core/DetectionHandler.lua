@@ -90,17 +90,144 @@ function DetectionHandler:cleanupStaleVehicles(): ()
         local isNotLastDetected = vehicle ~= self.lastDetectedVehicle
 
         if timeSinceLeave > DetectionHandler.CLEAR_TIME_THRESHOLD and isNotLastDetected then
-            local index = table.find(self.detectedVehicles, vehicle)
-            if index ~= nil then
-                table.remove(self.detectedVehicles, index)
-                vehiclesRemoved = true
-            end
+            if not self:isVehicleStillInRange(vehicle) then
+                local index = table.find(self.detectedVehicles, vehicle)
+                if index ~= nil then
+                    table.remove(self.detectedVehicles, index)
+                    vehiclesRemoved = true
+                end
 
-            self.vehicleLeaveTimes[vehicle] = nil -- GC
+                self.vehicleLeaveTimes[vehicle] = nil -- GC
+            end
         end
     end
 
     if vehiclesRemoved then
+        self:onDetectedVehiclesChanged(self.detectedVehicles)
+    end
+end
+
+function DetectionHandler:isVehicleStillInRange(vehicle: Vehicle): boolean
+    if self.triggerNode == nil or vehicle == nil or vehicle.rootNode == nil then
+        return false
+    end
+
+    local x, y, z = getWorldTranslation(self.triggerNode)
+    local rx, ry, rz = getWorldRotation(self.triggerNode)
+
+    local width, height, length = 1, 1, 1
+
+    self.overlapCheckVehicle = vehicle
+    self.vehicleFoundInOverlap = false
+
+    overlapBox(x, y, z, rx, ry, rz, width, height, length, "vehicleOverlapCallback", self, CollisionFlag.VEHICLE, true, false, true)
+
+    local foundInOverlap = self.vehicleFoundInOverlap
+    self.overlapCheckVehicle = nil
+    self.vehicleFoundInOverlap = false
+
+    if foundInOverlap then
+        self.lastDetectedTime = self.mission.time
+    end
+
+    return foundInOverlap
+end
+
+function DetectionHandler:vehicleOverlapCallback(transformId: number): boolean
+    if transformId == 0 or not getHasClassId(transformId, ClassIds.SHAPE) then
+        return true
+    end
+
+    local nodeVehicle = self.mission:getNodeObject(transformId)
+
+    if not DetectionHandler.canHandleVehicle(nodeVehicle) then
+        return true
+    end
+
+    local isTargetVehicle = nodeVehicle == self.overlapCheckVehicle
+    if isTargetVehicle then
+        self.vehicleFoundInOverlap = true
+        self:detectVehicleWithAttachments(nodeVehicle)
+        return false
+    end
+
+    return true
+end
+
+---Handles detection of a vehicle.
+function DetectionHandler:detectVehicle(vehicle: Vehicle): ()
+    if vehicle == nil then
+        return
+    end
+
+    if table.find(self.detectedVehicles, vehicle) == nil then
+        table.insert(self.detectedVehicles, vehicle)
+    end
+
+    self.vehicleLeaveTimes[vehicle] = self.lastDetectedTime
+end
+
+---Detects a vehicle and all its attached implements and attacher vehicle
+function DetectionHandler:detectVehicleWithAttachments(vehicle: Vehicle): ()
+    if vehicle == nil then
+        return
+    end
+
+    self:detectVehicle(vehicle)
+
+    if vehicle.getAttacherVehicle ~= nil then
+        self:detectVehicle(vehicle:getAttacherVehicle())
+    end
+
+    if vehicle.getAttachedImplements ~= nil then
+        for _, implement in pairs(vehicle:getAttachedImplements()) do
+            if implement.object ~= nil then
+                self:detectVehicle(implement.object)
+            end
+        end
+    end
+end
+
+---Checks if the detected vehicle is valid.
+function DetectionHandler.canHandleVehicle(vehicle: Vehicle): boolean
+    return vehicle ~= nil
+        and vehicle.isa ~= nil
+        and vehicle:isa(Vehicle)
+        and not vehicle:isa(StationCrane)
+        and not SpecializationUtil.hasSpecialization(SplineVehicle, vehicle.specializations)
+        and (SpecializationUtil.hasSpecialization(AttacherJoints, vehicle.specializations) or SpecializationUtil.hasSpecialization(Attachable, vehicle.specializations))
+end
+
+---Checks if the given vehicle has attacherJoints.
+function DetectionHandler.hasAttacherJoints(vehicle: Vehicle): boolean
+    return vehicle.getAttacherJoints ~= nil and next(vehicle:getAttacherJoints()) ~= nil
+end
+
+---Callback when trigger changes state.
+function DetectionHandler:vehicleDetectionCallback(triggerId: number, otherId: number, onEnter: boolean, onLeave: boolean, onStay: boolean): ()
+    if not (onEnter or onLeave) then
+        return
+    end
+
+    local numVehiclesBefore = #self.detectedVehicles
+    local nodeVehicle = self.mission:getNodeObject(otherId)
+
+    if not DetectionHandler.canHandleVehicle(nodeVehicle) then
+        return
+    end
+
+    self.lastDetectedTime = self.mission.time
+
+    -- Only save the last vehicle with attacher joints
+    if DetectionHandler.hasAttacherJoints(nodeVehicle) then
+        self.lastDetectedVehicle = nodeVehicle
+    end
+
+    if onEnter then
+        self:detectVehicleWithAttachments(nodeVehicle)
+    end
+
+    if numVehiclesBefore ~= #self.detectedVehicles then
         self:onDetectedVehiclesChanged(self.detectedVehicles)
     end
 end
@@ -129,19 +256,6 @@ function DetectionHandler:removeDetectionListener(listener: any): ()
             table.remove(self.listeners, index)
         end
     end
-end
-
----Handles detection of a vehicle.
-function DetectionHandler:detectVehicle(vehicle: Vehicle): ()
-    if vehicle == nil then
-        return
-    end
-
-    if table.find(self.detectedVehicles, vehicle) == nil then
-        table.insert(self.detectedVehicles, vehicle)
-    end
-
-    self.vehicleLeaveTimes[vehicle] = self.lastDetectedTime
 end
 
 ---Called when detected vehicles list changes.
@@ -253,61 +367,5 @@ function DetectionHandler:removeTrigger(player: Player, force: boolean?): ()
         self.lastDetectedVehicle = nil
         table.clear(self.detectedVehicles)
         table.clear(self.vehicleLeaveTimes)
-    end
-end
-
----Checks if the detected vehicle is valid.
-function DetectionHandler.canHandleVehicle(vehicle: Vehicle): boolean
-    return vehicle ~= nil
-        and vehicle.isa ~= nil
-        and vehicle:isa(Vehicle)
-        and not vehicle:isa(StationCrane)
-        and not SpecializationUtil.hasSpecialization(SplineVehicle, vehicle.specializations)
-        and (SpecializationUtil.hasSpecialization(AttacherJoints, vehicle.specializations) or SpecializationUtil.hasSpecialization(Attachable, vehicle.specializations))
-end
-
----Checks if the given vehicle has attacherJoints.
-function DetectionHandler.hasAttacherJoints(vehicle: Vehicle): boolean
-    return vehicle.getAttacherJoints ~= nil and next(vehicle:getAttacherJoints()) ~= nil
-end
-
----Callback when trigger changes state.
-function DetectionHandler:vehicleDetectionCallback(triggerId: number, otherId: number, onEnter: boolean, onLeave: boolean, onStay: boolean): ()
-    if not (onEnter or onLeave) then
-        return
-    end
-
-    local numVehiclesBefore = #self.detectedVehicles
-    local nodeVehicle = self.mission:getNodeObject(otherId)
-
-    if not DetectionHandler.canHandleVehicle(nodeVehicle) then
-        return
-    end
-
-    self.lastDetectedTime = self.mission.time
-
-    -- Only save the last vehicle with attacher joints
-    if DetectionHandler.hasAttacherJoints(nodeVehicle) then
-        self.lastDetectedVehicle = nodeVehicle
-    end
-
-    if onEnter then
-        self:detectVehicle(nodeVehicle)
-
-        if nodeVehicle.getAttacherVehicle ~= nil then
-            self:detectVehicle(nodeVehicle:getAttacherVehicle())
-        end
-
-        if nodeVehicle.getAttachedImplements ~= nil then
-            for _, implement in pairs(nodeVehicle:getAttachedImplements()) do
-                if implement.object ~= nil then
-                    self:detectVehicle(implement.object)
-                end
-            end
-        end
-    end
-
-    if numVehiclesBefore ~= #self.detectedVehicles then
-        self:onDetectedVehiclesChanged(self.detectedVehicles)
     end
 end
