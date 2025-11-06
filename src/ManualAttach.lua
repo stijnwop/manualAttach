@@ -132,7 +132,6 @@ function ManualAttach:update(dt: number): ()
         self.vehicleAttachmentHandler:onPlayerCapabilityChanged(player, canPerform)
     end
 
-    --Todo: bug here... somehow its not cleared.
     if not canPerform then
         local controlledVehicle = player:getCurrentVehicle() --!nocheck
         self.vehicleAttachmentHandler:updateControlledVehicle(controlledVehicle)
@@ -160,6 +159,15 @@ end
 ---Returns true when manual attach is enabled and we are controlling a vehicle.
 function ManualAttach:isPlayerControllingVehicle(): boolean
     local player = self:getLocalPlayer()
+
+    if player == nil then
+        return false
+    end
+
+    if player.getCurrentVehicle == nil then
+        return false
+    end
+
     local controlledVehicle = player:getCurrentVehicle()
     return controlledVehicle ~= nil
 end

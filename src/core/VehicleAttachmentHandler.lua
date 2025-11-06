@@ -14,11 +14,11 @@ local VehicleAttachmentHandler_mt = Class(VehicleAttachmentHandler)
 
 VehicleAttachmentHandler.PLAYER_MIN_DISTANCE_SQ = 8
 
-local AXIS_LOOKUP = table.freeze({
-    table.freeze({ 1, 0, 0 }), -- X axis
-    table.freeze({ 0, 1, 0 }), -- Y axis
-    table.freeze({ 0, 0, 1 }), -- Z axis
-})
+local AXIS_LOOKUP = table.freeze {
+    table.freeze { 1, 0, 0 }, -- X axis
+    table.freeze { 0, 1, 0 }, -- Y axis
+    table.freeze { 0, 0, 1 }, -- Z axis
+}
 
 type VehicleAttachmentHandlerData = {
     isServer: boolean,
@@ -221,12 +221,17 @@ end
 function VehicleAttachmentHandler:updateControlledVehicle(vehicle: Vehicle?): ()
     local self = self :: VehicleAttachmentHandler
 
-    if self.controlledVehicle ~= vehicle then
+    -- In controlled context, we always assume the first one as controlled vehicle
+    local firstVehicle = self.detectedVehicles[1]
+
+    if (self.controlledVehicle ~= vehicle) or (self.controlledVehicle ~= nil and firstVehicle ~= self.controlledVehicle) then
         self:resetCandidates()
 
         if vehicle ~= nil and DetectionHandler.canHandleVehicle(vehicle) then
+            self.detectionHandler:clear()
+
             self.controlledVehicle = vehicle
-            self:onVehicleListChanged({ vehicle })
+            self:onVehicleListChanged { vehicle }
         else
             self.controlledVehicle = nil
         end

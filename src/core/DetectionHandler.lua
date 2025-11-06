@@ -24,7 +24,6 @@ type DetectionHandlerData = {
     triggerNode: number?,
     triggerCloneNode: number?,
     lastDetectedTime: number,
-    lastDetectedVehicle: Vehicle?,
     detectedVehicles: { Vehicle },
     vehicleLeaveTimes: { [Vehicle]: number },
     listeners: { any },
@@ -45,7 +44,6 @@ function DetectionHandler.new(mission: BaseMission, modDirectory: string, custom
     self.triggerNode = nil
     self.triggerCloneNode = nil
     self.lastDetectedTime = 0
-    self.lastDetectedVehicle = nil
     self.detectedVehicles = {}
     self.vehicleLeaveTimes = {}
     self.listeners = {}
@@ -87,9 +85,8 @@ function DetectionHandler:cleanupStaleVehicles(): ()
 
     for vehicle, leaveTime in pairs(self.vehicleLeaveTimes) do
         local timeSinceLeave = currentTime - leaveTime
-        local isNotLastDetected = vehicle ~= self.lastDetectedVehicle
 
-        if timeSinceLeave > DetectionHandler.CLEAR_TIME_THRESHOLD and isNotLastDetected then
+        if timeSinceLeave > DetectionHandler.CLEAR_TIME_THRESHOLD then
             if not self:isVehicleStillInRange(vehicle) then
                 local index = table.find(self.detectedVehicles, vehicle)
                 if index ~= nil then
@@ -218,11 +215,6 @@ function DetectionHandler:vehicleDetectionCallback(triggerId: number, otherId: n
 
     self.lastDetectedTime = self.mission.time
 
-    -- Only save the last vehicle with attacher joints
-    if DetectionHandler.hasAttacherJoints(nodeVehicle) then
-        self.lastDetectedVehicle = nodeVehicle
-    end
-
     if onEnter then
         self:detectVehicleWithAttachments(nodeVehicle)
     end
@@ -235,7 +227,6 @@ end
 ---Clears all detection values.
 function DetectionHandler:clear(): ()
     self.lastDetectedTime = 0
-    self.lastDetectedVehicle = nil
     table.clear(self.detectedVehicles)
     table.clear(self.vehicleLeaveTimes)
     self:onDetectedVehiclesChanged(self.detectedVehicles)
@@ -341,10 +332,7 @@ function DetectionHandler:disableTrigger(player: Player): ()
     self:onGhostRemove(self.triggerNode)
     self:onTriggerStateChanged(true)
 
-    self.lastDetectedTime = 0
-    self.lastDetectedVehicle = nil
-    table.clear(self.detectedVehicles)
-    table.clear(self.vehicleLeaveTimes)
+    self:clear()
 end
 
 ---Removes the trigger from the player.
@@ -363,9 +351,6 @@ function DetectionHandler:removeTrigger(player: Player, force: boolean?): ()
         self.triggerNode = nil
         self:onTriggerStateChanged(true)
 
-        self.lastDetectedTime = 0
-        self.lastDetectedVehicle = nil
-        table.clear(self.detectedVehicles)
-        table.clear(self.vehicleLeaveTimes)
+        self:clear()
     end
 end
