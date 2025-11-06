@@ -291,7 +291,7 @@ function DetectionHandler:onPlayerLoad(player: Player): ()
 end
 
 ---Called on player delete.
-function DetectionHandler:onPLayerDelete(player: Player): ()
+function DetectionHandler:onPlayerDelete(player: Player): ()
     self:removeTrigger(player, true)
 end
 
