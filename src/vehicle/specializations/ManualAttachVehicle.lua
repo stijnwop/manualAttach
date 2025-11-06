@@ -17,6 +17,7 @@ end
 
 function ManualAttachVehicle.registerOverwrittenFunctions(vehicleType): ()
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanToggleAttach", ManualAttachVehicle.inj_getCanToggleAttach)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "attachImplementFromInfo", ManualAttachVehicle.inj_attachImplementFromInfo)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadAttacherJointFromXML", ManualAttachVehicle.inj_loadAttacherJointFromXML)
 end
 
@@ -37,6 +38,17 @@ end
 ---
 --- Injections
 ---
+
+---Handles setting the default lowered state for attached implements by vanilla attach events.
+function ManualAttachVehicle:inj_attachImplementFromInfo(superFunc, info)
+    if info.attachable ~= nil then
+        local attacherJoints = info.attacherVehicle.spec_attacherJoints.attacherJoints
+        local jointDesc = attacherJoints[info.attacherVehicleJointDescIndex]
+        attacherJoints[info.attacherVehicleJointDescIndex].isDefaultLowered = info.attachable:getAllowsLowering() and jointDesc.allowsLowering and not info.attachable:getIsFoldMiddleAllowed()
+    end
+
+    return superFunc(self, info)
+end
 
 ---Checks whether or not the vehicle can perform an attach.
 function ManualAttachVehicle:inj_getCanToggleAttach(superFunc): boolean

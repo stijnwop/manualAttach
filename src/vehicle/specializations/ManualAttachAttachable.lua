@@ -43,7 +43,7 @@ function ManualAttachAttachable:inj_isDetachAllowed(superFunc): (boolean, string
                 detachAllowed, warningKey, warningArg = ManualAttach.isDetachAllowedForManualHandling(self, vehicle, jointDesc)
 
                 if not detachAllowed and warningKey then
-                    warning = self.i18n:getText(warningKey):format(warningArg)
+                    warning = g_i18n:getText(warningKey):format(warningArg)
                 end
 
                 return detachAllowed, warning, showWarning

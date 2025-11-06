@@ -36,10 +36,26 @@ local function isDetachAllowed(self: VehicleJointAttachment, implement, vehicle,
     return detachAllowed, warning, showWarning
 end
 
+function handleActivatedOnLoweredObject(implement, spec)
+    if spec ~= nil and spec.activateOnLowering then
+        if implement.setIsTurnedOn ~= nil then
+            implement:setIsTurnedOn(false)
+        else
+            local attacherVehicle = implement:getAttacherVehicle()
+            if attacherVehicle.setIsTurnedOn ~= nil then
+                attacherVehicle:setIsTurnedOn(false)
+            end
+        end
+    end
+end
+
 ---Handles lowering the implement if needed after attachment.
-local function handleLoweringIfNeeded(self: VehicleJointAttachment, vehicle: any, implement: any, jointDesc: any): ()
+local function handleLoweringIfNeeded(self: VehicleJointAttachment, vehicle: any, implement: any, jointDesc: any, jointDescIndex: number, forceLowering: boolean): ()
     if implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed() then
-        vehicle:handleLowerImplementByAttacherJointIndex(jointDesc.jointIndex or jointDesc.index)
+        if forceLowering then
+            vehicle:handleLowerImplementByAttacherJointIndex(jointDescIndex, true)
+        end
+        handleActivatedOnLoweredObject(implement, implement.spec_sprayer)
     end
 end
 
@@ -55,14 +71,16 @@ local function attachImplement(self: VehicleJointAttachment, vehicle: any, imple
     end
 
     vehicle:attachImplement(implement, inputJointDescIndex, jointDescIndex)
-    handleLoweringIfNeeded(self, vehicle, implement, jointDesc)
+    handleLoweringIfNeeded(self, vehicle, implement, jointDesc, jointDescIndex, true)
 end
 
 ---Handles the detachment of the implement.
 local function detachImplement(self: VehicleJointAttachment, attacherVehicle: any, implement: any): ()
     local jointDesc = attacherVehicle:getAttacherJointDescFromObject(implement)
-    local detachAllowed, warning, showWarning = isDetachAllowed(self, implement, attacherVehicle, jointDesc)
 
+    handleLoweringIfNeeded(self, attacherVehicle, implement, jointDesc, 0, false)
+
+    local detachAllowed, warning, showWarning = isDetachAllowed(self, implement, attacherVehicle, jointDesc)
     if detachAllowed then
         attacherVehicle:detachImplementByObject(implement)
     elseif showWarning ~= false then
