@@ -157,6 +157,10 @@ function VehicleAttachmentHandler:draw(): ()
         return
     end
 
+    if not self.playerCanPerformManualAttachment then
+        return
+    end
+
     local attachedImplement = self:getTargetImplement()
 
     local prevEventInfo = nil
@@ -263,7 +267,7 @@ function VehicleAttachmentHandler:registerActionEvents(): ()
 
     local connectionHosesAttachmentHandler = ActionGroups.createLongPressHandler(function()
         self:executeAttachment(self.connectionHosesAttachment)
-    end, 500) -- ms
+    end, 350) -- ms
 
     local handlers = {
         { inputAction = InputAction.MA_ATTACH_VEHICLE, attachment = self.vehicleJointAttachment, handler = vehicleJointAttachmentHandler },

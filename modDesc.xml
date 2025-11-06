@@ -178,11 +178,11 @@ Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsi
     <inputBinding>
         <actionBinding action="MA_ATTACH_VEHICLE">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_q"/>
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_10"/>
+            <binding device="0_XINPUT_GAMEPAD" input="BUTTON_5 BUTTON_10"/>
         </actionBinding>
         <actionBinding action="MA_ATTACH_PTO_HOSE">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_z"/>
-            <binding device="GAMEPAD_DEFAULT" input="BUTTON_5 BUTTON_9"/>
+            <binding device="0_XINPUT_GAMEPAD" input="BUTTON_5 BUTTON_9"/>
         </actionBinding>
     </inputBinding>
 </modDesc>
