@@ -48,7 +48,8 @@ function ManualAttachVehicle:inj_attachImplementFromInfo(superFunc, info)
     if info.attachable ~= nil then
         local attacherJoints = info.attacherVehicle.spec_attacherJoints.attacherJoints
         local jointDesc = attacherJoints[info.attacherVehicleJointDescIndex]
-        attacherJoints[info.attacherVehicleJointDescIndex].isDefaultLowered = info.attachable:getAllowsLowering() and jointDesc.allowsLowering and not info.attachable:getIsFoldMiddleAllowed()
+        local isFoldMiddleAllowed = info.attachable:getIsFoldMiddleAllowed()
+        attacherJoints[info.attacherVehicleJointDescIndex].isDefaultLowered = jointDesc.allowsLowering and not isFoldMiddleAllowed
     end
 
     return superFunc(self, info)
