@@ -273,7 +273,7 @@ function VehicleAttachmentHandler:isVehicleAttachableManual(vehicle: Vehicle?, a
         return false
     end
 
-    return ManualAttach.shouldHandleJoint(vehicle, attachable, attacherVehicleJointDescIndex, self.playerCanPerformManualAttachment)
+    return ManualAttach.shouldHandleJoint(vehicle, attachable, attacherVehicleJointDescIndex, self.playerCanPerformManualAttachment, true)
 end
 
 ---Called when player's capability to perform manual attachments changes

@@ -266,7 +266,7 @@ function ManualAttach.isAutoJointType(jointDesc: any): boolean
 end
 
 ---Determines if the joint should be handled by manual attach.
-function ManualAttach.shouldHandleJoint(vehicle: any, object: any, jointIndex: number, playerCanPerformManualAttachment: boolean): boolean
+function ManualAttach.shouldHandleJoint(vehicle: any, object: any, jointIndex: number, playerCanPerformManualAttachment: boolean, canToggleAttach: boolean): boolean
     if vehicle == nil or object == nil then
         return false
     end
@@ -277,7 +277,7 @@ function ManualAttach.shouldHandleJoint(vehicle: any, object: any, jointIndex: n
         return false
     end
 
-    if jointDesc.jointIndex == 0 then
+    if jointDesc.jointIndex == 0 and not canToggleAttach then
         local isAutoJoint = ManualAttach.isAutoJointType(jointDesc)
         if isAutoJoint and not playerCanPerformManualAttachment then
             return true
