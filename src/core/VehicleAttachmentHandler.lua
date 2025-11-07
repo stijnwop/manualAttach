@@ -158,10 +158,6 @@ function VehicleAttachmentHandler:updateCandidates(): ()
 end
 
 function VehicleAttachmentHandler:draw(): ()
-    if #self.detectedVehicles == 0 or not self.playerCanPerformManualAttachment then
-        return
-    end
-
     local attachedImplement = self:getTargetImplement()
     local prevEventInfo = nil
 
@@ -169,7 +165,10 @@ function VehicleAttachmentHandler:draw(): ()
         local eventInfo = attachment:getActionEventInfo(self.attacherVehicle, self.attachable, attachedImplement, self.attacherVehicleJointDescIndex, self.playerCanPerformManualAttachment)
 
         self:updateActionEventDisplay(eventInfo, prevEventInfo)
-        self:updateContextDisplay(attachment, attachedImplement)
+
+        if self.playerCanPerformManualAttachment then
+            self:updateContextDisplay(attachment, attachedImplement)
+        end
 
         prevEventInfo = eventInfo
     end
