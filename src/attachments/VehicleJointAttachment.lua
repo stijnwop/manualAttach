@@ -76,7 +76,7 @@ local function attachImplement(self: VehicleJointAttachment, vehicle: any, imple
 
     local startLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
     vehicle:attachImplement(implement, inputJointDescIndex, jointDescIndex, false, nil, startLowered)
-    handleLoweringIfNeeded(self, vehicle, implement, jointDesc, jointDescIndex, true)
+    handleLoweringIfNeeded(self, vehicle, implement, jointDesc, jointDescIndex, startLowered)
 end
 
 ---Handles the detachment of the implement.
