@@ -93,5 +93,10 @@ function ManualAttachVehicle:inj_loadAttacherJointFromXML(superFunc, attacherJoi
         attacherJoint.isManual = isManualJointDesc
     end
 
+    local isAutoJointDesc = xmlFile:getBool(baseName .. "#isAuto")
+    if isAutoJointDesc ~= nil then
+        attacherJoint.isAuto = isAutoJointDesc
+    end
+
     return true
 end

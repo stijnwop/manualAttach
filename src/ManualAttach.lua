@@ -23,7 +23,7 @@ end
 
 ManualAttach.WARNING_TIMER_THRESHOLD = 2000 -- ms
 
--- Joint types that should NOT be manually attached (auto-attach only)
+-- Joint types that should NOT be manually attached (attach from controller vehicle only)
 ManualAttach.NON_MANUAL_ATTACH_JOINTYPES = table.freeze({
     [mapJointTypeNameToInt("skidSteer")] = true,
     [mapJointTypeNameToInt("cutter")] = true,
@@ -39,6 +39,11 @@ ManualAttach.NON_MANUAL_ATTACH_JOINTYPES = table.freeze({
     [mapJointTypeNameToInt("bigBag")] = true,
     -- Mods
     [mapJointTypeNameToInt("fastCoupler")] = true,
+})
+
+-- Joint types that should auto-attach when in close proximity
+ManualAttach.AUTO_ATTACH_JOINTYPES = table.freeze({
+    [mapJointTypeNameToInt("trailer")] = true,
 })
 
 type ManualAttachData = {
@@ -247,6 +252,19 @@ function ManualAttach.isManualJointType(jointDesc: any): boolean
     return not ManualAttach.NON_MANUAL_ATTACH_JOINTYPES[jointDesc.jointType]
 end
 
+---Returns true if given joint desc could be auto-attached, false otherwise.
+function ManualAttach.isAutoJointType(jointDesc: any): boolean
+    if jointDesc == nil then
+        return false
+    end
+
+    if jointDesc.isAuto ~= nil then
+        return jointDesc.isAuto
+    end
+
+    return ManualAttach.AUTO_ATTACH_JOINTYPES[jointDesc.jointType]
+end
+
 ---Determines if the joint should be handled by manual attach.
 function ManualAttach.shouldHandleJoint(vehicle: any, object: any, jointIndex: number, playerCanPerformManualAttachment: boolean): boolean
     if vehicle == nil or object == nil then
@@ -257,6 +275,13 @@ function ManualAttach.shouldHandleJoint(vehicle: any, object: any, jointIndex: n
 
     if jointDesc == nil then
         return false
+    end
+
+    if jointDesc.jointIndex == 0 then
+        local isAutoJoint = ManualAttach.isAutoJointType(jointDesc)
+        if isAutoJoint and not playerCanPerformManualAttachment then
+            return true
+        end
     end
 
     local isManualJoint = ManualAttach.isManualJointType(jointDesc)

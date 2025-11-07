@@ -87,5 +87,10 @@ function ManualAttachAttachable:inj_loadInputAttacherJoint(superFunc, xmlFile, k
         inputAttacherJoint.isManual = isManualJointDesc
     end
 
+    local isAutoJointDesc = xmlFile:getBool(key .. "#isAuto")
+    if isAutoJointDesc ~= nil then
+        inputAttacherJoint.isAuto = isAutoJointDesc
+    end
+
     return true
 end
