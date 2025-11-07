@@ -75,6 +75,9 @@ end
 
 function ManualAttachPowerTakeOff:onDelete()
     local spec = self.spec_manualAttachPowerTakeOff
+    if spec == nil then
+        return
+    end
 
     if self.isClient and spec.samples ~= nil then
         g_soundManager:deleteSample(spec.samples.attach)

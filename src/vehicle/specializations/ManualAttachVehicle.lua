@@ -27,6 +27,10 @@ end
 
 function ManualAttachVehicle:onDelete(): ()
     local spec = self.spec_attacherJoints
+    if spec == nil then
+        return
+    end
+
     if self.isClient and spec.attacherJoints ~= nil then
         for _, jointDesc in pairs(spec.attacherJoints) do
             g_soundManager:deleteSample(jointDesc.sampleAttachHoses)
