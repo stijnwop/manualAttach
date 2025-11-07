@@ -11,5 +11,4 @@ charset = utf-8
 
 [*.lua]
 syntax=Luau
-call_parentheses = NoSingleTable
 max_line_length = 190

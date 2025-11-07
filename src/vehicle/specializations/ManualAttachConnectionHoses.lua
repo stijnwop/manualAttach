@@ -262,6 +262,10 @@ function ManualAttachConnectionHoses:hasAttachedHosesOfType(type)
         return true
     end
 
+    if self.attachingIsInProgress then
+        return true
+    end
+
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
         if attacherVehicle ~= nil and attacherVehicle.hasAttachedHosesOfType ~= nil and not attacherVehicle:hasAttachedHosesOfType(type) then
@@ -470,7 +474,7 @@ function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc)
 end
 
 function ManualAttachConnectionHoses.inj_getAllowsLowering(vehicle, superFunc)
-    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+    if vehicle.getAttacherVehicle ~= nil and vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
         return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
     end
 
@@ -478,7 +482,7 @@ function ManualAttachConnectionHoses.inj_getAllowsLowering(vehicle, superFunc)
 end
 
 function ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed(vehicle, superFunc)
-    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+    if vehicle.getAttacherVehicle ~= nil and vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
         return false
     end
 

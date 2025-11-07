@@ -51,12 +51,16 @@ end
 
 ---Handles lowering the implement if needed after attachment.
 local function handleLoweringIfNeeded(self: VehicleJointAttachment, vehicle: any, implement: any, jointDesc: any, jointDescIndex: number, forceLowering: boolean): ()
-    if implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed() then
-        if forceLowering then
-            vehicle:handleLowerImplementByAttacherJointIndex(jointDescIndex, true)
-        end
-        handleActivatedOnLoweredObject(implement, implement.spec_sprayer)
+    if forceLowering then
+        vehicle:setJointMoveDown(jointDescIndex, true, false)
     end
+
+    local canBeLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
+    if not canBeLowered then
+        return
+    end
+
+    handleActivatedOnLoweredObject(implement, implement.spec_sprayer)
 end
 
 ---Handles the attachment of the implement and lowering if needed.
@@ -70,7 +74,8 @@ local function attachImplement(self: VehicleJointAttachment, vehicle: any, imple
         return
     end
 
-    vehicle:attachImplement(implement, inputJointDescIndex, jointDescIndex)
+    local startLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
+    vehicle:attachImplement(implement, inputJointDescIndex, jointDescIndex, false, nil, startLowered)
     handleLoweringIfNeeded(self, vehicle, implement, jointDesc, jointDescIndex, true)
 end
 
