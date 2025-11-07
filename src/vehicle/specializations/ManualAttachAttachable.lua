@@ -18,11 +18,32 @@ end
 function ManualAttachAttachable.registerOverwrittenFunctions(vehicleType): ()
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "isDetachAllowed", ManualAttachAttachable.inj_isDetachAllowed)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "loadInputAttacherJoint", ManualAttachAttachable.inj_loadInputAttacherJoint)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getAllowsLowering", ManualAttachAttachable.inj_getAllowsLowering)
 end
 
 ---
 --- Injections.
 ---
+
+---Fix for vanilla workmode logic
+function ManualAttachAttachable.inj_getAllowsLowering(vehicle, superFunc)
+    local allowLowering, warning = superFunc(vehicle)
+
+    local spec = vehicle.spec_workMode
+    if spec == nil then
+        return allowLowering, warning
+    end
+
+    -- Only allow lowering when we have workmodes with lowering animations, else it will block lowering for implements without workmodes lowering animations.
+    if spec.workModes ~= nil and #spec.workModes > 0 then
+        local hasLoweringAnimations = #spec.workModes[spec.state].loweringAnimations > 0
+        if not allowLowering and hasLoweringAnimations then
+            return true, nil
+        end
+    end
+
+    return allowLowering, warning
+end
 
 function ManualAttachAttachable:inj_isDetachAllowed(superFunc): (boolean, string?, boolean)
     local manualAttach: ManualAttach = g_manualAttach
