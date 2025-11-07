@@ -183,6 +183,7 @@ end
 function ActionGroups.createLongPressHandler(callback: any, threshold: number?, priority: number?): any
     local pressedDuration = 0
     local pressThreshold = threshold or 500 -- ms
+    local hasTriggered = false
 
     return {
         callback = callback,
@@ -191,11 +192,17 @@ function ActionGroups.createLongPressHandler(callback: any, threshold: number?, 
         shouldTrigger = function(inputValue: number, dt: number): boolean
             if inputValue == 1 then
                 pressedDuration = pressedDuration + dt
+
+                if not hasTriggered and pressedDuration >= pressThreshold then
+                    hasTriggered = true
+                    return true
+                end
+
                 return false
             else
-                local wasLongPress = pressedDuration >= pressThreshold
                 pressedDuration = 0
-                return wasLongPress
+                hasTriggered = false
+                return false
             end
         end,
     }
