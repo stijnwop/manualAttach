@@ -135,9 +135,7 @@ end
 function VehicleAttachmentHandler:update(dt: number): ()
     self:updateCandidates()
 
-    if self.isServer then
-        self:checkAutoAttach(dt)
-    end
+    self:checkAutoAttach(dt)
 
     self.contextDisplay:update(dt)
     self.detectionHandler:update(dt)
