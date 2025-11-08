@@ -30,6 +30,40 @@ Without attached connection hoses the following can occur:
 - You won't be able to use the lights.
 - Brakes will be blocked.
 
+## Mod support
+When creating or modding vehicles and implements, the connection behavior can be controlled using the `attacherJoint` and `inputAttacherJoint` XML entries. You can use the attributes `isManual` and `isAuto` to define how attachments behave in-game.
+
+### Attribute Overview
+
+- `isManual="true/false"` — Forces a **manual attachment**. The player must connect the implement manually; the game will not attach it automatically.
+- `isManual="true/false"` — Standard attachment. The implement can be attached directly from the controlled vehicle without additional interaction (does not count for connection hoses and PTO).
+- `isAuto="true/false"` — Forces an **automatic attachment**. The implement will attach as soon as it comes within range, regardless of manual settings.
+
+```xml
+<!-- Implement side 'manual attachment' -->
+<inputAttacherJoint isManual="true" jointType="X" .... />
+
+<!-- Vehicle side  'manual attachment' -->
+<attacherJoint isManual="true" jointType="X"  ..... />
+
+<!-- Implement side 'standard attachment' -->
+<inputAttacherJoint isManual="false" jointType="X" .... />
+
+<!-- Vehicle side 'standard attachment' -->
+<attacherJoint isManual="false" jointType="X"  ..... />
+
+<!-- Implement side 'enable automatic attachment' -->
+<inputAttacherJoint isAuto="true" jointType="X" .... />
+
+<!-- Vehicle side 'enable automatic attachment' -->
+<attacherJoint isAuto="true" jointType="X"  ..... />
+
+<!-- Implement side 'disable automatic attachment' -->
+<inputAttacherJoint isAuto="false" jointType="X" .... />
+
+<!-- Vehicle side 'disable automatic attachment' -->
+<attacherJoint isAuto="false" jointType="X"  ..... />
+```
 
 ## Copyright
 Copyright (c) 2019-2025 [Wopster](https://github.com/stijnwop).
