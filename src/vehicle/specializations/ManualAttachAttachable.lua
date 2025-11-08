@@ -26,7 +26,7 @@ end
 ---
 
 ---Fix for vanilla workmode logic
-function ManualAttachAttachable.inj_getAllowsLowering(vehicle, superFunc)
+function ManualAttachAttachable.inj_getAllowsLowering(vehicle, superFunc): (boolean, string?)
     local allowLowering, warning = superFunc(vehicle)
 
     local spec = vehicle.spec_workMode

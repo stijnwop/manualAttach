@@ -11,17 +11,17 @@
 ---@class ManualAttachPowerTakeOff
 ManualAttachPowerTakeOff = {}
 
-function ManualAttachPowerTakeOff.prerequisitesPresent(specializations)
+function ManualAttachPowerTakeOff.prerequisitesPresent(specializations): boolean
     return SpecializationUtil.hasSpecialization(PowerTakeOffs, specializations)
 end
 
-function ManualAttachPowerTakeOff.registerFunctions(vehicleType)
+function ManualAttachPowerTakeOff.registerFunctions(vehicleType): ()
     SpecializationUtil.registerFunction(vehicleType, "handlePowerTakeOffPostAttach", ManualAttachPowerTakeOff.handlePowerTakeOffPostAttach)
     SpecializationUtil.registerFunction(vehicleType, "isPtoAttached", ManualAttachPowerTakeOff.isPtoAttached)
     SpecializationUtil.registerFunction(vehicleType, "playPtoAttachSound", ManualAttachPowerTakeOff.playPtoAttachSound)
 end
 
-function ManualAttachPowerTakeOff.initSpecialization()
+function ManualAttachPowerTakeOff.initSpecialization(): ()
     local schemaSavegame = Vehicle.xmlSchemaSavegame
     schemaSavegame:register(
         XMLValueType.BOOL,
@@ -30,13 +30,13 @@ function ManualAttachPowerTakeOff.initSpecialization()
     )
 end
 
-function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType)
+function ManualAttachPowerTakeOff.registerOverwrittenFunctions(vehicleType): ()
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ManualAttachPowerTakeOff.inj_getCanBeTurnedOn)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToObject", ManualAttachPowerTakeOff.inj_getCanDischargeToObject)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanDischargeToGround", ManualAttachPowerTakeOff.inj_getCanDischargeToGround)
 end
 
-function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
+function ManualAttachPowerTakeOff.registerEventListeners(vehicleType): ()
     SpecializationUtil.registerEventListener(vehicleType, "onLoad", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onDelete", ManualAttachPowerTakeOff)
@@ -45,7 +45,7 @@ function ManualAttachPowerTakeOff.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachPowerTakeOff)
 end
 
-function ManualAttachPowerTakeOff:onLoad(savegame)
+function ManualAttachPowerTakeOff:onLoad(savegame): ()
     self.spec_manualAttachPowerTakeOff = self[`spec_{g_manualAttachModName}.manualAttachPowerTakeOff`]
 
     local spec = self.spec_manualAttachPowerTakeOff
@@ -63,7 +63,7 @@ function ManualAttachPowerTakeOff:onLoad(savegame)
     end
 end
 
-function ManualAttachPowerTakeOff:onPostLoad(savegame)
+function ManualAttachPowerTakeOff:onPostLoad(savegame): ()
     local spec = self.spec_manualAttachPowerTakeOff
     spec.isBlockingInitialPtoDetach = false -- always block detach because we don't have an attached PTO at first load.
 
@@ -73,7 +73,7 @@ function ManualAttachPowerTakeOff:onPostLoad(savegame)
     end
 end
 
-function ManualAttachPowerTakeOff:onDelete()
+function ManualAttachPowerTakeOff:onDelete(): ()
     local spec = self.spec_manualAttachPowerTakeOff
     if spec == nil then
         return
@@ -87,7 +87,7 @@ end
 ---Called on client side on join
 ---@param streamId number
 ---@param connection number
-function ManualAttachPowerTakeOff:onReadStream(streamId, connection)
+function ManualAttachPowerTakeOff:onReadStream(streamId, connection): ()
     if streamReadBool(streamId) then
         local isPtoAttached = streamReadBool(streamId)
         if isPtoAttached then
@@ -106,7 +106,7 @@ end
 ---Called on server side on join
 ---@param streamId number
 ---@param connection number
-function ManualAttachPowerTakeOff:onWriteStream(streamId, connection)
+function ManualAttachPowerTakeOff:onWriteStream(streamId, connection): ()
     local hasAttacherVehicle = self.getAttacherVehicle ~= nil
     streamWriteBool(streamId, hasAttacherVehicle)
     if hasAttacherVehicle then
@@ -114,7 +114,7 @@ function ManualAttachPowerTakeOff:onWriteStream(streamId, connection)
     end
 end
 
-function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
+function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames): ()
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
 
@@ -125,7 +125,7 @@ function ManualAttachPowerTakeOff:saveToXMLFile(xmlFile, key, usedModNames)
 end
 
 ---Returns true when the vehicle doesn't have a pto or when the vehicle has a pto and the pto is attached, false otherwise.
-function ManualAttachPowerTakeOff:isPtoAttached()
+function ManualAttachPowerTakeOff:isPtoAttached(): boolean
     if self.getAttacherVehicle ~= nil then
         local attacherVehicle = self:getAttacherVehicle()
 
@@ -142,7 +142,7 @@ function ManualAttachPowerTakeOff:isPtoAttached()
 end
 
 ---Handles post attach in a function.
-function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
+function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex): ()
     local spec = self.spec_powerTakeOffs
     for i = #spec.delayedPowerTakeOffsMountings, 1, -1 do
         local delayedMounting = spec.delayedPowerTakeOffsMountings[i]
@@ -163,7 +163,7 @@ function ManualAttachPowerTakeOff:handlePowerTakeOffPostAttach(jointDescIndex)
 end
 
 ---Play attach sound for the given jointDesc.
-function ManualAttachPowerTakeOff:playPtoAttachSound(jointDesc)
+function ManualAttachPowerTakeOff:playPtoAttachSound(jointDesc): boolean
     local spec = self.spec_manualAttachPowerTakeOff
 
     if self.isClient then
@@ -178,7 +178,7 @@ function ManualAttachPowerTakeOff:playPtoAttachSound(jointDesc)
 end
 
 ---Called on post attach event.
-function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex)
+function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex): ()
     local spec = self.spec_manualAttachPowerTakeOff
 
     if not spec.isBlockingInitialPtoDetach and not self:getIsAIActive() then
@@ -195,7 +195,7 @@ end
 --- Injections
 ---
 
-function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
+function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc): boolean
     if not vehicle:isPtoAttached() then
         return false
     end
@@ -203,7 +203,7 @@ function ManualAttachPowerTakeOff.inj_getCanBeTurnedOn(vehicle, superFunc)
     return superFunc(vehicle)
 end
 
-function ManualAttachPowerTakeOff.inj_getCanDischargeToObject(vehicle, superFunc, dischargeNode)
+function ManualAttachPowerTakeOff.inj_getCanDischargeToObject(vehicle, superFunc, dischargeNode): boolean
     if not vehicle:isPtoAttached() then
         return false
     end
@@ -211,7 +211,7 @@ function ManualAttachPowerTakeOff.inj_getCanDischargeToObject(vehicle, superFunc
     return superFunc(vehicle, dischargeNode)
 end
 
-function ManualAttachPowerTakeOff.inj_getCanDischargeToGround(vehicle, superFunc, dischargeNode)
+function ManualAttachPowerTakeOff.inj_getCanDischargeToGround(vehicle, superFunc, dischargeNode): boolean
     if not vehicle:isPtoAttached() then
         return false
     end

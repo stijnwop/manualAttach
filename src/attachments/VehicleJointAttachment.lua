@@ -36,7 +36,8 @@ local function isDetachAllowed(self: VehicleJointAttachment, implement, vehicle,
     return detachAllowed, warning, showWarning
 end
 
-function handleActivatedOnLoweredObject(implement, spec)
+---Handles deactivating the implement or attacher vehicle when lowering.
+local function handleActivatedOnLoweredObject(implement, spec)
     if spec ~= nil and spec.activateOnLowering then
         if implement.setIsTurnedOn ~= nil then
             implement:setIsTurnedOn(false)
@@ -55,7 +56,7 @@ local function handleLoweringIfNeeded(self: VehicleJointAttachment, vehicle: any
         vehicle:setJointMoveDown(jointDescIndex, true, false)
     end
 
-    local canBeLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
+    local canBeLowered = VehicleJointAttachment.canImplementBeLowered(implement, jointDesc)
     if not canBeLowered then
         return
     end
@@ -74,7 +75,7 @@ local function attachImplement(self: VehicleJointAttachment, vehicle: any, imple
         return
     end
 
-    local startLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
+    local startLowered = VehicleJointAttachment.canImplementBeLowered(implement, jointDesc)
     vehicle:attachImplement(implement, inputJointDescIndex, jointDescIndex, false, nil, startLowered)
     handleLoweringIfNeeded(self, vehicle, implement, jointDesc, jointDescIndex, startLowered)
 end
@@ -91,6 +92,23 @@ local function detachImplement(self: VehicleJointAttachment, attacherVehicle: an
     elseif showWarning ~= false then
         self.mission:showBlinkingWarning(warning or self.i18n:getText("warning_detachNotAllowed"), ManualAttach.WARNING_TIMER_THRESHOLD)
     end
+end
+
+---
+--- Public Static Methods
+---
+
+---Checks if the implement can be lowered.
+function VehicleJointAttachment.canImplementBeLowered(implement, jointDesc)
+    local canBeLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
+
+    -- When the implement is mounted, we should not force lowering.
+    if canBeLowered and implement.getMountObject ~= nil then
+        local mounter = implement:getDynamicMountObject() or implement:getMountObject()
+        return mounter == nil
+    end
+
+    return canBeLowered
 end
 
 ---

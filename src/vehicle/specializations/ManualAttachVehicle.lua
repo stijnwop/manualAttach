@@ -44,12 +44,12 @@ end
 ---
 
 ---Handles setting the default lowered state for attached implements by vanilla attach events.
-function ManualAttachVehicle:inj_attachImplementFromInfo(superFunc, info)
-    if info.attachable ~= nil then
+function ManualAttachVehicle:inj_attachImplementFromInfo(superFunc, info): boolean
+    local attachable = info.attachable
+    if attachable ~= nil then
         local attacherJoints = info.attacherVehicle.spec_attacherJoints.attacherJoints
         local jointDesc = attacherJoints[info.attacherVehicleJointDescIndex]
-        local isFoldMiddleAllowed = info.attachable:getIsFoldMiddleAllowed()
-        attacherJoints[info.attacherVehicleJointDescIndex].isDefaultLowered = jointDesc.allowsLowering and not isFoldMiddleAllowed
+        jointDesc.isDefaultLowered = VehicleJointAttachment.canImplementBeLowered(attachable, jointDesc)
     end
 
     return superFunc(self, info)
