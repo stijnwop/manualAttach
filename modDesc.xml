@@ -171,8 +171,8 @@ Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsi
     </extraSourceFiles>
 
     <actions>
-        <action name="MA_ATTACH_VEHICLE" axisType="HALF"/>
-        <action name="MA_ATTACH_PTO_HOSE" axisType="HALF"/>
+        <action name="MA_ATTACH_VEHICLE" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
+        <action name="MA_ATTACH_PTO_HOSE" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
     </actions>
 
     <inputBinding>

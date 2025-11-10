@@ -175,15 +175,21 @@ function VehicleAttachmentHandler:draw(): ()
 end
 
 function VehicleAttachmentHandler:updateActionEventDisplay(eventInfo: any, prevEventInfo: any?): ()
-    local shouldUseExtraInfo = eventInfo.isExtraInfo and eventInfo.text ~= nil
+    local previousIsSameEvent = prevEventInfo ~= nil and prevEventInfo.id == eventInfo.id
+    local prevEventIsVisible = prevEventInfo ~= nil and prevEventInfo.visibility
+    local shouldUseExtraInfo = previousIsSameEvent and eventInfo.isExtraInfo and eventInfo.text ~= nil
 
-    if shouldUseExtraInfo and prevEventInfo ~= nil and not prevEventInfo.visibility then
+    if shouldUseExtraInfo and not prevEventIsVisible then
         shouldUseExtraInfo = false
     end
 
     if shouldUseExtraInfo then
         self.mission:addExtraPrintText(eventInfo.text)
     else
+        if prevEventIsVisible and prevEventInfo.id == eventInfo.id then
+            return
+        end
+
         self.input:setActionEventText(eventInfo.id, eventInfo.text)
         self.input:setActionEventTextPriority(eventInfo.id, eventInfo.priority)
         self.input:setActionEventTextVisibility(eventInfo.id, eventInfo.visibility)

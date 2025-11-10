@@ -4,16 +4,18 @@
   <Files>
   </Files>
 
+
   <Materials>
     <Material name="lambert1" materialId="5" diffuseColor="0.501961 0.501961 0.501961 1">
     </Material>
   </Materials>
 
+
   <Shapes externalShapesFile="detectionTrigger.i3d.shapes">
   </Shapes>
 
   <Scene>
-    <Shape name="detectionTrigger" shapeId="1" kinematic="true" trigger="true" collisionFilterGroup="0x60000000" collisionFilterMask="0x40000000" nodeId="8" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="5"/>
+    <Shape name="detectionTrigger" shapeId="1" kinematic="true" trigger="true" collisionFilterGroup="0x60000000" collisionFilterMask="0x50000" nodeId="8" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="5"/>
   </Scene>
 
 </i3D>

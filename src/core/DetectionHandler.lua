@@ -112,12 +112,12 @@ function DetectionHandler:isVehicleStillInRange(vehicle: Vehicle): boolean
     local x, y, z = getWorldTranslation(self.triggerNode)
     local rx, ry, rz = getWorldRotation(self.triggerNode)
 
-    local width, height, length = 2, 2, 1
+    local width, height, length = 4, 4, 4
 
     self.overlapCheckVehicle = vehicle
     self.vehicleFoundInOverlap = false
 
-    overlapBox(x, y, z, rx, ry, rz, width, height, length, "vehicleOverlapCallback", self, CollisionFlag.VEHICLE, true, false, true)
+    overlapBox(x, y, z, rx, ry, rz, width, height, length, "vehicleOverlapCallback", self, CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE, true, false, true)
 
     local foundInOverlap = self.vehicleFoundInOverlap
     self.overlapCheckVehicle = nil
