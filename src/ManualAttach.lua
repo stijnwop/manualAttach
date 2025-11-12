@@ -44,6 +44,7 @@ ManualAttach.NON_MANUAL_ATTACH_JOINTYPES = table.freeze({
 -- Joint types that should auto-attach when in close proximity
 ManualAttach.AUTO_ATTACH_JOINTYPES = table.freeze({
     [mapJointTypeNameToInt("trailer")] = true,
+    [mapJointTypeNameToInt("semitrailer")] = true,
 })
 
 type ManualAttachData = {
