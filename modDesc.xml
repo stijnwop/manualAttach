@@ -159,7 +159,7 @@ Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsi
         </tr>
     </description>
 
-    <iconFilename>icon.png</iconFilename>
+    <iconFilename>icon_manualAttach.png</iconFilename>
 
     <multiplayer supported="true"/>
 
