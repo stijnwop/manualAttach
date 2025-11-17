@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<l10n>
+    <translationContributors>Michaebjerg21978</translationContributors>
+    <locale>da</locale>
+    <texts>
+        <text name="input_MA_ATTACH_VEHICLE" text="ManuelTilkobel: Tilkobel/Frakobel" />
+        <text name="input_MA_ATTACH_PTO_HOSE" text="ManuelTilkobel: Tilkobel/Frakobel PTO og slanger" />
+        <text name="action_attach_pto" text="Tilkobel PTO Aksel" />
+        <text name="action_detach_pto" text="Frakobel PTO Aksel" />
+        <text name="action_attach_hose" text="Hold for og tilkoble slanger" />
+        <text name="action_detach_hose" text="Hold for og frakoble slanger" />
+        <text name="info_lower_warning" text="Sænk %s først" />
+        <text name="info_turn_off_warning" text="Sluk %s først" />
+        <text name="info_detach_pto_warning" text="Frakobel PTO til %s først" />
+        <text name="info_attach_pto_warning" text="Tilkobel PTO til %s først" />
+        <text name="info_detach_hoses_warning" text="Frakobel slanger til %s først" />
+        <text name="info_attach_hoses_warning" text="Tilkobel slanger til %s først" />
+    </texts>
+</l10n>
