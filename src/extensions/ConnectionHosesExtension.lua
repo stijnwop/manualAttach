@@ -74,7 +74,7 @@ function ConnectionHosesExtension.hasAttachedCustomHoses(object: any, type: stri
             end
 
             if type ~= nil then
-                if not hasTypeMatch then
+                if not hasTypeMatch and typeMap ~= nil then
                     hasTypeMatch = typeMap[customHose.type:upper()]
                 end
 
@@ -94,7 +94,7 @@ function ConnectionHosesExtension.hasAttachedCustomHoses(object: any, type: stri
             end
 
             if type ~= nil then
-                if not hasTypeMatch then
+                if not hasTypeMatch and typeMap ~= nil then
                     hasTypeMatch = typeMap[customTarget.type:upper()]
                 end
 
@@ -120,7 +120,7 @@ function ConnectionHosesExtension.hasConnectionTarget(vehicle: any, attacherJoin
         local hasMatchingType = false
 
         for _, node in ipairs(spec.targetNodes) do
-            if typeMap[node.type:upper()] ~= nil then
+            if typeMap ~= nil and typeMap[node.type:upper()] ~= nil then
                 hasMatchingType = true
                 break
             end

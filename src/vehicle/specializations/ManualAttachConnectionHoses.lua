@@ -15,12 +15,14 @@ ManualAttachConnectionHoses.TYPE_ELECTRIC = "electric"
 ManualAttachConnectionHoses.TYPE_HYDRAULIC = "hydraulic"
 ManualAttachConnectionHoses.TYPE_AIR = "air"
 ManualAttachConnectionHoses.TYPE_ISOBUS = "isobus"
+ManualAttachConnectionHoses.TYPE_CABLE_BUNDLE = "cable_bundle"
 
 ManualAttachConnectionHoses.ALL_TYPES = table.freeze({
     ManualAttachConnectionHoses.TYPE_ELECTRIC,
     ManualAttachConnectionHoses.TYPE_HYDRAULIC,
     ManualAttachConnectionHoses.TYPE_AIR,
     ManualAttachConnectionHoses.TYPE_ISOBUS,
+    ManualAttachConnectionHoses.TYPE_CABLE_BUNDLE,
 })
 
 ManualAttachConnectionHoses.TYPES = table.freeze({
@@ -28,18 +30,21 @@ ManualAttachConnectionHoses.TYPES = table.freeze({
     [ManualAttachConnectionHoses.TYPE_HYDRAULIC] = 2,
     [ManualAttachConnectionHoses.TYPE_AIR] = 3,
     [ManualAttachConnectionHoses.TYPE_ISOBUS] = 4,
+    [ManualAttachConnectionHoses.TYPE_CABLE_BUNDLE] = 5,
 })
 
 local TYPES_TO_INTERNAL_HYDRAULIC = { HYDRAULICIN = true, HYDRAULICOUT = true, CNHMULTICOUPLER = true, CLAASMULTICOUPLER = true, JOHNDEERMULTICOUPLER = true }
 local TYPES_TO_INTERNAL_AIR = { AIRDOUBLERED = true, AIRDOUBLEYELLOW = true }
 local TYPES_TO_INTERNAL_ELECTRIC = { ELECTRIC = true }
 local TYPES_TO_INTERNAL_ISOBUS = { ISOBUS = true }
+local TYPES_TO_INTERNAL_CABLEBUNDLE = { CABLE_BUNDLE = true }
 
 ManualAttachConnectionHoses.TYPES_TO_INTERNAL = table.freeze({
     [ManualAttachConnectionHoses.TYPE_HYDRAULIC] = table.freeze(TYPES_TO_INTERNAL_HYDRAULIC),
     [ManualAttachConnectionHoses.TYPE_AIR] = table.freeze(TYPES_TO_INTERNAL_AIR),
     [ManualAttachConnectionHoses.TYPE_ELECTRIC] = table.freeze(TYPES_TO_INTERNAL_ELECTRIC),
     [ManualAttachConnectionHoses.TYPE_ISOBUS] = table.freeze(TYPES_TO_INTERNAL_ISOBUS),
+    [ManualAttachConnectionHoses.TYPE_CABLE_BUNDLE] = table.freeze(TYPES_TO_INTERNAL_CABLEBUNDLE),
 })
 
 function ManualAttachConnectionHoses.prerequisitesPresent(specializations): boolean
