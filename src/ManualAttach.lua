@@ -191,7 +191,7 @@ end
 
 ---Checks if the player can currently perform manual attachments.
 function ManualAttach:checkPlayerCanPerformManualAttachment(player: Player): boolean
-    return player.isControlled and not player:getAreHandsHoldingObject() and not player:getIsHoldingHandTool() and not player:getIsInVehicle()
+    return player ~= nil and player.isControlled and not player:getAreHandsHoldingObject() and not player:getIsHoldingHandTool() and not player:getIsInVehicle()
 end
 
 ---Called when the player is loaded.
