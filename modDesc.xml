@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="111">
     <author>Wopster</author>
-    <version>1.1.0.0-rc.2</version>
+    <version>1.1.0.0</version>
 
     <title>
         <en>Manual Attach</en>
@@ -39,6 +39,11 @@ Without attached connection hoses the following can occur:
 - You won't be able to control hydraulics (e.g. moving parts, folding, use ridge markers etc)
 - You won't be able to use the lights.
 - Brakes will be blocked.
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
 ]]>
         </en>
         <de>
@@ -69,6 +74,11 @@ Ohne angeschlossene Schläuche kann folgendes passieren:
 - Du wirst nicht in der Lage sein die Hydraulik zu kontrollieren (z.B. sich bewegende Teile, ein-/ausklappen, Spuranreißer benutzen etc.)
 - Du kannst keine Lichter benutzen.
 - Blockierte Bremse.
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
 ]]>
         </de>
         <fr>
@@ -96,19 +106,48 @@ Si les flexibles hydrauliques ne sont pas branchés, les situations suivantes pe
 - Vous ne pourrez pas utiliser les fonctions hydrauliques (dépliage/repliage, traceurs, etc.)
 - Vous ne pourrez pas allumer les feux de l'outil.
 - Vos outils trainés seront freinés (freinage pneumatique).
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
 ]]>
         </fr>
         <pl>
-            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!]]>
+            <![CDATA[Ten mod zmusza cię do ręcznego zaczepiania/odczepiania przyczep, maszyn i narzędzi. Mamy nadzieję, że będziesz się dobrze z nim bawił!
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
+]]>
         </pl>
         <ru>
-            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.]]>
+            <![CDATA[Этот мод вынуждает присоединять/отсоединять оборудование и прицепы только вручную. Мы надеемся вам понравится этот мод.
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
+]]>
         </ru>
         <cz>
-            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.]]>
+            <![CDATA[S tímto módem musíte manuálně připojovat a odpojovat vaše nástroje a vlečky.
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
+]]>
         </cz>
         <hu>
-            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.]]>
+            <![CDATA[Ezzel a moddal kézzel kell csatlakoztatnod a pótkocsikat és eszközöket.
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
+]]>
         </hu>
         <it>
             <![CDATA[Questa mod ti impone di collegare/scollegare attrezzi e rimorchi manualmente.
@@ -133,6 +172,12 @@ Senza aver collegato i tubi dei servizi idraulici, luci e/o similari, si verific
 - Non sarai in grado di controllare l'idraulica (ad esempio parti mobili, piegatura, utilizzo di marcatori di colmo, ecc.)
 - Non potrai usare le luci.
 - I freni saranno bloccati.
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Added Danish translation.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
 ]]>
         </it>
         <tr>
@@ -155,7 +200,14 @@ Bağlantı borularını bağlamazsanız alttaki durumlar ile karşılaşabilirsi
 - Aletteki hidrolikleri kullanamazsınız (Örnek olarak, katlanan parçalar)
 - Aletin ışıklarını çalıştıramazsınız
 - Alet frenleri kitlenecektir
-    ]]>
+
+
+Changelog 1.1.0.0:
+- Added support for multicouplers and cable bundles, combines and other implements that bundle their connections into a single coupling now work properly instead of showing nothing to connect.
+- Added Danish translation.
+- Fixed implements that slide onto a pallet or stand when you detach them (like the Krone bale shredder), they now play their animation properly instead of snapping off and clipping through it.
+- Fixed several crashes when attaching or detaching certain implements, and when standing near them.
+]]>
         </tr>
     </description>
 
