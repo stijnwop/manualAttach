@@ -59,7 +59,11 @@ function DetectionHandler:delete(): ()
             delete(self.triggerNode)
         end
     end
-    delete(self.triggerCloneNode)
+
+    if self.triggerCloneNode ~= nil then
+        self.triggerCloneNode = nil
+        delete(self.triggerCloneNode)
+    end
 end
 
 ---Main update function called every frame.
