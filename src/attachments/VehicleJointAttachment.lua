@@ -88,7 +88,11 @@ local function detachImplement(self: VehicleJointAttachment, attacherVehicle: an
 
     local detachAllowed, warning, showWarning = isDetachAllowed(self, implement, attacherVehicle, jointDesc)
     if detachAllowed then
-        attacherVehicle:detachImplementByObject(implement)
+        if implement.startDetachProcess ~= nil then
+            implement:startDetachProcess()
+        else
+            attacherVehicle:detachImplementByObject(implement)
+        end
     elseif showWarning ~= false then
         self.mission:showBlinkingWarning(warning or self.i18n:getText("warning_detachNotAllowed"), ManualAttach.WARNING_TIMER_THRESHOLD)
     end
@@ -100,15 +104,32 @@ end
 
 ---Checks if the implement can be lowered.
 function VehicleJointAttachment.canImplementBeLowered(implement, jointDesc)
-    local canBeLowered = implement:getAllowsLowering() and jointDesc.allowsLowering and not implement:getIsFoldMiddleAllowed()
+    if implement == nil or jointDesc == nil then
+        return false
+    end
+
+    -- Not every implement has the attachable specialization.
+    if implement.getAllowsLowering == nil or not implement:getAllowsLowering() then
+        return false
+    end
+
+    if not jointDesc.allowsLowering then
+        return false
+    end
+
+    if implement.getIsFoldMiddleAllowed ~= nil and implement:getIsFoldMiddleAllowed() then
+        return false
+    end
 
     -- When the implement is mounted, we should not force lowering.
-    if canBeLowered and implement.getMountObject ~= nil then
-        local mounter = implement:getDynamicMountObject() or implement:getMountObject()
+    if implement.getMountObject ~= nil then
+        local mounter = implement.getDynamicMountObject ~= nil and implement:getDynamicMountObject() or nil
+        mounter = mounter or implement:getMountObject()
+
         return mounter == nil
     end
 
-    return canBeLowered
+    return true
 end
 
 ---
@@ -127,11 +148,21 @@ function VehicleJointAttachment:canPerformAttachment(attacherVehicle: Vehicle?, 
         return false
     end
 
+    local spec = attachable.spec_attachable
+    if spec ~= nil and spec.detachingInProgress then
+        return false
+    end
+
     return self.mission.accessHandler:canFarmAccess(attacherVehicle:getActiveFarm(), attachable)
 end
 
 function VehicleJointAttachment:canPerformDetachment(attachedImplement: Vehicle?): boolean
     if attachedImplement == nil or attachedImplement.getAttacherVehicle == nil then
+        return false
+    end
+
+    local spec = attachedImplement.spec_attachable
+    if spec ~= nil and spec.detachingInProgress then
         return false
     end
 

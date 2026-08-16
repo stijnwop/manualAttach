@@ -48,7 +48,7 @@ function PowerTakeOffAttachment:attachPowerTakeOff(vehicle: Vehicle, object: Veh
     ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, true, noEventSend)
 
     local implement = vehicle:getImplementByObject(object)
-    if implement == nil then
+    if implement == nil or object.spec_attachable == nil then
         return
     end
 

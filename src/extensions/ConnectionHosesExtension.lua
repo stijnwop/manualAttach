@@ -11,10 +11,28 @@
 ---@class ConnectionHosesExtension
 ConnectionHosesExtension = {}
 
+---Returns the attachable spec when the object supports connection hose lookups, nil otherwise.
+---Not every attachable has the connection hoses specialization, so the functions it provides can be missing.
+local function getSupportedAttachableSpec(object: any): any
+    if object == nil then
+        return nil
+    end
+
+    local spec = object.spec_attachable
+    if spec == nil or object.spec_connectionHoses == nil then
+        return nil
+    end
+
+    if object.getConnectionHosesByInputAttacherJoint == nil or object.getIsConnectionHoseUsed == nil then
+        return nil
+    end
+
+    return spec
+end
+
 ---Returns true when object has attached connection hoses, false otherwise.
 function ConnectionHosesExtension.hasAttachedConnectionHoses(object: any, type: string?): boolean
-    local spec = object.spec_attachable
-    if spec == nil then
+    if getSupportedAttachableSpec(object) == nil then
         return false
     end
 
@@ -23,7 +41,7 @@ end
 
 ---Returns true when object has attached connection hoses for given type, false otherwise.
 function ConnectionHosesExtension.hasAttachedTypedConnectionHoses(object: any, type: string?): boolean
-    local spec = object.spec_attachable
+    local spec = getSupportedAttachableSpec(object)
     if spec == nil then
         return false
     end
@@ -31,7 +49,7 @@ function ConnectionHosesExtension.hasAttachedTypedConnectionHoses(object: any, t
     local typeMap = type and ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type]
     local hasTypeMatch = false
 
-    local hoses = object:getConnectionHosesByInputAttacherJoint(spec.inputAttacherJointDescIndex)
+    local hoses = object:getConnectionHosesByInputAttacherJoint(spec.inputAttacherJointDescIndex) or {}
     for i = 1, #hoses do
         local hose = hoses[i]
         if hose ~= nil then
@@ -41,7 +59,7 @@ function ConnectionHosesExtension.hasAttachedTypedConnectionHoses(object: any, t
             end
 
             if type ~= nil then
-                if not hasTypeMatch then
+                if not hasTypeMatch and typeMap ~= nil then
                     hasTypeMatch = typeMap[hose.type:upper()]
                 end
 
@@ -57,7 +75,7 @@ end
 
 ---Returns true when object has attached custom connection hoses, false otherwise.
 function ConnectionHosesExtension.hasAttachedCustomHoses(object: any, type: string?): boolean
-    local spec = object.spec_attachable
+    local spec = getSupportedAttachableSpec(object)
     if spec == nil then
         return false
     end
@@ -65,7 +83,8 @@ function ConnectionHosesExtension.hasAttachedCustomHoses(object: any, type: stri
     local typeMap = type and ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type]
     local hasTypeMatch = false
 
-    local customHoses = object.spec_connectionHoses.customHosesByInputAttacher[spec.inputAttacherJointDescIndex]
+    local hosesSpec = object.spec_connectionHoses
+    local customHoses = hosesSpec.customHosesByInputAttacher ~= nil and hosesSpec.customHosesByInputAttacher[spec.inputAttacherJointDescIndex] or nil
     if customHoses ~= nil then
         for i = 1, #customHoses do
             local customHose = customHoses[i]
@@ -85,7 +104,7 @@ function ConnectionHosesExtension.hasAttachedCustomHoses(object: any, type: stri
         end
     end
 
-    local customTargets = object.spec_connectionHoses.customHoseTargetsByInputAttacher[spec.inputAttacherJointDescIndex]
+    local customTargets = hosesSpec.customHoseTargetsByInputAttacher ~= nil and hosesSpec.customHoseTargetsByInputAttacher[spec.inputAttacherJointDescIndex] or nil
     if customTargets ~= nil then
         for i = 1, #customTargets do
             local customTarget = customTargets[i]
@@ -110,8 +129,8 @@ end
 
 ---Checks if vehicle has connection targets for the attacherJoints.
 function ConnectionHosesExtension.hasConnectionTarget(vehicle: any, attacherJointIndex: number, type: string?): boolean
-    local spec = vehicle.spec_connectionHoses
-    if spec == nil then
+    local spec = vehicle ~= nil and vehicle.spec_connectionHoses or nil
+    if spec == nil or spec.targetNodes == nil or attacherJointIndex == nil then
         return false
     end
 
@@ -166,8 +185,12 @@ end
 
 ---Returns true when object has connection hoses for given type, false otherwise.
 function ConnectionHosesExtension.hasTypedConnectionHoses(object: any, vehicle: any, type: string?): boolean
-    local spec = object.spec_attachable
-    if spec == nil or object.getConnectionHosesByInputAttacherJoint == nil or not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
+    local spec = getSupportedAttachableSpec(object)
+    if spec == nil or not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
+        return false
+    end
+
+    if vehicle == nil or vehicle.getAttacherJointIndexFromObject == nil then
         return false
     end
 
@@ -176,12 +199,12 @@ function ConnectionHosesExtension.hasTypedConnectionHoses(object: any, vehicle: 
         return false
     end
 
-    local hoses = object:getConnectionHosesByInputAttacherJoint(spec.inputAttacherJointDescIndex)
+    local hoses = object:getConnectionHosesByInputAttacherJoint(spec.inputAttacherJointDescIndex) or {}
     local typeMap = ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type]
 
     for i = 1, #hoses do
         local hose = hoses[i]
-        if hose and typeMap[hose.type:upper()] ~= nil then
+        if hose and typeMap ~= nil and typeMap[hose.type:upper()] ~= nil then
             return true
         end
     end
@@ -193,7 +216,7 @@ function ConnectionHosesExtension.hasCustomHoseMatch(customHoseTargets: any, cus
     local typeMap = type and ManualAttachConnectionHoses.TYPES_TO_INTERNAL[type]
 
     for _, customHose in ipairs(customHoses) do
-        if type == nil or typeMap[customHose.type:upper()] ~= nil then
+        if type == nil or (typeMap ~= nil and typeMap[customHose.type:upper()] ~= nil) then
             for _, customTarget in ipairs(customHoseTargets) do
                 if customHose.type == customTarget.type and customHose.specType == customTarget.specType then
                     return true
@@ -206,21 +229,31 @@ function ConnectionHosesExtension.hasCustomHoseMatch(customHoseTargets: any, cus
 end
 
 function ConnectionHosesExtension.hasConnectionCustomHoses(object: any, vehicle: any, type: string?): boolean
-    local spec = object.spec_attachable
-    if spec == nil or object.getConnectionHosesByInputAttacherJoint == nil or not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
+    local spec = getSupportedAttachableSpec(object)
+    if spec == nil or not SpecializationUtil.hasSpecialization(ManualAttachConnectionHoses, object.specializations) then
         return false
     end
 
+    if vehicle == nil or vehicle.getAttacherJointIndexFromObject == nil or vehicle.spec_connectionHoses == nil then
+        return false
+    end
+
+    local objectSpec = object.spec_connectionHoses
+    local vehicleSpec = vehicle.spec_connectionHoses
     local attacherJointIndex = vehicle:getAttacherJointIndexFromObject(object)
-    local customHoseTargetsByInputAttacher = object.spec_connectionHoses.customHoseTargetsByInputAttacher[spec.inputAttacherJointDescIndex] or {}
-    local customHosesOfVehicle = vehicle.spec_connectionHoses.customHosesByAttacher[attacherJointIndex] or {}
+    if attacherJointIndex == nil then
+        return false
+    end
+
+    local customHoseTargetsByInputAttacher = objectSpec.customHoseTargetsByInputAttacher ~= nil and objectSpec.customHoseTargetsByInputAttacher[spec.inputAttacherJointDescIndex] or {}
+    local customHosesOfVehicle = vehicleSpec.customHosesByAttacher ~= nil and vehicleSpec.customHosesByAttacher[attacherJointIndex] or {}
 
     if ConnectionHosesExtension.hasCustomHoseMatch(customHoseTargetsByInputAttacher, customHosesOfVehicle, type) then
         return true
     end
 
-    local customHosesOfObject = object.spec_connectionHoses.customHosesByInputAttacher[spec.inputAttacherJointDescIndex] or {}
-    local customHoseTargetsByAttacher = vehicle.spec_connectionHoses.customHoseTargetsByAttacher[attacherJointIndex] or {}
+    local customHosesOfObject = objectSpec.customHosesByInputAttacher ~= nil and objectSpec.customHosesByInputAttacher[spec.inputAttacherJointDescIndex] or {}
+    local customHoseTargetsByAttacher = vehicleSpec.customHoseTargetsByAttacher ~= nil and vehicleSpec.customHoseTargetsByAttacher[attacherJointIndex] or {}
 
     return ConnectionHosesExtension.hasCustomHoseMatch(customHoseTargetsByAttacher, customHosesOfObject, type)
 end

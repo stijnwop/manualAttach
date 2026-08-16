@@ -13,6 +13,10 @@ PowerTakeOffExtension = {}
 
 ---Check if object and vehicle have PTO compatibility
 function PowerTakeOffExtension.hasPowerTakeOffs(object: any, vehicle: any): boolean
+    if object == nil or vehicle == nil then
+        return false
+    end
+
     if vehicle.getOutputPowerTakeOffs == nil or object.getInputPowerTakeOffs == nil then
         return false
     end
@@ -21,16 +25,20 @@ function PowerTakeOffExtension.hasPowerTakeOffs(object: any, vehicle: any): bool
         return false
     end
 
-    local outputs = vehicle:getOutputPowerTakeOffs()
+    -- Not every object with power take offs is an attachable.
+    local spec = object.spec_attachable
+    if spec == nil or spec.inputAttacherJointDescIndex == nil then
+        return false
+    end
+
+    local outputs = vehicle:getOutputPowerTakeOffs() or {}
     if #outputs == 0 then
         return false
     end
 
-    local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
-
     for i = 1, #outputs do
         local output = outputs[i]
-        local inputs = object:getInputPowerTakeOffsByJointDescIndexAndName(inputJointDescIndex, output.ptoName)
+        local inputs = object:getInputPowerTakeOffsByJointDescIndexAndName(spec.inputAttacherJointDescIndex, output.ptoName) or {}
         if #inputs > 0 then
             return true
         end
@@ -41,7 +49,7 @@ end
 
 ---Check if object has PTO attached to specific vehicle
 function PowerTakeOffExtension.hasAttachedPowerTakeOffs(object: any, attacherVehicle: any): boolean
-    local spec = object.spec_powerTakeOffs
+    local spec = object ~= nil and object.spec_powerTakeOffs or nil
     if spec == nil then
         return false
     end

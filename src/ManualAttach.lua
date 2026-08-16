@@ -297,9 +297,10 @@ function ManualAttach.isDetachAllowedForManualHandling(object: any, vehicle: any
     local detachAllowed, warningKey, warningArg = true, nil, nil
 
     if ManualAttach.isManualJointType(jointDesc) then
-        local allowsLowering = object:getAllowsLowering()
+        local allowsLowering = object.getAllowsLowering ~= nil and object:getAllowsLowering()
+        local isFoldMiddleAllowed = object.getIsFoldMiddleAllowed ~= nil and object:getIsFoldMiddleAllowed()
 
-        if allowsLowering and jointDesc.allowsLowering and not object:getIsFoldMiddleAllowed() then
+        if allowsLowering and jointDesc.allowsLowering and not isFoldMiddleAllowed then
             -- Allow detaching of vehicles that are forced on turned on by lowering.
             local spec_sprayer = object.spec_sprayer
             local isActivatedOnLowering = spec_sprayer ~= nil and spec_sprayer.activateOnLowering

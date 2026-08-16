@@ -48,6 +48,10 @@ function ConnectionHosesAttachment:attachConnectionHoses(vehicle: Vehicle, objec
     ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, true, noEventSend)
 
     local implement = vehicle:getImplementByObject(object)
+    if implement == nil or object.spec_attachable == nil then
+        return
+    end
+
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local jointDescIndex = implement.jointDescIndex
 
