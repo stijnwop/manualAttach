@@ -472,7 +472,11 @@ end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc): boolean
     if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
-        return false
+        if vehicle.isPtoAttached ~= nil and vehicle:isPtoAttached() then
+            return superFunc(vehicle)
+        else
+            return false
+        end
     end
 
     return superFunc(vehicle)
