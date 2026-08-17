@@ -41,6 +41,7 @@ function ManualAttachPowerTakeOff.registerEventListeners(vehicleType): ()
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onDelete", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachPowerTakeOff)
+    SpecializationUtil.registerEventListener(vehicleType, "onPreDetach", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onReadStream", ManualAttachPowerTakeOff)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachPowerTakeOff)
 end
@@ -65,7 +66,7 @@ end
 
 function ManualAttachPowerTakeOff:onPostLoad(savegame): ()
     local spec = self.spec_manualAttachPowerTakeOff
-    spec.isBlockingInitialPtoDetach = false -- always block detach because we don't have an attached PTO at first load.
+    spec.isBlockingInitialPtoDetach = false
 
     if savegame ~= nil then
         local key = `{savegame.key}.{g_manualAttachModName}.manualAttachPowerTakeOff`
@@ -88,16 +89,24 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachPowerTakeOff:onReadStream(streamId, connection): ()
+    local spec = self.spec_manualAttachPowerTakeOff
+    if spec == nil then
+        return
+    end
+
     if streamReadBool(streamId) then
         local isPtoAttached = streamReadBool(streamId)
+        spec.isBlockingInitialPtoDetach = isPtoAttached
         if isPtoAttached then
             local attacherVehicle = self:getAttacherVehicle()
             if attacherVehicle ~= nil and attacherVehicle.attachPowerTakeOff ~= nil then
                 local implement = attacherVehicle:getImplementByObject(self)
-                local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
-                local jointDescIndex = implement.jointDescIndex
-                attacherVehicle:attachPowerTakeOff(self, inputJointDescIndex, jointDescIndex)
-                attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+                if implement ~= nil then
+                    local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
+                    local jointDescIndex = implement.jointDescIndex
+                    attacherVehicle:attachPowerTakeOff(self, inputJointDescIndex, jointDescIndex)
+                    attacherVehicle:handlePowerTakeOffPostAttach(jointDescIndex)
+                end
             end
         end
     end
@@ -107,10 +116,12 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachPowerTakeOff:onWriteStream(streamId, connection): ()
-    local hasAttacherVehicle = self.getAttacherVehicle ~= nil
+    local attacherVehicle = self.getAttacherVehicle ~= nil and self:getAttacherVehicle() or nil
+    local hasAttacherVehicle = attacherVehicle ~= nil
+
     streamWriteBool(streamId, hasAttacherVehicle)
     if hasAttacherVehicle then
-        streamWriteBool(streamId, self:isPtoAttached())
+        streamWriteBool(streamId, PowerTakeOffExtension.hasAttachedPowerTakeOffs(self, attacherVehicle))
     end
 end
 
@@ -180,13 +191,26 @@ end
 ---Called on post attach event.
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex): ()
     local spec = self.spec_manualAttachPowerTakeOff
+    if spec == nil then
+        return
+    end
 
     if not spec.isBlockingInitialPtoDetach and not self:getIsAIActive() then
-        if attacherVehicle.detachPowerTakeOff ~= nil then
+        if attacherVehicle ~= nil and attacherVehicle.detachPowerTakeOff ~= nil then
             local implement = attacherVehicle:getImplementByObject(self)
-            attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+            if implement ~= nil then
+                attacherVehicle:detachPowerTakeOff(attacherVehicle, implement)
+            end
         end
     else
+        spec.isBlockingInitialPtoDetach = false
+    end
+end
+
+---Called before detach event.
+function ManualAttachPowerTakeOff:onPreDetach(attacherVehicle, implement): ()
+    local spec = self.spec_manualAttachPowerTakeOff
+    if spec ~= nil then
         spec.isBlockingInitialPtoDetach = false
     end
 end
