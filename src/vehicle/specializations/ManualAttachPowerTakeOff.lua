@@ -90,10 +90,6 @@ end
 ---@param connection number
 function ManualAttachPowerTakeOff:onReadStream(streamId, connection): ()
     local spec = self.spec_manualAttachPowerTakeOff
-    if spec == nil then
-        return
-    end
-
     if streamReadBool(streamId) then
         local isPtoAttached = streamReadBool(streamId)
         spec.isBlockingInitialPtoDetach = isPtoAttached
@@ -191,10 +187,6 @@ end
 ---Called on post attach event.
 function ManualAttachPowerTakeOff:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex): ()
     local spec = self.spec_manualAttachPowerTakeOff
-    if spec == nil then
-        return
-    end
-
     if not spec.isBlockingInitialPtoDetach and not self:getIsAIActive() then
         if attacherVehicle ~= nil and attacherVehicle.detachPowerTakeOff ~= nil then
             local implement = attacherVehicle:getImplementByObject(self)
@@ -210,9 +202,7 @@ end
 ---Called before detach event.
 function ManualAttachPowerTakeOff:onPreDetach(attacherVehicle, implement): ()
     local spec = self.spec_manualAttachPowerTakeOff
-    if spec ~= nil then
-        spec.isBlockingInitialPtoDetach = false
-    end
+    spec.isBlockingInitialPtoDetach = false
 end
 
 ---
