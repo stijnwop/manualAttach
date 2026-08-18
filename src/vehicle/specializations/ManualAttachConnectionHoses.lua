@@ -518,12 +518,8 @@ function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFun
 end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc): boolean
-    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
-        if vehicle.isPtoAttached ~= nil and vehicle:isPtoAttached() then
-            return superFunc(vehicle)
-        else
-            return false
-        end
+    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) and (vehicle.isPtoAttached == nil and not vehicle:isPtoAttached()) then
+        return false
     end
 
     return superFunc(vehicle)
