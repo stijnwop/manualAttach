@@ -505,7 +505,7 @@ end
 
 function ManualAttachConnectionHoses.inj_getAllowsLowering(vehicle, superFunc): (boolean, string)
     local specAttachable = vehicle.spec_attachable
-    if specAttachable ~= nil and specAttachable.lowerAnimation ~= nil then
+    if specAttachable ~= nil and specAttachable.lowerAnimation ~= nil and vehicle.spec_cutter == nil then
         if vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
             return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
         end
