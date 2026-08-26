@@ -93,6 +93,7 @@ function ManualAttachConnectionHoses.registerEventListeners(vehicleType): ()
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onDelete", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostAttach", ManualAttachConnectionHoses)
+    SpecializationUtil.registerEventListener(vehicleType, "onPreDetach", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onPostUpdateTick", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onReadStream", ManualAttachConnectionHoses)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", ManualAttachConnectionHoses)
@@ -103,7 +104,8 @@ function ManualAttachConnectionHoses:onLoad(savegame): ()
 
     local spec = self.spec_manualAttachConnectionHoses
 
-    spec.hoseStateChanged = false
+    spec.hoseStateChanged = true
+    spec.isBlockingInitialHoseDetach = false
     spec.attachedHosesByType = {
         [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_ELECTRIC]] = false,
         [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_AIR]] = false,
@@ -126,9 +128,8 @@ end
 
 function ManualAttachConnectionHoses:onPostLoad(savegame): ()
     local spec = self.spec_manualAttachConnectionHoses
-
     spec.doLightsUpdate = false
-    spec.isBlockingInitialHoseDetach = false -- always block detach because we don't have attached hoses at first load.
+    spec.isBlockingInitialHoseDetach = false
 
     if savegame ~= nil then
         local key = `{savegame.key}.{g_manualAttachModName}.manualAttachConnectionHoses`
@@ -151,17 +152,23 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachConnectionHoses:onReadStream(streamId, connection): ()
+    local spec = self.spec_manualAttachConnectionHoses
     if streamReadBool(streamId) then
         local hasAttachedConnectionHoses = streamReadBool(streamId)
+        spec.isBlockingInitialHoseDetach = hasAttachedConnectionHoses
+
         if hasAttachedConnectionHoses then
             local attacherVehicle = self:getAttacherVehicle()
             if attacherVehicle ~= nil then
                 local implement = attacherVehicle:getImplementByObject(self)
-                local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
-                local jointDescIndex = implement.jointDescIndex
+                if implement ~= nil and self.spec_attachable ~= nil then
+                    local inputJointDescIndex = self.spec_attachable.inputAttacherJointDescIndex
+                    local jointDescIndex = implement.jointDescIndex
 
-                self:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
-                self:updateAttachedConnectionHoses(attacherVehicle) -- update once
+                    self:connectHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
+                    self:connectCustomHosesToAttacherVehicle(attacherVehicle, inputJointDescIndex, jointDescIndex)
+                    self:updateAttachedConnectionHoses(attacherVehicle)
+                end
             end
         end
     end
@@ -171,10 +178,12 @@ end
 ---@param streamId number
 ---@param connection number
 function ManualAttachConnectionHoses:onWriteStream(streamId, connection): ()
-    local hasAttacherVehicle = self.getAttacherVehicle ~= nil
+    local attacherVehicle = self.getAttacherVehicle ~= nil and self:getAttacherVehicle() or nil
+    local hasAttacherVehicle = attacherVehicle ~= nil
+
     streamWriteBool(streamId, hasAttacherVehicle)
     if hasAttacherVehicle then
-        streamWriteBool(streamId, self:hasAttachedHoses())
+        streamWriteBool(streamId, ConnectionHosesExtension.hasAttachedConnectionHoses(self))
     end
 end
 
@@ -218,7 +227,9 @@ end
 ---@param state boolean
 function ManualAttachConnectionHoses:setUpdateLightsState(state): ()
     local spec = self.spec_manualAttachConnectionHoses
-    spec.doLightsUpdate = state
+    if spec ~= nil then
+        spec.doLightsUpdate = state
+    end
 end
 
 ---Returns true if vehicle has attached hoses, false otherwise.
@@ -245,7 +256,6 @@ function ManualAttachConnectionHoses:hasAttachedHoses(): boolean
     end
 
     local spec = self.spec_manualAttachConnectionHoses
-    -- Weird check, however spec table might be injected to nil..
     if spec == nil then
         return true
     end
@@ -279,7 +289,6 @@ function ManualAttachConnectionHoses:hasAttachedHosesOfType(type): boolean
     end
 
     local spec = self.spec_manualAttachConnectionHoses
-    -- Weird check, however spec table might be injected to nil..
     if spec == nil then
         return true
     end
@@ -301,10 +310,12 @@ function ManualAttachConnectionHoses:toggleLightStates(isActive, noEventSend): (
         self:deactivateLights()
     else
         local rootVehicle = self:getRootVehicle()
-        local rootSpec = rootVehicle.spec_lights
-        self:setLightsTypesMask(rootSpec.lightsTypesMask, true, noEventSend)
-        self:setBeaconLightsVisibility(rootSpec.beaconLightsActive, true, noEventSend)
-        self:setTurnLightState(rootSpec.turnLightState, true, noEventSend)
+        local rootSpec = rootVehicle ~= nil and rootVehicle.spec_lights or nil
+        if rootSpec ~= nil then
+            self:setLightsTypesMask(rootSpec.lightsTypesMask, true, noEventSend)
+            self:setBeaconLightsVisibility(rootSpec.beaconLightsActive, true, noEventSend)
+            self:setTurnLightState(rootSpec.turnLightState, true, noEventSend)
+        end
     end
 end
 
@@ -318,19 +329,24 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle): ()
         self:toggleLightStates(false, true)
 
         local inputJointDescIndex = self:getActiveInputAttacherJointDescIndex()
-        for _, hose in self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex) do
-            self:disconnectHose(hose)
-        end
-
-        for i = #spec.updateableHoses, 1, -1 do
-            local hose = spec.updateableHoses[i]
-            if hose.connectedObject == attacherVehicle then
+        local hoses = self:getConnectionHosesByInputAttacherJoint(inputJointDescIndex)
+        if hoses ~= nil then
+            for _, hose in ipairs(hoses) do
                 self:disconnectHose(hose)
             end
         end
 
-        local attacherVehicleSpec = attacherVehicle.spec_connectionHoses
-        if attacherVehicleSpec ~= nil then
+        if spec.updateableHoses ~= nil then
+            for i = #spec.updateableHoses, 1, -1 do
+                local hose = spec.updateableHoses[i]
+                if hose.connectedObject == attacherVehicle then
+                    self:disconnectHose(hose)
+                end
+            end
+        end
+
+        local attacherVehicleSpec = attacherVehicle ~= nil and attacherVehicle.spec_connectionHoses or nil
+        if attacherVehicleSpec ~= nil and attacherVehicleSpec.toolConnectorHoses ~= nil then
             for _, toolConnector in pairs(attacherVehicleSpec.toolConnectorHoses) do
                 if toolConnector.delayedMounting ~= nil and toolConnector.delayedMounting.sourceObject == self then
                     toolConnector.delayedMounting = nil
@@ -353,12 +369,19 @@ function ManualAttachConnectionHoses:disconnectHoses(attacherVehicle): ()
             end
         end
 
-        disconnectCustom(spec.customHosesByInputAttacher[inputJointDescIndex], false)
-        disconnectCustom(spec.customHoseTargetsByInputAttacher[inputJointDescIndex], true)
+        if spec.customHosesByInputAttacher ~= nil then
+            disconnectCustom(spec.customHosesByInputAttacher[inputJointDescIndex], false)
+        end
+        if spec.customHoseTargetsByInputAttacher ~= nil then
+            disconnectCustom(spec.customHoseTargetsByInputAttacher[inputJointDescIndex], true)
+        end
     end
 
-    self.spec_manualAttachConnectionHoses.hoseStateChanged = true
-    self:raiseActive()
+    local specMA = self.spec_manualAttachConnectionHoses
+    if specMA ~= nil then
+        specMA.hoseStateChanged = true
+        self:raiseActive()
+    end
 end
 
 ---Play attach sound for the given jointDesc.
@@ -376,18 +399,23 @@ function ManualAttachConnectionHoses:playHoseAttachSound(jointDesc): boolean
     return true
 end
 
----Called on post attache event.
+---Called on post attach event.
 ---@param attacherVehicle table
 ---@param inputJointDescIndex number
 ---@param jointDescIndex number
 function ManualAttachConnectionHoses:onPostAttach(attacherVehicle, inputJointDescIndex, jointDescIndex): ()
     local spec = self.spec_manualAttachConnectionHoses
-
     if not spec.isBlockingInitialHoseDetach and not self:getIsAIActive() then
         self:disconnectHoses(attacherVehicle)
     else
         spec.isBlockingInitialHoseDetach = false
     end
+end
+
+---Called before detach event.
+function ManualAttachConnectionHoses:onPreDetach(attacherVehicle, implement): ()
+    local spec = self.spec_manualAttachConnectionHoses
+    spec.isBlockingInitialHoseDetach = false
 end
 
 ---
@@ -397,11 +425,8 @@ end
 function ManualAttachConnectionHoses.inj_connectHosesToAttacherVehicle(vehicle, superFunc, attacherVehicle, inputJointDescIndex, jointDescIndex, updateToolConnections, excludeVehicle): ()
     superFunc(vehicle, attacherVehicle, inputJointDescIndex, jointDescIndex, updateToolConnections, excludeVehicle)
     vehicle:toggleLightStates(true, true)
-
-    if attacherVehicle.getConnectionTarget ~= nil then
-        vehicle.spec_manualAttachConnectionHoses.hoseStateChanged = true
-        vehicle:raiseActive()
-    end
+    vehicle.spec_manualAttachConnectionHoses.hoseStateChanged = true
+    vehicle:raiseActive()
 end
 
 function ManualAttachConnectionHoses.inj_setLightsTypesMask(vehicle, superFunc, lightsTypesMask, force, noEventSend): boolean
@@ -471,7 +496,7 @@ function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFun
 end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc): boolean
-    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) and (vehicle.isPtoAttached == nil and not vehicle:isPtoAttached()) then
         return false
     end
 
@@ -479,8 +504,11 @@ function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc): b
 end
 
 function ManualAttachConnectionHoses.inj_getAllowsLowering(vehicle, superFunc): (boolean, string)
-    if vehicle.getAttacherVehicle ~= nil and vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
-        return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
+    local specAttachable = vehicle.spec_attachable
+    if specAttachable ~= nil and specAttachable.lowerAnimation ~= nil and vehicle.spec_cutter == nil then
+        if vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
+            return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
+        end
     end
 
     return superFunc(vehicle)
@@ -488,7 +516,7 @@ end
 
 function ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed(vehicle, superFunc): boolean
     if vehicle.getAttacherVehicle ~= nil and vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
-        return false
+        return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
     end
 
     return superFunc(vehicle)
