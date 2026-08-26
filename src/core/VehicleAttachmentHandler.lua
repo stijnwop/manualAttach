@@ -19,6 +19,7 @@ VehicleAttachmentHandler.PLAYER_MIN_DISTANCE_SQ = 8
 VehicleAttachmentHandler.AUTO_ATTACH_DISTANCE_SQ = 0.5 * 0.5
 VehicleAttachmentHandler.AUTO_ATTACH_ANGLE = 0.17452
 VehicleAttachmentHandler.AUTO_ATTACH_CHECK_INTERVAL = 1000 -- ms
+VehicleAttachmentHandler.AUTO_ATTACH_MIN_JOINT_OFFSET_SQ = 0.25 * 0.25
 
 local AXIS_LOOKUP = table.freeze({
     table.freeze({ 1, 0, 0 }), -- X axis
@@ -213,15 +214,22 @@ function VehicleAttachmentHandler:checkAutoAttach(dt: number): ()
 
     self.autoAttachTimer = 0
 
-    if self.controlledVehicle == nil or self.controlledVehicle:getLastSpeed() < 1 or self.controlledVehicle.movingDirection > 0 then
+    local controlledVehicle = self.controlledVehicle
+    if controlledVehicle == nil or controlledVehicle:getLastSpeed() < 1 then
         return
     end
 
-    self:checkVehicleAutoAttach(self.controlledVehicle)
+    local movingDirection = controlledVehicle.movingDirection
+    if movingDirection == 0 then
+        return
+    end
+
+    local dirX, _, dirZ = localDirectionToWorld(controlledVehicle.rootNode, 0, 0, movingDirection)
+    self:checkVehicleAutoAttach(controlledVehicle, dirX, dirZ)
 end
 
 ---Checks if a specific vehicle can auto-attach to nearby implements
-function VehicleAttachmentHandler:checkVehicleAutoAttach(vehicle: Vehicle): ()
+function VehicleAttachmentHandler:checkVehicleAutoAttach(vehicle: Vehicle, dirX: number, dirZ: number): ()
     local spec = vehicle.spec_attacherJoints
     if spec == nil then
         return
@@ -232,7 +240,7 @@ function VehicleAttachmentHandler:checkVehicleAutoAttach(vehicle: Vehicle): ()
         for i = 1, #implements do
             local implement = implements[i]
             if implement.object ~= nil then
-                self:checkVehicleAutoAttach(implement.object)
+                self:checkVehicleAutoAttach(implement.object, dirX, dirZ)
             end
         end
     end
@@ -241,10 +249,27 @@ function VehicleAttachmentHandler:checkVehicleAutoAttach(vehicle: Vehicle): ()
     for i = 1, #attacherJoints do
         local attacherJoint = attacherJoints[i]
 
-        if attacherJoint.jointIndex == 0 and ManualAttach.isAutoJointType(attacherJoint) then
+        if attacherJoint.jointIndex == 0
+            and ManualAttach.isAutoJointType(attacherJoint)
+            and VehicleAttachmentHandler.isJointInMovingDirection(vehicle, attacherJoint, dirX, dirZ) then
             self:tryAutoAttach(vehicle, attacherJoint, i)
         end
     end
+end
+
+---Returns true when the attacher joint is located on the side of the vehicle we are moving towards.
+function VehicleAttachmentHandler.isJointInMovingDirection(vehicle: Vehicle, attacherJoint: any, dirX: number, dirZ: number): boolean
+    local jointX, _, jointZ = getWorldTranslation(attacherJoint.jointTransform)
+    local vehicleX, _, vehicleZ = getWorldTranslation(vehicle.rootNode)
+
+    local offsetX = jointX - vehicleX
+    local offsetZ = jointZ - vehicleZ
+
+    if offsetX * offsetX + offsetZ * offsetZ < VehicleAttachmentHandler.AUTO_ATTACH_MIN_JOINT_OFFSET_SQ then
+        return true
+    end
+
+    return offsetX * dirX + offsetZ * dirZ > 0
 end
 
 ---Attempts to auto-attach an implement to a vehicle if conditions are met
