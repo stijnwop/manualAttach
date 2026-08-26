@@ -215,7 +215,16 @@ function VehicleAttachmentHandler:checkAutoAttach(dt: number): ()
     self.autoAttachTimer = 0
 
     local controlledVehicle = self.controlledVehicle
-    if controlledVehicle == nil or controlledVehicle:getLastSpeed() < 1 then
+    if controlledVehicle == nil then
+        return
+    end
+
+    if not VehicleAttachmentHandler.isVehicleValid(controlledVehicle) then
+        self:updateControlledVehicle(nil)
+        return
+    end
+
+    if controlledVehicle:getLastSpeed() < 1 then
         return
     end
 
@@ -231,7 +240,7 @@ end
 ---Checks if a specific vehicle can auto-attach to nearby implements
 function VehicleAttachmentHandler:checkVehicleAutoAttach(vehicle: Vehicle, dirX: number, dirZ: number): ()
     local spec = vehicle.spec_attacherJoints
-    if spec == nil then
+    if spec == nil or not VehicleAttachmentHandler.isVehicleValid(vehicle) then
         return
     end
 
@@ -255,6 +264,11 @@ function VehicleAttachmentHandler:checkVehicleAutoAttach(vehicle: Vehicle, dirX:
             self:tryAutoAttach(vehicle, attacherJoint, i)
         end
     end
+end
+
+---Returns true when the vehicle is still valid to run node based checks on.
+function VehicleAttachmentHandler.isVehicleValid(vehicle: Vehicle): boolean
+    return not vehicle.isDeleted and vehicle.rootNode ~= nil and entityExists(vehicle.rootNode)
 end
 
 ---Returns true when the attacher joint is located on the side of the vehicle we are moving towards.
@@ -307,6 +321,10 @@ end
 ---Called when player's capability to perform manual attachments changes
 function VehicleAttachmentHandler:onPlayerCapabilityChanged(player: Player, canPerform: boolean): ()
     self.playerCanPerformManualAttachment = canPerform
+
+    if canPerform then
+        self:updateControlledVehicle(nil)
+    end
 end
 
 ---Updates the controlled vehicle for manual attachment
@@ -540,7 +558,7 @@ function VehicleAttachmentHandler.getCandidatesInAttachRange(
     for i = 1, #vehicles do
         local vehicle = vehicles[i]
 
-        if vehicle.isDeleted then
+        if not VehicleAttachmentHandler.isVehicleValid(vehicle) then
             continue
         end
 
