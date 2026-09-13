@@ -292,15 +292,27 @@ function ManualAttach.shouldHandleJoint(vehicle: any, object: any, jointIndex: n
     return isManualJoint == playerCanPerformManualAttachment
 end
 
+---Returns true if the implement supports a fold middle state, false otherwise.
+---This checks the capability of the implement instead calling `getIsFoldMiddleAllowed`, which reports false while the hydraulic hoses are detached.
+function ManualAttach.hasFoldMiddleState(object: any): boolean
+    if object == nil then
+        return false
+    end
+
+    local spec = object.spec_foldable
+
+    return spec ~= nil and spec.foldMiddleAnimTime ~= nil
+end
+
 ---Check whether or not ManualAttach can detach the object.
 function ManualAttach.isDetachAllowedForManualHandling(object: any, vehicle: any, jointDesc: any): (boolean, string?, string?)
     local detachAllowed, warningKey, warningArg = true, nil, nil
 
     if ManualAttach.isManualJointType(jointDesc) then
         local allowsLowering = object.getAllowsLowering ~= nil and object:getAllowsLowering()
-        local isFoldMiddleAllowed = object.getIsFoldMiddleAllowed ~= nil and object:getIsFoldMiddleAllowed()
+        local hasFoldMiddleState = ManualAttach.hasFoldMiddleState(object)
 
-        if allowsLowering and jointDesc.allowsLowering and not isFoldMiddleAllowed then
+        if allowsLowering and jointDesc.allowsLowering and not hasFoldMiddleState then
             -- Allow detaching of vehicles that are forced on turned on by lowering.
             local spec_sprayer = object.spec_sprayer
             local isActivatedOnLowering = spec_sprayer ~= nil and spec_sprayer.activateOnLowering

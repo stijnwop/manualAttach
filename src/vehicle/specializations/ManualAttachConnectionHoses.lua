@@ -516,7 +516,7 @@ end
 
 function ManualAttachConnectionHoses.inj_getIsFoldMiddleAllowed(vehicle, superFunc): boolean
     if vehicle.getAttacherVehicle ~= nil and vehicle:getAttacherVehicle() ~= nil and not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) then
-        return false, g_i18n:getText("info_attach_hoses_warning"):format(vehicle:getFullName())
+        return false
     end
 
     return superFunc(vehicle)

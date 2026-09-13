@@ -117,7 +117,7 @@ function VehicleJointAttachment.canImplementBeLowered(implement, jointDesc)
         return false
     end
 
-    if implement.getIsFoldMiddleAllowed ~= nil and implement:getIsFoldMiddleAllowed() then
+    if ManualAttach.hasFoldMiddleState(implement) then
         return false
     end
 
