@@ -134,7 +134,7 @@ function ManualAttachConnectionHoses:onPostLoad(savegame): ()
 
     if savegame ~= nil and not savegame.resetVehicles then
         local key = `{savegame.key}.{g_manualAttachModName}.manualAttachConnectionHoses`
-        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getBool(key .. "#hasAttachedConnectionHoses", false)
+        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getValue(key .. "#hasAttachedConnectionHoses", false)
     end
 end
 
