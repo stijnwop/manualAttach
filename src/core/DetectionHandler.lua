@@ -58,11 +58,16 @@ function DetectionHandler:delete(): ()
         if entityExists(self.triggerNode) then
             delete(self.triggerNode)
         end
+
+        self.triggerNode = nil
     end
 
     if self.triggerCloneNode ~= nil then
+        if entityExists(self.triggerCloneNode) then
+            delete(self.triggerCloneNode)
+        end
+
         self.triggerCloneNode = nil
-        delete(self.triggerCloneNode)
     end
 end
 
@@ -292,6 +297,11 @@ end
 
 ---Loads the trigger from the i3d file.
 function DetectionHandler:loadCloneableTrigger(): ()
+    -- Player load is called for every player in multiplayer, the trigger only has to be loaded once.
+    if self.triggerCloneNode ~= nil then
+        return
+    end
+
     local filename = Utils.getFilename("data/shared/detectionTrigger.i3d", self.modDirectory)
     local rootNode = loadI3DFile(filename, false, false, false)
     local trigger = I3DUtil.indexToObject(rootNode, "0")
