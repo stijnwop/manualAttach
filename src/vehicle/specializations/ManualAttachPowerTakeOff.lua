@@ -70,7 +70,7 @@ function ManualAttachPowerTakeOff:onPostLoad(savegame): ()
 
     if savegame ~= nil and not savegame.resetVehicles then
         local key = `{savegame.key}.{g_manualAttachModName}.manualAttachPowerTakeOff`
-        spec.isBlockingInitialPtoDetach = savegame.xmlFile:getBool(key .. "#hasAttachedPowerTakeOffs", false)
+        spec.isBlockingInitialPtoDetach = savegame.xmlFile:getValue(key .. "#hasAttachedPowerTakeOffs", false)
     end
 end
 
