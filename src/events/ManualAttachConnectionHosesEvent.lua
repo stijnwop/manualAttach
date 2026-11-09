@@ -61,6 +61,10 @@ end
 function ManualAttachConnectionHosesEvent:run(connection): ()
     local self = self :: ManualAttachConnectionHosesEvent
 
+    if self.vehicle == nil or self.object == nil then
+        return
+    end
+
     if self.doAttach then
         self.manualAttach:attachConnectionHoses(self.vehicle, self.object, true)
     else

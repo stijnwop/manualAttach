@@ -93,7 +93,7 @@ function ManualAttach.new(
 
     if self.isClient then
         local xmlFile = loadXMLFile("ManualAttachSamples", Utils.getFilename("data/sounds/sounds.xml", self.modDirectory))
-        if xmlFile ~= nil then
+        if xmlFile ~= 0 then
             local soundsNode = getRootNode()
 
             self.samples.hosesAttach = self.soundManager:loadSampleFromXML(xmlFile, "vehicle.sounds", "hosesAttach", self.modDirectory, soundsNode, 1, AudioGroup.VEHICLE, nil, nil)
@@ -110,6 +110,7 @@ end
 function ManualAttach:delete(): ()
     local self = self :: ManualAttach
     self.vehicleAttachmentHandler:delete()
+    self.soundManager:deleteSamples(self.samples)
 end
 
 ---Called on delete map by modEventListener
@@ -132,6 +133,10 @@ function ManualAttach:update(dt: number): ()
     end
 
     local player = self:getLocalPlayer()
+    if player == nil then
+        return
+    end
+
     local canPerform = self:checkPlayerCanPerformManualAttachment(player)
     if canPerform ~= self.canPlayerPerformManualAttachment then
         self.canPlayerPerformManualAttachment = canPerform

@@ -60,6 +60,10 @@ end
 function ManualAttachPowerTakeOffEvent:run(connection): ()
     local self = self :: ManualAttachPowerTakeOffEvent
 
+    if self.vehicle == nil or self.object == nil then
+        return
+    end
+
     if self.doAttach then
         self.manualAttach:attachPowerTakeOff(self.vehicle, self.object, true)
     else

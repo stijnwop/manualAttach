@@ -111,6 +111,7 @@ function ManualAttachConnectionHoses:onLoad(savegame): ()
         [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_AIR]] = false,
         [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_HYDRAULIC]] = false,
         [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_ISOBUS]] = false,
+        [ManualAttachConnectionHoses.TYPES[ManualAttachConnectionHoses.TYPE_CABLE_BUNDLE]] = false,
     }
 
     if self.isClient then
@@ -131,9 +132,9 @@ function ManualAttachConnectionHoses:onPostLoad(savegame): ()
     spec.doLightsUpdate = false
     spec.isBlockingInitialHoseDetach = false
 
-    if savegame ~= nil then
+    if savegame ~= nil and not savegame.resetVehicles then
         local key = `{savegame.key}.{g_manualAttachModName}.manualAttachConnectionHoses`
-        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getValue(key .. "#hasAttachedConnectionHoses") or false
+        spec.isBlockingInitialHoseDetach = savegame.xmlFile:getBool(key .. "#hasAttachedConnectionHoses", false)
     end
 end
 
@@ -496,7 +497,7 @@ function ManualAttachConnectionHoses.inj_getIsMovingToolActive(vehicle, superFun
 end
 
 function ManualAttachConnectionHoses.inj_getCanBeTurnedOn(vehicle, superFunc): boolean
-    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) and (vehicle.isPtoAttached == nil and not vehicle:isPtoAttached()) then
+    if not vehicle:hasAttachedHosesOfType(ManualAttachConnectionHoses.TYPE_HYDRAULIC) and (vehicle.isPtoAttached == nil or not vehicle:isPtoAttached()) then
         return false
     end
 
