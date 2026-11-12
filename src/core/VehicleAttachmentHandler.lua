@@ -568,7 +568,7 @@ function VehicleAttachmentHandler.getCandidatesInAttachRange(
         end
 
         if vehicle.getAttachedImplements ~= nil then
-            local aVehicle, aJointIndex, aAttachable, aAttachJointIndex, aImplement =
+            local aVehicle, aJointIndex, aAttachable, aAttachJointIndex, aImplement, aImplementDist =
                 VehicleAttachmentHandler.processAttachedImplements(vehicle, vehicleSystem, maxDistanceSq, maxAngle, isPlayerBased, playerRootNode, minPlayerAttachedImplDist)
 
             if aVehicle ~= nil then
@@ -577,7 +577,7 @@ function VehicleAttachmentHandler.getCandidatesInAttachRange(
 
             if aImplement ~= nil then
                 attachedImplement = aImplement
-                minPlayerAttachedImplDist = math.min(minPlayerAttachedImplDist, VehicleAttachmentHandler.PLAYER_MIN_DISTANCE_SQ)
+                minPlayerAttachedImplDist = aImplementDist
             end
         end
 
@@ -608,7 +608,7 @@ function VehicleAttachmentHandler.processAttachedImplements(
     isPlayerBased: boolean,
     playerRootNode: number?,
     minPlayerAttachedImplDist: number
-): (Vehicle?, number?, Vehicle?, number?, Vehicle?)
+): (Vehicle?, number?, Vehicle?, number?, Vehicle?, number)
     local implements = vehicle:getAttachedImplements()
     local closestImplement = nil
 
@@ -635,12 +635,12 @@ function VehicleAttachmentHandler.processAttachedImplements(
                 VehicleAttachmentHandler.getCandidatesInAttachRange(vehicleSystem, { object }, maxDistanceSq, maxAngle, isPlayerBased)
 
             if aVehicle ~= nil then
-                return aVehicle, aJointIndex, aAttachable, aAttachJointIndex, aImplement
+                return aVehicle, aJointIndex, aAttachable, aAttachJointIndex, aImplement, minPlayerAttachedImplDist
             end
         end
     end
 
-    return nil, nil, nil, nil, closestImplement
+    return nil, nil, nil, nil, closestImplement, minPlayerAttachedImplDist
 end
 
 function VehicleAttachmentHandler.processAttacherJoints(

@@ -45,12 +45,12 @@ end
 
 ---Attaches the PTO from the given object to the vehicle
 function PowerTakeOffAttachment:attachPowerTakeOff(vehicle: Vehicle, object: Vehicle, noEventSend: boolean): ()
-    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, true, noEventSend)
-
     local implement = vehicle:getImplementByObject(object)
     if implement == nil or object.spec_attachable == nil then
         return
     end
+
+    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, true, noEventSend)
 
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local jointDescIndex = implement.jointDescIndex
@@ -64,12 +64,12 @@ end
 
 ---Detaches the PTO from the given object from the vehicle
 function PowerTakeOffAttachment:detachPowerTakeOff(vehicle: Vehicle, object: Vehicle, noEventSend: boolean): ()
-    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, false, noEventSend)
-
     local implement = vehicle:getImplementByObject(object)
     if implement == nil then
         return
     end
+
+    ManualAttachPowerTakeOffEvent.sendEvent(vehicle, object, false, noEventSend)
 
     vehicle:detachPowerTakeOff(vehicle, implement)
 

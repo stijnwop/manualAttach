@@ -45,12 +45,12 @@ end
 
 ---Attaches the connection hoses from the given object to the vehicle
 function ConnectionHosesAttachment:attachConnectionHoses(vehicle: Vehicle, object: Vehicle, noEventSend: boolean): ()
-    ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, true, noEventSend)
-
     local implement = vehicle:getImplementByObject(object)
     if implement == nil or object.spec_attachable == nil then
         return
     end
+
+    ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, true, noEventSend)
 
     local inputJointDescIndex = object.spec_attachable.inputAttacherJointDescIndex
     local jointDescIndex = implement.jointDescIndex
@@ -66,11 +66,15 @@ end
 
 ---Detaches the connection hoses from the given object from the vehicle
 function ConnectionHosesAttachment:detachConnectionHoses(vehicle: Vehicle, object: Vehicle, noEventSend: boolean): ()
+    local implement = vehicle:getImplementByObject(object)
+    if implement == nil then
+        return
+    end
+
     ManualAttachConnectionHosesEvent.sendEvent(vehicle, object, false, noEventSend)
 
     object:disconnectHoses(vehicle)
 
-    local implement = vehicle:getImplementByObject(object)
     local jointDesc = vehicle:getAttacherJointByJointDescIndex(implement.jointDescIndex)
     object:playHoseAttachSound(jointDesc)
 end
